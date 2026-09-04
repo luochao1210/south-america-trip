@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>南美旅行手册 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAF6F1;--bg2:#FFFFFF;--bg3:#F0EBE4;
+  --tx1:#1A1A1A;--tx2:#666;--tx3:#999;
+  --pri:#E07A5F;--pri-l:#FDEEE9;--sec:#3D405B;
+  --ok:#81B29A;--warn:#F2CC8F;--danger:#E07A5F;
+  --brd:#E8E0D8;--sh:rgba(0,0,0,.06);
+  --r:14px;--rs:8px;
+}
+html.dark{
+  --bg:#121220;--bg2:#1C1C30;--bg3:#252540;
+  --tx1:#E4E4EE;--tx2:#A0A0B8;--tx3:#6A6A80;
+  --pri:#F4845F;--pri-l:#2D2040;--sec:#C8C8E0;
+  --ok:#8BC6A0;--warn:#F4D890;--danger:#F4845F;
+  --brd:#2E2E48;--sh:rgba(0,0,0,.2);
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--tx1);
+  line-height:1.6;min-height:100vh;
+  padding-bottom:env(safe-area-inset-bottom,20px);
+}
+.container{max-width:680px;margin:0 auto;padding:0 16px}
+
+/* ===== Hero ===== */
+.hero{
+  background:linear-gradient(135deg,#3D405B 0%,#E07A5F 100%);
+  color:#fff;padding:28px 20px 24px;border-radius:0 0 24px 24px;
+  margin-bottom:20px;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;top:-40%;right:-20%;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);pointer-events:none;
+}
+.hero-label{font-size:12px;opacity:.7;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.hero-title{font-size:24px;font-weight:700;margin-bottom:2px}
+.hero-detail{font-size:14px;opacity:.8;margin-bottom:20px}
+.countdown{display:flex;justify-content:center;gap:10px;position:relative;z-index:1}
+.cd-unit{text-align:center;min-width:56px}
+.cd-num{
+  font-size:36px;font-weight:800;line-height:1;
+  font-family:"SF Mono","Cascadia Code","Fira Code",monospace;
+  background:rgba(255,255,255,.15);backdrop-filter:blur(4px);
+  border-radius:10px;padding:8px 10px;display:block;
+}
+.cd-lbl{font-size:11px;opacity:.7;margin-top:4px;display:block}
+.hero-tz{font-size:12px;opacity:.6;text-align:center;margin-top:10px}
+
+/* ===== Section ===== */
+.section{margin-bottom:24px}
+.section-title{
+  font-size:18px;font-weight:700;padding:0 16px;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title .icon{font-size:20px}
+
+/* ===== Tabs ===== */
+.tabs{
+  display:flex;gap:6px;padding:0 16px;margin-bottom:12px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;
+  white-space:nowrap;cursor:pointer;border:none;
+  background:var(--bg3);color:var(--tx2);transition:all .2s;
+}
+.tab.active{background:var(--pri);color:#fff}
+.tab-panel{display:none;padding:0 16px}
+.tab-panel.active{display:block}
+
+/* ===== Cards ===== */
+.card{
+  background:var(--bg2);border-radius:var(--r);
+  box-shadow:0 2px 8px var(--sh);border:1px solid var(--brd);
+  margin-bottom:12px;overflow:hidden;transition:transform .15s;
+}
+.card:active{transform:scale(.98)}
+
+/* Flight card */
+.flight{padding:16px}
+.flight-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.flight-no{font-weight:700;font-size:15px}
+.flight-tag{
+  font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;
+}
+.tag-ok{background:rgba(129,178,154,.15);color:var(--ok)}
+.tag-tbd{background:rgba(242,204,143,.2);color:#C89630}
+.flight-route{display:flex;align-items:center;gap:10px}
+.flight-city{flex:1}
+.flight-city.left{text-align:left}
+.flight-city.right{text-align:right}
+.flight-time{font-size:28px;font-weight:800;font-family:"SF Mono",monospace;line-height:1}
+.flight-code{font-size:13px;color:var(--tx2);font-weight:600;margin-top:2px}
+.flight-date{font-size:11px;color:var(--tx3);margin-top:2px}
+.flight-mid{
+  display:flex;flex-direction:column;align-items:center;
+  color:var(--tx3);min-width:60px;flex-shrink:0;
+}
+.flight-dur{font-size:11px;margin-bottom:2px}
+.flight-line{width:100%;height:1px;background:var(--brd);position:relative}
+.flight-line::before{content:'✈';position:absolute;right:-2px;top:-8px;font-size:12px}
+.flight-note{font-size:12px;color:var(--tx3);margin-top:10px;padding-top:8px;border-top:1px solid var(--brd)}
+
+/* Accommodation / generic card */
+.info-card{padding:14px 16px}
+.info-card .ic-title{font-weight:600;font-size:14px;margin-bottom:4px}
+.info-card .ic-sub{font-size:13px;color:var(--tx2)}
+.info-card .ic-empty{color:var(--tx3);font-style:italic;font-size:13px}
+
+/* ===== Map ===== */
+.map-wrap{
+  background:var(--bg2);border-radius:var(--r);
+  border:1px solid var(--brd);padding:12px;margin:0 16px 12px;
+  box-shadow:0 2px 8px var(--sh);overflow:hidden;
+}
+.map-wrap svg{width:100%;height:auto;display:block}
+.map-legend{
+  display:flex;flex-wrap:wrap;gap:8px;padding:8px 0 0;
+  font-size:11px;color:var(--tx2);
+}
+.map-legend span{display:flex;align-items:center;gap:4px}
+.map-legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+
+/* ===== Itinerary ===== */
+.day-card{
+  background:var(--bg2);border-radius:var(--r);
+  border:1px solid var(--brd);margin:0 16px 12px;
+  box-shadow:0 2px 8px var(--sh);overflow:hidden;
+}
+.day-head{
+  display:flex;align-items:center;padding:14px 16px;
+  cursor:pointer;user-select:none;gap:10px;
+}
+.day-num{
+  font-size:12px;font-weight:700;color:#fff;
+  background:var(--pri);border-radius:6px;
+  padding:2px 8px;flex-shrink:0;
+}
+.day-date{font-weight:700;font-size:15px;flex:1}
+.day-arrow{
+  font-size:12px;color:var(--tx3);transition:transform .25s;flex-shrink:0;
+}
+.day-card.open .day-arrow{transform:rotate(180deg)}
+.day-body{
+  max-height:0;overflow:hidden;transition:max-height .35s ease;
+}
+.day-card.open .day-body{max-height:2000px}
+.day-inner{padding:0 16px 16px}
+
+/* Timeline */
+.tl{position:relative;padding-left:60px}
+.tl::before{
+  content:'';position:absolute;left:34px;top:4px;bottom:4px;
+  width:2px;background:var(--brd);border-radius:1px;
+}
+.tl-item{position:relative;margin-bottom:16px}
+.tl-item:last-child{margin-bottom:0}
+.tl-time{
+  position:absolute;left:-60px;top:0;width:52px;
+  text-align:right;font-size:13px;font-weight:700;
+  font-family:"SF Mono",monospace;color:var(--pri);
+}
+.tl-dot{
+  position:absolute;left:-23px;top:5px;width:10px;height:10px;
+  border-radius:50%;border:2px solid var(--pri);background:var(--bg2);
+}
+.tl-dot.hotel{border-color:var(--sec);background:var(--sec)}
+.tl-dot.done{border-color:var(--ok);background:var(--ok)}
+.tl-content{font-size:14px;line-height:1.5}
+.tl-content .loc-link{
+  color:var(--pri);text-decoration:underline;text-decoration-style:dotted;
+  text-underline-offset:2px;cursor:pointer;
+}
+.tl-sub{font-size:12px;color:var(--tx3);margin-top:2px}
+.tl-badge{
+  display:inline-block;font-size:11px;font-weight:600;
+  padding:1px 6px;border-radius:4px;margin-left:4px;
+}
+.badge-ticket{background:rgba(129,178,154,.15);color:var(--ok)}
+.badge-book{background:rgba(242,204,143,.2);color:#C89630}
+.badge-group{background:rgba(61,64,91,.12);color:var(--sec)}
+.day-nav{
+  margin-top:12px;padding-top:10px;border-top:1px solid var(--brd);
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.nav-btn{
+  font-size:12px;padding:6px 12px;border-radius:6px;
+  background:var(--pri-l);color:var(--pri);border:1px solid var(--pri);
+  cursor:pointer;text-decoration:none;font-weight:600;
+}
+.nav-btn:active{opacity:.7}
+
+/* ===== Todo ===== */
+.todo-list{padding:0 16px}
+.todo-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:var(--bg2);
+  border:1px solid var(--brd);border-radius:var(--rs);
+  margin-bottom:8px;font-size:14px;
+}
+.todo-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.todo-dot.urgent{background:var(--danger)}
+.todo-dot.normal{background:var(--warn)}
+.todo-dot.low{background:var(--ok)}
+
+/* ===== Shopping ===== */
+.shop-list{padding:0 16px}
+.shop-item{
+  display:flex;align-items:center;padding:10px 14px;
+  background:var(--bg2);border:1px solid var(--brd);
+  border-radius:var(--rs);margin-bottom:8px;font-size:14px;
+  cursor:pointer;user-select:none;transition:opacity .2s;
+}
+.shop-item.checked{opacity:.5}
+.shop-item.checked .shop-name{text-decoration:line-through;color:var(--tx3)}
+.shop-name{flex:1}
+.shop-cat{font-size:11px;color:var(--tx3);margin-right:8px}
+.shop-check{
+  width:22px;height:22px;border-radius:6px;
+  border:2px solid var(--brd);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;font-size:14px;color:transparent;
+}
+.shop-item.checked .shop-check{
+  background:var(--ok);border-color:var(--ok);color:#fff;
+}
+
+/* ===== Tips ===== */
+.tips-grid{padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tip-card{
+  background:var(--bg2);border:1px solid var(--brd);
+  border-radius:var(--rs);padding:14px;
+}
+.tip-card h4{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.tip-card p{font-size:12px;color:var(--tx2);line-height:1.5}
+.tip-card a{color:var(--pri);text-decoration:none}
+
+/* ===== Footer ===== */
+.footer{
+  text-align:center;padding:30px 16px;font-size:12px;color:var(--tx3);
+}
+
+/* ===== Responsive ===== */
+@media(max-width:380px){
+  .cd-num{font-size:28px;padding:6px 8px}
+  .flight-time{font-size:22px}
+  .tips-grid{grid-template-columns:1fr}
+}
+@media(min-width:768px){
+  .container{padding:0 24px}
+  .hero{padding:36px 28px 28px}
+}
+
+/* ===== Print ===== */
+@media print{
+  .hero{background:#3D405B!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .day-body{max-height:none!important}
+  .countdown{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero: 此刻关注 -->
+<div class="hero" id="hero">
+  <div class="container">
+    <div class="hero-label">此刻关注 · NEXT UP</div>
+    <div class="hero-title" id="heroTitle">加载中...</div>
+    <div class="hero-detail" id="heroDetail"></div>
+    <div class="countdown" id="countdown">
+      <div class="cd-unit"><span class="cd-num" id="cdD">-</span><span class="cd-lbl">天</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cdH">-</span><span class="cd-lbl">时</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cdM">-</span><span class="cd-lbl">分</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cdS">-</span><span class="cd-lbl">秒</span></div>
+    </div>
+    <div class="hero-tz" id="heroTz"></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 行程地图 -->
+<div class="section">
+  <div class="section-title"><span class="icon">🗺️</span> 行程总览</div>
+  <div class="map-wrap">
+    <svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" id="routeMap">
+      <!-- South America outline (simplified hand-drawn) -->
+      <path d="M295,38 C310,32 340,28 365,35 Q385,42 395,55 Q400,68 395,85
+        L388,105 Q392,120 385,140 L378,160 Q370,178 360,195 L348,215
+        Q338,230 325,248 L310,268 Q298,285 288,305 L278,325
+        Q270,340 262,355 L255,368 Q248,378 240,390 L228,405
+        Q218,415 212,425 L208,432 Q205,440 210,445 L218,448
+        Q225,445 228,438 L232,428 Q236,420 238,412
+        L235,400 Q232,390 228,382 L222,372 Q218,360 222,348
+        L228,335 Q235,320 242,305 L252,288 Q260,270 265,255
+        L268,240 Q270,225 268,212 L262,198 Q258,185 252,172
+        L245,158 Q238,148 232,138 L228,125 Q225,112 228,98
+        L235,85 Q242,72 252,62 L265,50 Q278,42 295,38 Z"
+        fill="var(--bg3)" stroke="var(--brd)" stroke-width="1.5"
+        stroke-linejoin="round" stroke-linecap="round"
+        stroke-dasharray="4,2" opacity=".6"/>
+      <!-- Route lines -->
+      <g id="routes" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="6,4">
+        <!-- 09.24 PEK→GRU (off-map, shown as label) -->
+        <!-- 09.25 GRU→SCL -->
+        <path d="M358,198 Q320,220 265,268" stroke="#E07A5F" opacity=".8"/>
+        <!-- 09.26 SCL→IPC -->
+        <path d="M265,268 Q180,280 108,305" stroke="#F2CC8F" opacity=".8"/>
+        <!-- 09.28 IPC→SCL -->
+        <path d="M108,305 Q180,260 265,268" stroke="#81B29A" opacity=".6" stroke-dasharray="3,5"/>
+        <!-- 09.29 SCL→CUZ -->
+        <path d="M265,268 Q258,220 250,178" stroke="#3D8B8B" opacity=".8"/>
+        <!-- 09.29 GRU→LIM→CUZ (group 2, dashed) -->
+        <path d="M358,198 Q310,170 262,148" stroke="#8B5CF6" opacity=".5" stroke-dasharray="3,5"/>
+        <path d="M262,148 Q255,160 250,178" stroke="#8B5CF6" opacity=".5" stroke-dasharray="3,5"/>
+        <!-- 09.30 CUZ→Aguas Calientes -->
+        <path d="M250,178 Q246,176 242,174" stroke="#E07A5F" opacity=".7" stroke-width="2"/>
+        <!-- 10.01 CUZ→LIM -->
+        <path d="M250,178 Q256,162 262,148" stroke="#F2CC8F" opacity=".7"/>
+        <!-- 10.02 LIM→EZE -->
+        <path d="M262,148 Q290,220 322,300" stroke="#81B29A" opacity=".8"/>
+        <!-- 10.02 EZE→USH -->
+        <path d="M322,300 Q280,370 225,440" stroke="#3D8B8B" opacity=".8"/>
+        <!-- 10.03 USH→EZE -->
+        <path d="M225,440 Q280,370 322,300" stroke="#E07A5F" opacity=".6" stroke-dasharray="3,5"/>
+        <!-- 10.04 EZE→Colonia (tiny line) -->
+        <path d="M322,300 Q326,298 330,296" stroke="#F2CC8F" opacity=".7" stroke-width="2"/>
+        <!-- 10.05 EZE→GIG→GRU -->
+        <path d="M322,300 Q345,265 368,230" stroke="#8B5CF6" opacity=".7"/>
+        <path d="M368,230 Q365,215 358,198" stroke="#8B5CF6" opacity=".7"/>
+        <!-- 10.06 GRU→PEK (off-map) -->
+      </g>
+      <!-- City markers -->
+      <g id="cities">
+        <g class="city" data-name="圣保罗"><circle cx="358" cy="198" r="5" fill="#E07A5F" stroke="#fff" stroke-width="1.5"/><text x="365" y="195" font-size="11" fill="var(--tx1)" font-weight="600">圣保罗</text></g>
+        <g class="city" data-name="圣地亚哥"><circle cx="265" cy="268" r="5" fill="#F2CC8F" stroke="#fff" stroke-width="1.5"/><text x="272" y="265" font-size="11" fill="var(--tx1)" font-weight="600">圣地亚哥</text></g>
+        <g class="city" data-name="复活节岛"><circle cx="108" cy="305" r="5" fill="#81B29A" stroke="#fff" stroke-width="1.5"/><text x="62" y="300" font-size="10" fill="var(--tx1)" font-weight="600">复活节岛</text></g>
+        <g class="city" data-name="库斯科"><circle cx="250" cy="178" r="5" fill="#3D8B8B" stroke="#fff" stroke-width="1.5"/><text x="232" y="172" font-size="11" fill="var(--tx1)" font-weight="600">库斯科</text></g>
+        <g class="city" data-name="利马"><circle cx="262" cy="148" r="4" fill="#8B5CF6" stroke="#fff" stroke-width="1.5"/><text x="270" y="145" font-size="11" fill="var(--tx1)" font-weight="600">利马</text></g>
+        <g class="city" data-name="布宜诺斯"><circle cx="322" cy="300" r="5" fill="#E07A5F" stroke="#fff" stroke-width="1.5"/><text x="330" y="297" font-size="11" fill="var(--tx1)" font-weight="600">布宜诺斯</text></g>
+        <g class="city" data-name="乌斯怀亚"><circle cx="225" cy="440" r="5" fill="#3D8B8B" stroke="#fff" stroke-width="1.5"/><text x="232" y="437" font-size="10" fill="var(--tx1)" font-weight="600">乌斯怀亚</text></g>
+        <g class="city" data-name="里约"><circle cx="368" cy="230" r="4" fill="#8B5CF6" stroke="#fff" stroke-width="1.5"/><text x="375" y="227" font-size="11" fill="var(--tx1)" font-weight="600">里约</text></g>
+        <g class="city" data-name="科洛尼亚"><circle cx="330" cy="296" r="3" fill="#F2CC8F" stroke="#fff" stroke-width="1"/><text x="336" y="310" font-size="9" fill="var(--tx2)">科洛尼亚</text></g>
+      </g>
+    </svg>
+    <div class="map-legend">
+      <span><i style="background:#E07A5F"></i>第1-2天</span>
+      <span><i style="background:#F2CC8F"></i>第3-5天</span>
+      <span><i style="background:#81B29A"></i>第6-9天</span>
+      <span><i style="background:#3D8B8B"></i>第10-11天</span>
+      <span><i style="background:#8B5CF6"></i>第12-13天</span>
+    </div>
+  </div>
+</div>
+
+<!-- 已确认预订 -->
+<div class="section">
+  <div class="section-title"><span class="icon">✅</span> 已确认预订</div>
+  <div class="tabs" id="bookingTabs">
+    <button class="tab active" data-tab="flights">✈️ 机票 10</button>
+    <button class="tab" data-tab="trains">🚂 火车</button>
+    <button class="tab" data-tab="hotels">🏨 酒店</button>
+    <button class="tab" data-tab="tickets">🎫 门票</button>
+  </div>
+  <div class="tab-panel active" id="panel-flights"></div>
+  <div class="tab-panel" id="panel-trains"></div>
+  <div class="tab-panel" id="panel-hotels"></div>
+  <div class="tab-panel" id="panel-tickets"></div>
+</div>
+
+<!-- 逐日行程 -->
+<div class="section">
+  <div class="section-title"><span class="icon">📅</span> 逐日行程</div>
+  <div id="itinerary"></div>
+</div>
+
+<!-- 待办清单 -->
+<div class="section">
+  <div class="section-title"><span class="icon">📋</span> 待办清单</div>
+  <div class="todo-list" id="todoList"></div>
+</div>
+
+<!-- 出发前采购 -->
+<div class="section">
+  <div class="section-title"><span class="icon">🛒</span> 出发前采购</div>
+  <div class="shop-list" id="shopList"></div>
+</div>
+
+<!-- 实用贴士 -->
+<div class="section">
+  <div class="section-title"><span class="icon">💡</span> 实用贴士</div>
+  <div class="tips-grid" id="tipsGrid"></div>
+</div>
+
+<div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
+</div>
+
+<script>
+/* ============================
+   UTILITIES
+   ============================ */
+const UT = {
+  off: { 'PEK':8, 'GRU':-3, 'SCL':-3, 'IPC':-5, 'CUZ':-5, 'LIM':-5, 'EZE':-3, 'USH':-3, 'MVD':-3, 'GIG':-3 },
+  label: { 'PEK':'北京','GRU':'圣保罗','SCL':'圣地亚哥','IPC':'复活节岛','CUZ':'库斯科','LIM':'利马','EZE':'布宜诺斯','USH':'乌斯怀亚','MVD':'科洛尼亚','GIG':'里约' },
+  tzName: { 'PEK':'CST +8','GRU':'BRT −3','SCL':'CLST −3','IPC':'EASST −5','CUZ':'PET −5','LIM':'PET −5','EZE':'ART −3','USH':'ART −3','MVD':'UYT −3','GIG':'BRT −3' },
+  toUTC(y,mo,d,h,mi,code) {
+    const o = this.off[code]||0;
+    return Date.UTC(y,mo-1,d,h-o,mi);
+  },
+  fmt(h,mi) {
+    return String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0');
+  },
+  fmtDate(y,mo,d) {
+    return mo+'/'+d;
+  }
+};
+
+/* ============================
+   FLIGHT DATA
+   ============================ */
+const flights = [
+  // Group 1
+  { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:24,dh:15,dmi:0, ay:2026,am:9,ad:25,ah:5,ami:0, air:'中国国航', ok:true, note:'T3 → T3' },
+  { no:'LA612', from:'GRU', to:'SCL', dy:2026,dm:9,dd:25,dh:12,dmi:5, ay:2026,am:9,ad:25,ah:16,ami:25, air:'南美航空', ok:true, note:'经济舱 · 无免费托运' },
+  { no:'LA843', from:'SCL', to:'IPC', dy:2026,dm:9,dd:26,dh:11,dmi:10, ay:2026,am:9,ad:26,ah:14,ami:45, air:'南美航空', ok:true, note:'经济舱 Basic' },
+  { no:'LA844', from:'IPC', to:'SCL', dy:2026,dm:9,dd:28,dh:17,dmi:30, ay:2026,am:9,ad:29,ah:0,ami:5, air:'南美航空', ok:true, note:'经济舱 Basic · 到达即09.29凌晨' },
+  { no:'LA2367', from:'SCL', to:'CUZ', dy:2026,dm:9,dd:29,dh:7,dmi:10, ay:2026,am:9,ad:29,ah:8,ami:40, air:'南美航空', ok:true, note:'无免费托运' },
+  // Group 2 (小何 小季)
+  { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:28,dh:15,dmi:0, ay:2026,am:9,ad:29,ah:5,ami:0, air:'中国国航', ok:true, note:'小何 小季 · T3→T3', grp2:true },
+  { no:'待定', from:'GRU', to:'CUZ', dy:2026,dm:9,dd:29,dh:0,dmi:0, ay:2026,am:9,ad:29,ah:0,ami:0, air:'待定', ok:false, note:'小何 小季 · 经利马中转', grp2:true },
+  // Remaining (all 4)
+  { no:'待定', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:20,dmi:0, ay:2026,am:10,ad:1,ah:22,ami:30, air:'待定', ok:false, note:'飞行约1.5h' },
+  { no:'待定', from:'LIM', to:'EZE', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:7,ami:30, air:'待定', ok:false, note:'红眼航班' },
+  { no:'待定', from:'EZE', to:'USH', dy:2026,dm:10,dd:2,dh:16,dmi:40, ay:2026,am:10,ad:2,ah:20,ami:19, air:'待定', ok:false, note:'' },
+  { no:'待定', from:'USH', to:'EZE', dy:2026,dm:10,dd:3,dh:18,dmi:40, ay:2026,am:10,ad:3,ah:22,ami:10, air:'待定', ok:false, note:'' },
+  { no:'待定', from:'EZE', to:'GIG', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'10.04晚或10.05早' },
+  { no:'待定', from:'GIG', to:'GRU', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'基督山后飞圣保罗' },
+  { no:'CA898', from:'GRU', to:'PEK', dy:2026,dm:10,dd:6,dh:9,dmi:25, ay:2026,am:10,ad:7,ah:19,ami:30, air:'中国国航', ok:true, note:'T3 → T3' },
+];
+
+/* ============================
+   ACCOMMODATION / TRAIN / TICKETS
+   ============================ */
+const hotels = [
+  { date:'09.25', city:'圣地亚哥', name:null },
+  { date:'09.26-27', city:'复活节岛', name:null },
+  { date:'09.28', city:'圣地亚哥', name:null },
+  { date:'09.29', city:'库斯科', name:null },
+  { date:'09.30', city:'热水镇', name:null },
+  { date:'10.02', city:'乌斯怀亚', name:null },
+  { date:'10.03-04', city:'布宜诺斯艾利斯', name:null },
+  { date:'10.05', city:'圣保罗', name:null },
+];
+const trains = [
+  { date:'09.30', route:'库斯科 → 热水镇', company:'待定 PeruRail / Inca Rail', ok:false },
+  { date:'10.01', route:'热水镇 → 库斯科', company:'待定 PeruRail / Inca Rail', ok:false },
+];
+const tickets = [
+  { name:'马丘比丘', date:'10.01', time:'08:00 AM', detail:'Circuito 1 · Ruta 1-B 上层平台', ok:true },
+  { name:'复活节岛国家公园', date:'09.27', time:'全天', detail:'待购票', ok:false },
+  { name:'世界尽头小火车', date:'10.03', time:'上午', detail:'乌斯怀亚', ok:false },
+  { name:'火地岛国家公园', date:'10.03', time:'上午', detail:'乌斯怀亚', ok:false },
+];
+
+/* ============================
+   ITINERARY
+   ============================ */
+const days = [
+  { n:1, date:'9月24日 周三', title:'北京出发', loc:'北京 → 圣保罗',
+    ev: [
+      { t:'15:00', c:'PEK', txt:'北京首都 T3 出发', sub:'小罗、小刘', type:'dep' },
+      { t:'', c:'', txt:'飞行约 14 小时', sub:'', type:'info' },
+    ]
+  },
+  { n:2, date:'9月25日 周四', title:'圣保罗中转 → 圣地亚哥', loc:'圣保罗 → 圣地亚哥',
+    ev: [
+      { t:'05:00', c:'GRU', txt:'到达圣保罗 GRU T3', sub:'CA897', type:'arr' },
+      { t:'', c:'', txt:'圣保罗机场停留约 7 小时', sub:'转机', type:'info' },
+      { t:'12:05', c:'GRU', txt:'圣保罗 GRU T3 出发', sub:'LA612 · 无免费托运', type:'dep' },
+      { t:'16:25', c:'SCL', txt:'到达圣地亚哥 SCL T2', sub:'LA612', type:'arr' },
+      { t:'晚', c:'SCL', txt:'圣地亚哥市区', sub:'住圣地亚哥', type:'hotel' },
+    ]
+  },
+  { n:3, date:'9月26日 周五', title:'飞往复活节岛', loc:'圣地亚哥 → 复活节岛',
+    ev: [
+      { t:'上午', c:'SCL', txt:'圣地亚哥市区自由活动', sub:'', type:'act' },
+      { t:'11:10', c:'SCL', txt:'圣地亚哥 SCL 出发', sub:'LA843 · 经济舱 Basic', type:'dep' },
+      { t:'14:45', c:'IPC', txt:'到达复活节岛', sub:'LA843', type:'arr' },
+      { t:'下午', c:'IPC', txt:'复活节岛初步探索', sub:'', type:'act' },
+      { t:'晚', c:'IPC', txt:'住复活节岛', sub:'', type:'hotel' },
+    ]
+  },
+  { n:4, date:'9月27日 周六', title:'复活节岛全天', loc:'复活节岛',
+    ev: [
+      { t:'全天', c:'IPC', txt:'Rano Raraku 石像采石场', sub:'复活节岛国家公园 · 需购票', type:'act' },
+      { t:'', c:'IPC', txt:'Ahu Tongariki 十五石像', sub:'', type:'act' },
+      { t:'', c:'IPC', txt:'Anakena 海滩', sub:'', type:'act' },
+      { t:'晚', c:'IPC', txt:'住复活节岛', sub:'', type:'hotel' },
+    ]
+  },
+  { n:5, date:'9月28日 周日', title:'复活节岛 → 圣地亚哥', loc:'复活节岛 → 圣地亚哥',
+    ev: [
+      { t:'上午', c:'IPC', txt:'复活节岛上午活动', sub:'', type:'act' },
+      { t:'17:30', c:'IPC', txt:'复活节岛 IPC 出发', sub:'LA844 · 经济舱 Basic', type:'dep' },
+      { t:'00:05', c:'SCL', txt:'到达圣地亚哥（09.29 凌晨）', sub:'LA844 · 转机间隔约7h', type:'arr' },
+    ]
+  },
+  { n:6, date:'9月29日 周一', title:'飞抵库斯科 · 四人汇合', loc:'圣地亚哥 → 库斯科',
+    ev: [
+      { t:'07:10', c:'SCL', txt:'圣地亚哥 SCL T2 出发', sub:'LA2367 · 无免费托运', type:'dep' },
+      { t:'08:40', c:'CUZ', txt:'到达库斯科（海拔 3400m）', sub:'LA2367 · 注意高原反应', type:'arr' },
+      { t:'09:29', c:'CUZ', txt:'小何、小季 经利马到达库斯科', sub:'第二批 · 航班待定', type:'arr', badge:'汇合' },
+      { t:'下午', c:'CUZ', txt:'适应海拔，库斯科城区漫步', sub:'武器广场、太阳神殿', type:'act' },
+      { t:'晚', c:'CUZ', txt:'住库斯科', sub:'', type:'hotel' },
+    ]
+  },
+  { n:7, date:'9月30日 周二', title:'库斯科 → 热水镇', loc:'库斯科 → 热水镇',
+    ev: [
+      { t:'上午', c:'CUZ', txt:'库斯科城区游览', sub:'', type:'act' },
+      { t:'下午', c:'CUZ', txt:'火车前往热水镇', sub:'PeruRail / Inca Rail · 待购票', type:'act', badge:'订票' },
+      { t:'傍晚', c:'CUZ', txt:'到达热水镇（马丘比丘脚下）', sub:'', type:'arr' },
+      { t:'晚', c:'CUZ', txt:'住热水镇', sub:'早睡！明天早起', type:'hotel' },
+    ]
+  },
+  { n:8, date:'10月1日 周三', title:'马丘比丘 → 利马', loc:'马丘比丘 → 库斯科 → 利马',
+    ev: [
+      { t:'08:00', c:'CUZ', txt:'马丘比丘入场', sub:'Circuito 1 · Ruta 1-B 上层平台', type:'act', badge:'门票' },
+      { t:'中午', c:'CUZ', txt:'下山，火车回 Ollantaytambo', sub:'待购票', type:'act', badge:'订票' },
+      { t:'下午', c:'CUZ', txt:'坐车回库斯科，前往机场', sub:'车程约 1.5h', type:'act' },
+      { t:'20:00', c:'CUZ', txt:'库斯科出发飞利马', sub:'航班号待定 · 飞行约 1.5h', type:'dep' },
+      { t:'22:30', c:'LIM', txt:'到达利马', sub:'', type:'arr' },
+      { t:'~00:00', c:'LIM', txt:'利马机场等候（转机约3.5h）', sub:'下一班 02:00 起飞', type:'info' },
+    ]
+  },
+  { n:9, date:'10月2日 周四', title:'利马 → 布宜诺斯 → 乌斯怀亚', loc:'利马 → 布宜诺斯 → 乌斯怀亚',
+    ev: [
+      { t:'02:00', c:'LIM', txt:'利马出发飞布宜诺斯', sub:'航班号待定 · 红眼航班', type:'dep' },
+      { t:'07:30', c:'EZE', txt:'到达布宜诺斯艾利斯', sub:'', type:'arr' },
+      { t:'白天', c:'EZE', txt:'布宜诺斯市区游览', sub:'背包随身带 · 可寄存', type:'act' },
+      { t:'16:40', c:'EZE', txt:'布宜诺斯出发飞乌斯怀亚', sub:'航班号待定', type:'dep' },
+      { t:'20:19', c:'USH', txt:'到达乌斯怀亚（世界尽头）', sub:'', type:'arr' },
+      { t:'晚', c:'USH', txt:'住乌斯怀亚', sub:'', type:'hotel' },
+    ]
+  },
+  { n:10, date:'10月3日 周五', title:'世界尽头 · 火地岛', loc:'乌斯怀亚 → 布宜诺斯',
+    ev: [
+      { t:'上午', c:'USH', txt:'世界尽头小火车', sub:'待购票', type:'act', badge:'订票' },
+      { t:'', c:'USH', txt:'火地岛国家公园', sub:'待购票', type:'act', badge:'订票' },
+      { t:'', c:'USH', txt:'乌斯怀亚港', sub:'', type:'act' },
+      { t:'18:40', c:'USH', txt:'乌斯怀亚出发飞布宜诺斯', sub:'航班号待定', type:'dep' },
+      { t:'22:10', c:'EZE', txt:'到达布宜诺斯艾利斯', sub:'', type:'arr' },
+      { t:'晚', c:'EZE', txt:'住布宜诺斯艾利斯', sub:'', type:'hotel' },
+    ]
+  },
+  { n:11, date:'10月4日 周六', title:'布宜诺斯 ⇄ 科洛尼亚', loc:'布宜诺斯 → 科洛尼亚 → 布宜诺斯',
+    ev: [
+      { t:'上午', c:'EZE', txt:'坐船前往科洛尼亚（约 1h）', sub:'渡轮 · 往返共 $60', type:'act' },
+      { t:'白天', c:'MVD', txt:'科洛尼亚世遗小镇漫步', sub:'世界文化遗产', type:'act' },
+      { t:'傍晚', c:'MVD', txt:'坐船返回布宜诺斯', sub:'', type:'act' },
+      { t:'晚', c:'EZE', txt:'住布宜诺斯艾利斯', sub:'', type:'hotel' },
+    ]
+  },
+  { n:12, date:'10月5日 周日', title:'里约基督山 → 圣保罗', loc:'布宜诺斯 → 里约 → 圣保罗',
+    ev: [
+      { t:'', c:'EZE', txt:'布宜诺斯飞里约热内卢', sub:'航班待定', type:'dep' },
+      { t:'白天', c:'GIG', txt:'基督山（Cristo Redentor）', sub:'', type:'act' },
+      { t:'傍晚', c:'GIG', txt:'里约飞圣保罗', sub:'航班待定', type:'dep' },
+      { t:'晚', c:'GRU', txt:'住圣保罗', sub:'明早 09:25 航班！', type:'hotel' },
+    ]
+  },
+  { n:13, date:'10月6日 周一', title:'圣保罗 → 北京', loc:'圣保罗 → 北京',
+    ev: [
+      { t:'09:25', c:'GRU', txt:'圣保罗 GRU T3 出发', sub:'CA898', type:'dep' },
+      { t:'', c:'', txt:'飞行约 24 小时', sub:'', type:'info' },
+    ]
+  },
+  { n:14, date:'10月7日 周二', title:'到家', loc:'北京',
+    ev: [
+      { t:'19:30', c:'PEK', txt:'到达北京首都 T3', sub:'CA898 · 旅途结束 🏠', type:'arr' },
+    ]
+  },
+];
+
+/* ============================
+   TODOS
+   ============================ */
+const todos = [
+  { txt:'办理巴西签证（中国护照需提前办理）', urg:'urgent' },
+  { txt:'办理阿根廷签证 / 确认 AVE 电子旅行授权', urg:'urgent' },
+  { txt:'确认智利 / 秘鲁入境要求（是否需单独签证）', urg:'urgent' },
+  { txt:'预订小何、小季 09.29 圣保罗→库斯科中转航班', urg:'urgent' },
+  { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
+  { txt:'预订 10.02 利马→布宜诺斯航班', urg:'normal' },
+  { txt:'预订 10.02 布宜诺斯→乌斯怀亚航班', urg:'normal' },
+  { txt:'预订 10.03 乌斯怀亚→布宜诺斯航班', urg:'normal' },
+  { txt:'预订 10.05 布宜诺斯→里约→圣保罗航班', urg:'normal' },
+  { txt:'预订库斯科↔热水镇火车票（PeruRail / Inca Rail）', urg:'normal' },
+  { txt:'预订全部酒店（12 晚）', urg:'normal' },
+  { txt:'购买复活节岛国家公园门票', urg:'normal' },
+  { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
+  { txt:'确认 10.04 布宜诺斯⇄科洛尼亚渡轮时刻（Buquebus / Colonia Express）', urg:'low' },
+  { txt:'准备高原反应药物（库斯科海拔 3400m）', urg:'normal' },
+  { txt:'兑换美元现金（部分国家信用卡覆盖不全）', urg:'low' },
+];
+
+/* ============================
+   SHOPPING LIST
+   ============================ */
+const shops = [
+  { cat:'证件', name:'护照 + 复印件（2份分开放）' },
+  { cat:'证件', name:'签证材料打印件' },
+  { cat:'证件', name:'机票行程单打印' },
+  { cat:'证件', name:'酒店确认单打印' },
+  { cat:'证件', name:'旅行保险单' },
+  { cat:'电子', name:'万能转换插头（南美四种接口）' },
+  { cat:'电子', name:'充电宝 20000mAh' },
+  { cat:'电子', name:'手机充电线 ×2' },
+  { cat:'电子', name:'耳机（降噪款长途必备）' },
+  { cat:'药品', name:'高原安 / 红景天（提前一周吃）' },
+  { cat:'药品', name:'止泻药 + 肠胃药' },
+  { cat:'药品', name:'感冒药 + 退烧药' },
+  { cat:'药品', name:'创可贴 + 消炎药膏' },
+  { cat:'药品', name:'防蚊液（含 DEET）' },
+  { cat:'衣物', name:'冲锋衣 / 防风外套' },
+  { cat:'衣物', name:'抓绒衣（乌斯怀亚 0~10°C）' },
+  { cat:'衣物', name:'速干 T 恤 ×3' },
+  { cat:'衣物', name:'登山鞋 / 防滑徒步鞋' },
+  { cat:'衣物', name:'压缩袜 2 双（长途飞行防血栓）' },
+  { cat:'防护', name:'防晒霜 SPF50+（高原紫外线强）' },
+  { cat:'防护', name:'墨镜（偏光）' },
+  { cat:'防护', name:'遮阳帽' },
+  { cat:'日用', name:'颈枕（充气款省空间）' },
+  { cat:'日用', name:'保温杯' },
+  { cat:'日用', name:'密封袋若干（湿衣物 / 证件防水）' },
+  { cat:'日用', name:'小背包（20L 日用）' },
+  { cat:'安全', name:'防盗腰包 / 贴身钱包' },
+  { cat:'安全', name:'行李锁 ×2' },
+  { cat:'其他', name:'美元现金（小面额 $5/$10/$20）' },
+  { cat:'其他', name:'签字笔 ×2（填入境表用）' },
+  { cat:'其他', name:'飞机零食 / 口香糖' },
+  { cat:'其他', name:'离线地图 App 提前下载' },
+  { cat:'其他', name:'西班牙语翻译 App 离线包' },
+];
+
+/* ============================
+   TIPS
+   ============================ */
+const tips = [
+  { icon:'💰', title:'汇率参考', body:'1 SOL ≈ 2 RMB<br>1 BRL ≈ 1.3 RMB<br>1 RMB ≈ 140 CLP<br>1 RMB ≈ 220 ARS<br>1 RMB ≈ 6 UYU' },
+  { icon:'🕐', title:'时区速查', body:'北京 CST +8<br>巴西/阿根廷 BRT/ART −3<br>复活节岛 EASST −5<br>秘鲁/哥伦比亚 PET −5' },
+  { icon:'🔌', title:'插头类型', body:'智利/秘鲁：Type C/L（圆头）<br>阿根廷：Type I（八字形）<br>巴西：Type N（三圆孔）<br>建议带万能转换头' },
+  { icon:'⚠️', title:'安全提醒', body:'南美城市注意防盗<br>贵重物品贴身放<br>避免夜间独行<br>手机不要外放' },
+  { icon:'🏔️', title:'高原注意', body:'库斯科海拔 3400m<br>到达后慢动作、多喝水<br>提前 1 周吃红景天<br>严重高反立即就医' },
+  { icon:'🌡️', title:'天气提醒', body:'乌斯怀亚 10 月：0~10°C<br>复活节岛：18~24°C<br>里约/圣保罗：20~28°C<br>库斯科：5~20°C' },
+  { icon:'📱', title:'通讯', body:'各国买当地 SIM 卡最划算<br>机场有售（需护照）<br>提前下载离线地图<br>WhatsApp 是主要沟通工具' },
+  { icon:'🍽️', title:'饮食', body:'秘鲁菜世界闻名必尝<br>马黛茶是阿根廷国饮<br>街头食物慎选<br>饮用水买瓶装' },
+];
+
+/* ============================
+   THEME (day/night)
+   ============================ */
+function setTheme() {
+  const h = new Date().getHours();
+  document.documentElement.classList.toggle('dark', h < 6 || h >= 19);
+}
+setTheme();
+setInterval(setTheme, 60000);
+
+/* ============================
+   AMAP NAVIGATION
+   ============================ */
+function amapURI(name) {
+  return 'https://uri.amap.com/search?keyword=' + encodeURIComponent(name);
+}
+
+/* ============================
+   COUNTDOWN & HERO
+   ============================ */
+function getAllEvents() {
+  const evs = [];
+  flights.forEach(f => {
+    if (f.dh === 0 && f.dmi === 0 && !f.ok) return; // skip TBD with no time
+    const depUTC = UT.toUTC(f.dy,f.dm,f.dd,f.dh,f.dmi,f.from);
+    evs.push({ utc:depUTC, type:'dep', label:(f.grp2?'👥 ':'')+(f.air+' '+f.no), detail:UT.label[f.from]+' → '+UT.label[f.to], tz:f.from, sub:f.note });
+    if (f.ah !== 0 || f.ami !== 0) {
+      const arrUTC = UT.toUTC(f.ay,f.am,f.ad,f.ah,f.ami,f.to);
+      evs.push({ utc:arrUTC, type:'arr', label:(f.grp2?'👥 ':'')+'到达 '+UT.label[f.to], detail:f.air+' '+f.no, tz:f.to });
+    }
+  });
+  // Machu Picchu
+  evs.push({ utc:UT.toUTC(2026,10,1,8,0,'CUZ'), type:'act', label:'🏛️ 马丘比丘入场', detail:'Circuito 1 Ruta 1-B', tz:'CUZ' });
+  evs.sort((a,b)=>a.utc-b.utc);
+  return evs;
+}
+
+const allEvents = getAllEvents();
+
+function tickCountdown() {
+  const now = Date.now();
+  let next = allEvents.find(e => e.utc > now);
+  if (!next) next = allEvents[allEvents.length-1];
+
+  document.getElementById('heroTitle').textContent = next.label;
+  document.getElementById('heroDetail').textContent = next.detail;
+  document.getElementById('heroTz').textContent = (next.tz ? UT.tzName[next.tz]+' · ' : '') + '北京时间倒计时';
+
+  let diff = Math.max(0, next.utc - now);
+  const d = Math.floor(diff/864e5); diff %= 864e5;
+  const h = Math.floor(diff/36e5); diff %= 36e5;
+  const m = Math.floor(diff/6e4); diff %= 6e4;
+  const s = Math.floor(diff/1e3);
+  document.getElementById('cdD').textContent = d;
+  document.getElementById('cdH').textContent = String(h).padStart(2,'0');
+  document.getElementById('cdM').textContent = String(m).padStart(2,'0');
+  document.getElementById('cdS').textContent = String(s).padStart(2,'0');
+}
+tickCountdown();
+setInterval(tickCountdown, 1000);
+
+/* ============================
+   RENDER: FLIGHTS
+   ============================ */
+function renderFlights() {
+  const el = document.getElementById('panel-flights');
+  el.innerHTML = flights.map(f => {
+    const fromLabel = UT.label[f.from]||f.from;
+    const toLabel = UT.label[f.to]||f.to;
+    const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
+    const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
+    const crossDay = f.ad > f.dd || f.am > f.dm;
+    const tzFrom = UT.tzName[f.from]||'';
+    const tzTo = UT.tzName[f.to]||'';
+    return `<div class="card flight">
+      <div class="flight-head">
+        <span class="flight-no">${f.air} ${f.no}</span>
+        <span class="flight-tag ${f.ok?'tag-ok':'tag-tbd'}">${f.ok?'已出票':'待确认'}</span>
+      </div>
+      <div class="flight-route">
+        <div class="flight-city left">
+          <div class="flight-time">${depTime}</div>
+          <div class="flight-code">${fromLabel} ${f.from}</div>
+          <div class="flight-date">${UT.fmtDate(f.dy,f.dm,f.dd)} ${tzFrom}</div>
+        </div>
+        <div class="flight-mid">
+          <div class="flight-dur">${crossDay?'+1天':''}</div>
+          <div class="flight-line"></div>
+        </div>
+        <div class="flight-city right">
+          <div class="flight-time">${arrTime}</div>
+          <div class="flight-code">${toLabel} ${f.to}</div>
+          <div class="flight-date">${crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' '}${tzTo}</div>
+        </div>
+      </div>
+      ${f.note ? '<div class="flight-note">'+(f.grp2?'👥 小何 小季 · ':'')+f.note+'</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')}
+    </div>`;
+  }).join('');
+}
+
+/* ============================
+   RENDER: TRAINS
+   ============================ */
+function renderTrains() {
+  const el = document.getElementById('panel-trains');
+  el.innerHTML = trains.map(t => `
+    <div class="card info-card">
+      <div class="ic-title">${t.route}</div>
+      <div class="ic-sub">${t.date} · ${t.company}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================
+   RENDER: HOTELS
+   ============================ */
+function renderHotels() {
+  const el = document.getElementById('panel-hotels');
+  el.innerHTML = hotels.map(h => `
+    <div class="card info-card">
+      <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span></div>
+      <div class="ic-empty">${h.name || '待预订'}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================
+   RENDER: TICKETS
+   ============================ */
+function renderTickets() {
+  const el = document.getElementById('panel-tickets');
+  el.innerHTML = tickets.map(t => `
+    <div class="card info-card">
+      <div class="ic-title">${t.name} <span class="flight-tag ${t.ok?'tag-ok':'tag-tbd'}" style="margin-left:6px">${t.ok?'已购':'待购'}</span></div>
+      <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================
+   RENDER: ITINERARY
+   ============================ */
+function renderItinerary() {
+  const el = document.getElementById('itinerary');
+  el.innerHTML = days.map((day, idx) => {
+    const timeline = day.ev.map(e => {
+      const dotClass = e.type==='hotel'?'hotel':(e.type==='arr'?'done':'');
+      const badgeHTML = e.badge ? `<span class="tl-badge ${e.badge==='门票'?'badge-ticket':e.badge==='汇合'?'badge-group':'badge-book'}">${e.badge}</span>` : '';
+      const locName = UT.label[e.c] || '';
+      const navLink = e.c && locName ? ` <a class="loc-link" href="${amapURI(locName)}" target="_blank" rel="noopener">📍</a>` : '';
+      return `<div class="tl-item">
+        <div class="tl-time">${e.t||''}</div>
+        <div class="tl-dot ${dotClass}"></div>
+        <div class="tl-content">${e.txt}${badgeHTML}${navLink}${e.sub?'<div class="tl-sub">'+e.sub+'</div>':''}</div>
+      </div>`;
+    }).join('');
+
+    // Collect nav points for this day
+    const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>UT.label[e.c]);
+    const uniqueNav = [...new Set(navPoints)];
+    const navBtns = uniqueNav.map(n=>`<a class="nav-btn" href="${amapURI(n)}" target="_blank" rel="noopener">📍 ${n}</a>`).join('');
+
+    return `<div class="day-card${idx===0?' open':''}">
+      <div class="day-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="day-num">D${day.n}</span>
+        <span class="day-date">${day.date}</span>
+        <span class="day-arrow">▾</span>
+      </div>
+      <div class="day-body">
+        <div class="day-inner">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--tx2)">${day.title} <span style="font-weight:400;font-size:12px;color:var(--tx3)">· ${day.loc}</span></div>
+          <div class="tl">${timeline}</div>
+          ${navBtns?'<div class="day-nav">'+navBtns+'</div>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================
+   RENDER: TODOS
+   ============================ */
+function renderTodos() {
+  const el = document.getElementById('todoList');
+  el.innerHTML = todos.map(t => `
+    <div class="todo-item">
+      <span class="todo-dot ${t.urg}"></span>
+      <span>${t.txt}</span>
+    </div>
+  `).join('');
+}
+
+/* ============================
+   RENDER: SHOPPING LIST
+   ============================ */
+const SHOP_KEY = 'sa_trip_shop_2026';
+function loadShopState() {
+  try { return JSON.parse(localStorage.getItem(SHOP_KEY)) || {}; } catch { return {}; }
+}
+function saveShopState(state) {
+  try { localStorage.setItem(SHOP_KEY, JSON.stringify(state)); } catch {}
+}
+
+function renderShopping() {
+  const el = document.getElementById('shopList');
+  const state = loadShopState();
+  el.innerHTML = shops.map((s,i) => {
+    const checked = state[i] ? 'checked' : '';
+    return `<div class="shop-item ${checked}" data-idx="${i}" onclick="toggleShop(this)">
+      <span class="shop-cat">${s.cat}</span>
+      <span class="shop-name">${s.name}</span>
+      <span class="shop-check">✓</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleShop(el) {
+  const idx = el.dataset.idx;
+  const state = loadShopState();
+  state[idx] = !state[idx];
+  saveShopState(state);
+  el.classList.toggle('checked');
+}
+
+/* ============================
+   RENDER: TIPS
+   ============================ */
+function renderTips() {
+  const el = document.getElementById('tipsGrid');
+  el.innerHTML = tips.map(t => `
+    <div class="tip-card">
+      <h4>${t.icon} ${t.title}</h4>
+      <p>${t.body}</p>
+    </div>
+  `).join('');
+}
+
+/* ============================
+   TABS
+   ============================ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============================
+   INIT
+   ============================ */
+renderFlights();
+renderTrains();
+renderHotels();
+renderTickets();
+renderItinerary();
+renderTodos();
+renderShopping();
+renderTips();
+</script>
+</body>
+</html>
