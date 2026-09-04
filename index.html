@@ -63,6 +63,21 @@ body{
 }
 .section-title .icon{font-size:20px}
 
+/* Scope tabs (confirmed / unbooked) */
+.scope-tabs{
+  display:flex;gap:6px;padding:0 16px;margin-bottom:12px;
+}
+.scope-tab{
+  flex:1;padding:10px 14px;border-radius:20px;font-size:14px;font-weight:700;
+  cursor:pointer;border:none;text-align:center;
+  background:var(--bg3);color:var(--tx2);transition:all .2s;
+}
+.scope-tab.active{background:var(--pri);color:#fff}
+.sub-header{
+  font-size:13px;font-weight:600;color:var(--tx2);
+  padding:8px 0 4px;border-bottom:1px solid var(--brd);margin-bottom:8px;
+}
+
 /* ===== Tabs ===== */
 .tabs{
   display:flex;gap:6px;padding:0 16px;margin-bottom:12px;
@@ -158,21 +173,26 @@ body{
 .day-inner{padding:0 16px 16px}
 
 /* Timeline */
-.tl{position:relative;padding-left:60px}
+.tl{position:relative;padding-left:76px}
 .tl::before{
-  content:'';position:absolute;left:34px;top:4px;bottom:4px;
+  content:'';position:absolute;left:65px;top:4px;bottom:4px;
   width:2px;background:var(--brd);border-radius:1px;
 }
-.tl-item{position:relative;margin-bottom:16px}
+.tl-item{
+  position:relative;margin-bottom:16px;
+  display:flex;align-items:flex-start;
+}
 .tl-item:last-child{margin-bottom:0}
 .tl-time{
-  position:absolute;left:-60px;top:0;width:52px;
+  position:relative;left:-76px;
+  width:60px;flex-shrink:0;
   text-align:right;font-size:13px;font-weight:700;
   font-family:"SF Mono",monospace;color:var(--pri);
+  white-space:nowrap;padding-right:8px;
 }
 .tl-dot{
-  position:absolute;left:-23px;top:5px;width:10px;height:10px;
-  border-radius:50%;border:2px solid var(--pri);background:var(--bg2);
+  position:relative;left:-16px;top:4px;width:10px;height:10px;
+  flex-shrink:0;border-radius:50%;border:2px solid var(--pri);background:var(--bg2);
 }
 .tl-dot.hotel{border-color:var(--sec);background:var(--sec)}
 .tl-dot.done{border-color:var(--ok);background:var(--ok)}
@@ -236,6 +256,17 @@ body{
 .shop-item.checked .shop-check{
   background:var(--ok);border-color:var(--ok);color:#fff;
 }
+.shop-tabs{
+  display:flex;gap:6px;padding:0 16px;margin-bottom:12px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.shop-tabs::-webkit-scrollbar{display:none}
+.shop-tab{
+  padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;
+  white-space:nowrap;cursor:pointer;border:none;
+  background:var(--bg3);color:var(--tx2);transition:all .2s;
+}
+.shop-tab.active{background:var(--pri);color:#fff}
 
 /* ===== Tips ===== */
 .tips-grid{padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -365,19 +396,15 @@ body{
   </div>
 </div>
 
-<!-- 已确认预订 -->
+<!-- 预订管理 -->
 <div class="section">
-  <div class="section-title"><span class="icon">✅</span> 已确认预订</div>
-  <div class="tabs" id="bookingTabs">
-    <button class="tab active" data-tab="flights">✈️ 机票 10</button>
-    <button class="tab" data-tab="trains">🚂 火车</button>
-    <button class="tab" data-tab="hotels">🏨 酒店</button>
-    <button class="tab" data-tab="tickets">🎫 门票</button>
+  <div class="section-title"><span class="icon">📋</span> 预订管理</div>
+  <div class="scope-tabs">
+    <button class="scope-tab active" onclick="switchScope('confirmed')">✅ 已确认</button>
+    <button class="scope-tab" onclick="switchScope('unbooked')">📝 未预定</button>
   </div>
-  <div class="tab-panel active" id="panel-flights"></div>
-  <div class="tab-panel" id="panel-trains"></div>
-  <div class="tab-panel" id="panel-hotels"></div>
-  <div class="tab-panel" id="panel-tickets"></div>
+  <div class="tabs" id="bookingTabs"></div>
+  <div id="bookingPanels"></div>
 </div>
 
 <!-- 逐日行程 -->
@@ -395,6 +422,7 @@ body{
 <!-- 出发前采购 -->
 <div class="section">
   <div class="section-title"><span class="icon">🛒</span> 出发前采购</div>
+  <div class="shop-tabs" id="shopTabs"></div>
   <div class="shop-list" id="shopList"></div>
 </div>
 
@@ -597,9 +625,7 @@ const days = [
    TODOS
    ============================ */
 const todos = [
-  { txt:'办理巴西签证（中国护照需提前办理）', urg:'urgent' },
-  { txt:'办理阿根廷签证 / 确认 AVE 电子旅行授权', urg:'urgent' },
-  { txt:'确认智利 / 秘鲁入境要求（是否需单独签证）', urg:'urgent' },
+  { txt:'办理阿根廷 AVE 电子旅行授权（有美签可在线申请）', urg:'urgent' },
   { txt:'预订小何、小季 09.29 圣保罗→库斯科中转航班', urg:'urgent' },
   { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
   { txt:'预订 10.02 利马→布宜诺斯航班', urg:'normal' },
@@ -611,8 +637,6 @@ const todos = [
   { txt:'购买复活节岛国家公园门票', urg:'normal' },
   { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
   { txt:'确认 10.04 布宜诺斯⇄科洛尼亚渡轮时刻（Buquebus / Colonia Express）', urg:'low' },
-  { txt:'准备高原反应药物（库斯科海拔 3400m）', urg:'normal' },
-  { txt:'兑换美元现金（部分国家信用卡覆盖不全）', urg:'low' },
 ];
 
 /* ============================
@@ -730,81 +754,110 @@ tickCountdown();
 setInterval(tickCountdown, 1000);
 
 /* ============================
-   RENDER: FLIGHTS
+   RENDER: BOOKING (confirmed / unbooked)
    ============================ */
-function renderFlights() {
-  const el = document.getElementById('panel-flights');
-  el.innerHTML = flights.map(f => {
-    const fromLabel = UT.label[f.from]||f.from;
-    const toLabel = UT.label[f.to]||f.to;
-    const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
-    const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
-    const crossDay = f.ad > f.dd || f.am > f.dm;
-    const tzFrom = UT.tzName[f.from]||'';
-    const tzTo = UT.tzName[f.to]||'';
-    return `<div class="card flight">
-      <div class="flight-head">
-        <span class="flight-no">${f.air} ${f.no}</span>
-        <span class="flight-tag ${f.ok?'tag-ok':'tag-tbd'}">${f.ok?'已出票':'待确认'}</span>
+let currentScope = 'confirmed';
+
+function switchScope(scope) {
+  currentScope = scope;
+  document.querySelectorAll('.scope-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderBooking();
+}
+
+function flightCard(f) {
+  const fromLabel = UT.label[f.from]||f.from;
+  const toLabel = UT.label[f.to]||f.to;
+  const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
+  const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
+  const crossDay = f.ad > f.dd || f.am > f.dm;
+  const tzFrom = UT.tzName[f.from]||'';
+  const tzTo = UT.tzName[f.to]||'';
+  return `<div class="card flight">
+    <div class="flight-head">
+      <span class="flight-no">${f.air} ${f.no}</span>
+      <span class="flight-tag ${f.ok?'tag-ok':'tag-tbd'}">${f.ok?'已出票':'待确认'}</span>
+    </div>
+    <div class="flight-route">
+      <div class="flight-city left">
+        <div class="flight-time">${depTime}</div>
+        <div class="flight-code">${fromLabel} ${f.from}</div>
+        <div class="flight-date">${UT.fmtDate(f.dy,f.dm,f.dd)} ${tzFrom}</div>
       </div>
-      <div class="flight-route">
-        <div class="flight-city left">
-          <div class="flight-time">${depTime}</div>
-          <div class="flight-code">${fromLabel} ${f.from}</div>
-          <div class="flight-date">${UT.fmtDate(f.dy,f.dm,f.dd)} ${tzFrom}</div>
-        </div>
-        <div class="flight-mid">
-          <div class="flight-dur">${crossDay?'+1天':''}</div>
-          <div class="flight-line"></div>
-        </div>
-        <div class="flight-city right">
-          <div class="flight-time">${arrTime}</div>
-          <div class="flight-code">${toLabel} ${f.to}</div>
-          <div class="flight-date">${crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' '}${tzTo}</div>
-        </div>
+      <div class="flight-mid">
+        <div class="flight-dur">${crossDay?'+1天':''}</div>
+        <div class="flight-line"></div>
       </div>
-      ${f.note ? '<div class="flight-note">'+(f.grp2?'👥 小何 小季 · ':'')+f.note+'</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')}
-    </div>`;
-  }).join('');
+      <div class="flight-city right">
+        <div class="flight-time">${arrTime}</div>
+        <div class="flight-code">${toLabel} ${f.to}</div>
+        <div class="flight-date">${crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' '}${tzTo}</div>
+      </div>
+    </div>
+    ${f.note ? '<div class="flight-note">'+(f.grp2?'👥 小何 小季 · ':'')+f.note+'</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')}
+  </div>`;
 }
 
-/* ============================
-   RENDER: TRAINS
-   ============================ */
-function renderTrains() {
-  const el = document.getElementById('panel-trains');
-  el.innerHTML = trains.map(t => `
-    <div class="card info-card">
-      <div class="ic-title">${t.route}</div>
-      <div class="ic-sub">${t.date} · ${t.company}</div>
-    </div>
-  `).join('');
-}
+function renderBooking() {
+  const isConfirmed = currentScope === 'confirmed';
+  const cats = [
+    { key:'flights', icon:'✈️', label:'机票',
+      items: flights.filter(f => f.ok === isConfirmed),
+      render: items => items.map(f => flightCard(f)).join('') },
+    { key:'trains', icon:'🚂', label:'火车',
+      items: trains.filter(t => t.ok === isConfirmed),
+      render: items => items.map(t => `
+        <div class="card info-card">
+          <div class="ic-title">${t.route}</div>
+          <div class="ic-sub">${t.date} · ${t.company}</div>
+        </div>`).join('') },
+    { key:'hotels', icon:'🏨', label:'酒店',
+      items: hotels.filter(h => (h.name !== null) === isConfirmed),
+      render: items => items.map(h => `
+        <div class="card info-card">
+          <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span></div>
+          <div class="ic-empty">${h.name || '待预订'}</div>
+        </div>`).join('') },
+    { key:'tickets', icon:'🎫', label:'门票',
+      items: tickets.filter(t => t.ok === isConfirmed),
+      render: items => items.map(t => `
+        <div class="card info-card">
+          <div class="ic-title">${t.name} <span class="flight-tag ${t.ok?'tag-ok':'tag-tbd'}" style="margin-left:6px">${t.ok?'已购':'待购'}</span></div>
+          <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
+        </div>`).join('') },
+  ];
 
-/* ============================
-   RENDER: HOTELS
-   ============================ */
-function renderHotels() {
-  const el = document.getElementById('panel-hotels');
-  el.innerHTML = hotels.map(h => `
-    <div class="card info-card">
-      <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span></div>
-      <div class="ic-empty">${h.name || '待预订'}</div>
-    </div>
-  `).join('');
-}
+  // Filter out empty categories
+  const activeCats = cats.filter(c => c.items.length > 0);
 
-/* ============================
-   RENDER: TICKETS
-   ============================ */
-function renderTickets() {
-  const el = document.getElementById('panel-tickets');
-  el.innerHTML = tickets.map(t => `
-    <div class="card info-card">
-      <div class="ic-title">${t.name} <span class="flight-tag ${t.ok?'tag-ok':'tag-tbd'}" style="margin-left:6px">${t.ok?'已购':'待购'}</span></div>
-      <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
-    </div>
-  `).join('');
+  const tabsEl = document.getElementById('bookingTabs');
+  const panelsEl = document.getElementById('bookingPanels');
+
+  if (activeCats.length === 0) {
+    tabsEl.innerHTML = '';
+    panelsEl.innerHTML = '<div style="padding:20px 16px;text-align:center;color:var(--tx3)">🎉 暂无' + (isConfirmed ? '已确认' : '未预定') + '项目</div>';
+    return;
+  }
+
+  // Build tabs
+  tabsEl.innerHTML = activeCats.map((c, i) =>
+    `<button class="tab${i===0?' active':''}" data-cat="${c.key}">${c.icon} ${c.label} ${c.items.length}</button>`
+  ).join('');
+
+  // Build panels
+  panelsEl.innerHTML = activeCats.map((c, i) =>
+    `<div class="tab-panel${i===0?' active':''}" id="panel-${c.key}">${c.render(c.items)}</div>`
+  ).join('');
+
+  // Tab click handlers
+  tabsEl.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabsEl.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      panelsEl.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.cat).classList.add('active');
+    });
+  });
 }
 
 /* ============================
@@ -871,17 +924,45 @@ function saveShopState(state) {
   try { localStorage.setItem(SHOP_KEY, JSON.stringify(state)); } catch {}
 }
 
+let currentShopCat = null;
+
 function renderShopping() {
-  const el = document.getElementById('shopList');
+  const tabsEl = document.getElementById('shopTabs');
+  const listEl = document.getElementById('shopList');
   const state = loadShopState();
-  el.innerHTML = shops.map((s,i) => {
+
+  // Build category list with counts
+  const catCounts = {};
+  shops.forEach((s, i) => {
+    if (!catCounts[s.cat]) catCounts[s.cat] = { total: 0, done: 0 };
+    catCounts[s.cat].total++;
+    if (state[i]) catCounts[s.cat].done++;
+  });
+  const cats = Object.keys(catCounts);
+
+  if (!currentShopCat || !cats.includes(currentShopCat)) currentShopCat = cats[0];
+
+  // Render category tabs
+  tabsEl.innerHTML = cats.map(cat => {
+    const c = catCounts[cat];
+    const active = cat === currentShopCat ? ' active' : '';
+    return `<button class="shop-tab${active}" onclick="switchShopCat('${cat}')">${cat} ${c.done}/${c.total}</button>`;
+  }).join('');
+
+  // Render items for current category
+  listEl.innerHTML = shops.map((s, i) => {
+    if (s.cat !== currentShopCat) return '';
     const checked = state[i] ? 'checked' : '';
     return `<div class="shop-item ${checked}" data-idx="${i}" onclick="toggleShop(this)">
-      <span class="shop-cat">${s.cat}</span>
       <span class="shop-name">${s.name}</span>
       <span class="shop-check">✓</span>
     </div>`;
   }).join('');
+}
+
+function switchShopCat(cat) {
+  currentShopCat = cat;
+  renderShopping();
 }
 
 function toggleShop(el) {
@@ -890,6 +971,8 @@ function toggleShop(el) {
   state[idx] = !state[idx];
   saveShopState(state);
   el.classList.toggle('checked');
+  // Re-render to update tab counts
+  renderShopping();
 }
 
 /* ============================
@@ -920,10 +1003,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 /* ============================
    INIT
    ============================ */
-renderFlights();
-renderTrains();
-renderHotels();
-renderTickets();
+renderBooking();
 renderItinerary();
 renderTodos();
 renderShopping();
