@@ -256,17 +256,29 @@ body{
 .shop-item.checked .shop-check{
   background:var(--ok);border-color:var(--ok);color:#fff;
 }
-.shop-tabs{
-  display:flex;gap:6px;padding:0 16px;margin-bottom:12px;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;
+.shop-card{
+  background:var(--bg2);border-radius:var(--r);
+  border:1px solid var(--brd);margin:0 16px 12px;
+  box-shadow:0 2px 8px var(--sh);overflow:hidden;
 }
-.shop-tabs::-webkit-scrollbar{display:none}
-.shop-tab{
-  padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;
-  white-space:nowrap;cursor:pointer;border:none;
-  background:var(--bg3);color:var(--tx2);transition:all .2s;
+.shop-head{
+  display:flex;align-items:center;padding:14px 16px;
+  cursor:pointer;user-select:none;gap:10px;
 }
-.shop-tab.active{background:var(--pri);color:#fff}
+.shop-cat-icon{
+  font-size:12px;font-weight:700;color:#fff;
+  background:var(--sec);border-radius:6px;
+  padding:2px 8px;flex-shrink:0;
+}
+.shop-cat-name{font-weight:700;font-size:15px;flex:1}
+.shop-progress{font-size:12px;color:var(--tx3);margin-right:4px}
+.shop-arrow{
+  font-size:12px;color:var(--tx3);transition:transform .25s;flex-shrink:0;
+}
+.shop-card.open .shop-arrow{transform:rotate(180deg)}
+.shop-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.shop-card.open .shop-body{max-height:1000px}
+.shop-body-inner{padding:0 16px 12px}
 
 /* ===== Tips ===== */
 .tips-grid{padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -422,8 +434,7 @@ body{
 <!-- 出发前采购 -->
 <div class="section">
   <div class="section-title"><span class="icon">🛒</span> 出发前采购</div>
-  <div class="shop-tabs" id="shopTabs"></div>
-  <div class="shop-list" id="shopList"></div>
+  <div id="shopCards"></div>
 </div>
 
 <!-- 实用贴士 -->
@@ -927,45 +938,40 @@ function saveShopState(state) {
   try { localStorage.setItem(SHOP_KEY, JSON.stringify(state)); } catch {}
 }
 
-let currentShopCat = null;
-
 function renderShopping() {
-  const tabsEl = document.getElementById('shopTabs');
-  const listEl = document.getElementById('shopList');
+  const el = document.getElementById('shopCards');
   const state = loadShopState();
 
-  // Build category list with counts
-  const catCounts = {};
+  // Group shops by category
+  const catData = {};
   shops.forEach((s, i) => {
-    if (!catCounts[s.cat]) catCounts[s.cat] = { total: 0, done: 0 };
-    catCounts[s.cat].total++;
-    if (state[i]) catCounts[s.cat].done++;
+    if (!catData[s.cat]) catData[s.cat] = { total: 0, done: 0, items: [] };
+    catData[s.cat].total++;
+    if (state[i]) catData[s.cat].done++;
+    catData[s.cat].items.push({ ...s, idx: i });
   });
-  const cats = Object.keys(catCounts);
 
-  if (!currentShopCat || !cats.includes(currentShopCat)) currentShopCat = cats[0];
+  el.innerHTML = Object.entries(catData).map(([cat, data]) => {
+    const items = data.items.map(item => {
+      const checked = state[item.idx] ? 'checked' : '';
+      return `<div class="shop-item ${checked}" data-idx="${item.idx}" onclick="toggleShop(this)">
+        <span class="shop-name">${item.name}</span>
+        <span class="shop-check">✓</span>
+      </div>`;
+    }).join('');
 
-  // Render category tabs
-  tabsEl.innerHTML = cats.map(cat => {
-    const c = catCounts[cat];
-    const active = cat === currentShopCat ? ' active' : '';
-    return `<button class="shop-tab${active}" onclick="switchShopCat('${cat}')">${cat} ${c.done}/${c.total}</button>`;
-  }).join('');
-
-  // Render items for current category
-  listEl.innerHTML = shops.map((s, i) => {
-    if (s.cat !== currentShopCat) return '';
-    const checked = state[i] ? 'checked' : '';
-    return `<div class="shop-item ${checked}" data-idx="${i}" onclick="toggleShop(this)">
-      <span class="shop-name">${s.name}</span>
-      <span class="shop-check">✓</span>
+    return `<div class="shop-card">
+      <div class="shop-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="shop-cat-icon">${cat}</span>
+        <span class="shop-cat-name">${cat}</span>
+        <span class="shop-progress">${data.done}/${data.total}</span>
+        <span class="shop-arrow">▾</span>
+      </div>
+      <div class="shop-body">
+        <div class="shop-body-inner">${items}</div>
+      </div>
     </div>`;
   }).join('');
-}
-
-function switchShopCat(cat) {
-  currentShopCat = cat;
-  renderShopping();
 }
 
 function toggleShop(el) {
@@ -974,8 +980,11 @@ function toggleShop(el) {
   state[idx] = !state[idx];
   saveShopState(state);
   el.classList.toggle('checked');
-  // Re-render to update tab counts
-  renderShopping();
+  // Update progress text in the card header
+  const card = el.closest('.shop-card');
+  const items = card.querySelectorAll('.shop-item');
+  const done = card.querySelectorAll('.shop-item.checked').length;
+  card.querySelector('.shop-progress').textContent = done + '/' + items.length;
 }
 
 /* ============================
