@@ -501,6 +501,10 @@ body{
   font-size:13px;background:var(--bg2);color:var(--tx1);
   margin-top:8px;min-height:60px;resize:vertical;font-family:inherit;
 }
+.cam-status{
+  font-size:12px;color:var(--tx3);margin-top:4px;
+  display:flex;align-items:center;gap:6px;
+}
 .cam-result{
   margin-top:8px;padding:10px 14px;
   background:var(--pri-l);border-radius:10px;
@@ -1722,9 +1726,32 @@ function previewCam(input) {
       const img = document.getElementById('camPreview');
       img.src = e.target.result;
       img.style.display = 'block';
+      doOCR(e.target.result);
     };
     reader.readAsDataURL(input.files[0]);
   }
+}
+
+function doOCR(imageData) {
+  const textArea = document.getElementById('camText');
+  const result = document.getElementById('camResult');
+  textArea.value = '正在识别图片中的文字...';
+  result.style.display = 'none';
+  // Detect language from selector (use source language for OCR)
+  const langPair = document.getElementById('camLang').value;
+  const srcLang = langPair.split('|')[0];
+  const tessLang = srcLang === 'zh-CN' ? 'chi_sim' : (srcLang === 'pt' ? 'por' : (srcLang === 'es' ? 'spa' : 'eng'));
+  Tesseract.recognize(imageData, tessLang, {
+    logger: m => {
+      if (m.status === 'recognizing text') {
+        textArea.value = '识别中... ' + Math.round(m.progress * 100) + '%';
+      }
+    }
+  }).then(({ data: { text } }) => {
+    textArea.value = text.trim() || '未识别到文字，请手动输入';
+  }).catch(() => {
+    textArea.value = '识别失败，请手动输入文字';
+  });
 }
 
 function doCamTranslate() {
@@ -1803,6 +1830,7 @@ renderShopping();
     });
   });
 })();
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </script>
 </body>
 </html>
