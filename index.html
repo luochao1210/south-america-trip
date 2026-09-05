@@ -534,10 +534,11 @@ body{
   display:none;word-break:break-word;
 }
 .cam-result{
-  margin-top:8px;padding:10px 14px;
+  margin-top:8px;padding:12px 14px;
   background:var(--pri-l);border-radius:10px;
   font-size:14px;font-weight:600;color:var(--pri);
   display:none;word-break:break-word;
+  line-height:1.7;
 }
 .fx-result{
   margin-top:10px;padding:10px 14px;
@@ -1843,12 +1844,28 @@ function doCamTranslate() {
   if (!text) { result.textContent = '请先输入要翻译的文字'; result.style.display = 'block'; return; }
   result.textContent = '翻译中...';
   result.style.display = 'block';
-  // Split into chunks of 500 chars for API limit
-  const chunkSize = 450;
+  // Split by lines first, then by sentence boundaries within 450 chars
+  const lines = text.split('\n').filter(l => l.trim());
   const chunks = [];
-  for (let i = 0; i < text.length; i += chunkSize) {
-    chunks.push(text.slice(i, i + chunkSize));
-  }
+  lines.forEach(line => {
+    if (line.length <= 450) {
+      chunks.push(line.trim());
+    } else {
+      // Split long lines at sentence boundaries
+      const sentences = line.match(/[^.!?。！？]+[.!?。！？]?/g) || [line];
+      let buf = '';
+      sentences.forEach(s => {
+        if ((buf + s).length > 450 && buf) {
+          chunks.push(buf.trim());
+          buf = s;
+        } else {
+          buf += s;
+        }
+      });
+      if (buf.trim()) chunks.push(buf.trim());
+    }
+  });
+  if (chunks.length === 0) chunks.push(text);
   const translated = [];
   let done = 0;
   chunks.forEach((chunk, idx) => {
@@ -1856,18 +1873,21 @@ function doCamTranslate() {
     fetch(url)
       .then(r => r.json())
       .then(data => {
-        translated[idx] = (data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : chunk;
+        let t = (data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : chunk;
+        // Clean up: fix extra spaces, normalize
+        t = t.replace(/\s+/g, ' ').trim();
+        translated[idx] = t;
         done++;
         result.textContent = '翻译中... ' + Math.round(done / chunks.length * 100) + '%';
         if (done === chunks.length) {
-          result.textContent = translated.join('');
+          result.innerHTML = translated.map(t => t.replace(/</g,'&lt;')).join('<br>');
         }
       })
       .catch(() => {
         translated[idx] = chunk;
         done++;
         if (done === chunks.length) {
-          result.textContent = translated.join('');
+          result.innerHTML = translated.map(t => t.replace(/</g,'&lt;')).join('<br>');
         }
       });
   });
