@@ -359,20 +359,26 @@ body{
 .tip-card p{font-size:12px;color:var(--tx2);line-height:1.5}
 .tip-card a{color:var(--pri);text-decoration:none}
 
-/* ===== Restaurant ===== */
-.rest-grid{padding:0 16px;display:flex;flex-direction:column;gap:10px}
-.rest-city{font-size:14px;font-weight:700;color:var(--pri);margin:8px 0 4px;display:flex;align-items:center;gap:6px}
-.rest-card{
-  background:var(--bg2);border:1px solid var(--brd);
-  border-radius:var(--rs);padding:12px 14px;
+/* Tip food interactive */
+.tip-card.full{grid-column:1/-1}
+.tip-food-cities{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tip-city-btn{
+  padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid var(--brd);
+  background:var(--bg3);color:var(--tx2);transition:all .15s;
 }
-.rest-name{font-size:14px;font-weight:700;margin-bottom:2px}
-.rest-meta{font-size:12px;color:var(--tx2);line-height:1.5}
-.rest-tag{
-  display:inline-block;font-size:11px;font-weight:600;
-  padding:1px 6px;border-radius:4px;margin-left:6px;
-  background:rgba(129,178,154,.15);color:var(--ok);
+.tip-city-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.tip-rest-list{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.tip-rest-card{
+  background:var(--bg3);border-radius:8px;padding:8px 12px;
 }
+.tip-rest-name{font-size:13px;font-weight:700}
+.tip-rest-tag{
+  display:inline-block;font-size:10px;font-weight:600;
+  padding:1px 5px;border-radius:3px;margin-left:4px;
+  background:rgba(129,178,154,.2);color:var(--ok);
+}
+.tip-rest-meta{font-size:11px;color:var(--tx2);margin-top:2px}
 
 /* ===== Footer ===== */
 .footer{
@@ -539,12 +545,6 @@ body{
 <div class="section" id="sec-tips">
   <div class="section-title"><span class="icon">💡</span> 实用贴士</div>
   <div class="tips-grid" id="tipsGrid"></div>
-</div>
-
-<!-- 美食推荐 -->
-<div class="section">
-  <div class="section-title"><span class="icon">🍽️</span> 美食推荐</div>
-  <div class="rest-grid" id="restGrid"></div>
 </div>
 
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
@@ -1143,12 +1143,39 @@ function toggleShop(el) {
    ============================ */
 function renderTips() {
   const el = document.getElementById('tipsGrid');
-  el.innerHTML = tips.map(t => `
-    <div class="tip-card">
+  el.innerHTML = tips.map((t, i) => {
+    if (t.icon === '🍽️') {
+      const cities = restaurants.map(g => g.city);
+      const cityBtns = cities.map((c, ci) =>
+        `<button class="tip-city-btn" data-idx="${ci}" onclick="toggleTipCity(this)">${c.replace(/ \(.*\)/, '')}</button>`
+      ).join('');
+      return `<div class="tip-card full">
+        <h4>${t.icon} ${t.title}</h4>
+        <p>${t.body}</p>
+        <div class="tip-food-cities">${cityBtns}</div>
+        <div class="tip-rest-list" id="tipRestList"></div>
+      </div>`;
+    }
+    return `<div class="tip-card">
       <h4>${t.icon} ${t.title}</h4>
       <p>${t.body}</p>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+}
+
+function toggleTipCity(btn) {
+  const list = document.getElementById('tipRestList');
+  const wasActive = btn.classList.contains('active');
+  document.querySelectorAll('.tip-city-btn').forEach(b => b.classList.remove('active'));
+  if (wasActive) { list.innerHTML = ''; return; }
+  btn.classList.add('active');
+  const group = restaurants[parseInt(btn.dataset.idx)];
+  list.innerHTML = group.items.map(r =>
+    `<div class="tip-rest-card">
+      <div class="tip-rest-name">${r.name}${r.tag ? '<span class="tip-rest-tag">'+r.tag+'</span>' : ''}</div>
+      <div class="tip-rest-meta">${r.type} · ${r.note}</div>
+    </div>`
+  ).join('');
 }
 
 /* ============================
@@ -1189,9 +1216,6 @@ function renderRouteSummary() {
   ).join('');
 }
 
-/* ============================
-   RENDER: RESTAURANTS
-   ============================ */
 const restaurants = [
   { city:'圣地亚哥 (9.25)', items:[
     { name:'Boragó', type:'新派智利菜', note:'拉丁美洲Top50餐厅，需提前预订', tag:'必吃' },
@@ -1225,18 +1249,6 @@ const restaurants = [
   ]},
 ];
 
-function renderRestaurants() {
-  document.getElementById('restGrid').innerHTML = restaurants.map(group => {
-    const items = group.items.map(r =>
-      `<div class="rest-card">
-        <div class="rest-name">${r.name}${r.tag ? '<span class="rest-tag">'+r.tag+'</span>' : ''}</div>
-        <div class="rest-meta">${r.type} · ${r.note}</div>
-      </div>`
-    ).join('');
-    return `<div class="rest-city">📍 ${group.city}</div>${items}`;
-  }).join('');
-}
-
 /* ============================
    INIT
    ============================ */
@@ -1247,7 +1259,6 @@ renderTopTodos();
 renderRouteSummary();
 renderShopping();
 renderTips();
-renderRestaurants();
 </script>
 </body>
 </html>
