@@ -450,9 +450,7 @@ body{
   cursor:pointer;user-select:none;gap:10px;
 }
 .shop-cat-icon{
-  font-size:12px;font-weight:700;color:#fff;
-  background:var(--sec);border-radius:6px;
-  padding:2px 8px;flex-shrink:0;
+  font-size:18px;line-height:1;flex-shrink:0;
 }
 .shop-cat-name{font-weight:700;font-size:15px;flex:1}
 .shop-progress{font-size:12px;color:var(--tx3);margin-right:4px}
@@ -1504,9 +1502,10 @@ function renderShopping() {
       </div>`;
     }).join('');
 
+    const catIcons = {'证件':'📄','电子':'🔌','药品':'💊','衣物':'👕','防护':'🧴','日用':'🧳','安全':'🔒','其他':'📦'};
     return `<div class="shop-card">
       <div class="shop-head" onclick="this.parentElement.classList.toggle('open')">
-        <span class="shop-cat-icon">${cat}</span>
+        <span class="shop-cat-icon">${catIcons[cat] || '📦'}</span>
         <span class="shop-cat-name">${cat}</span>
         <span class="shop-progress">${data.done}/${data.total}</span>
         <span class="shop-arrow">▾</span>
