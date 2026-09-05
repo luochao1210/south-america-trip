@@ -1620,6 +1620,8 @@ function renderTips() {
         <button onclick="addCustomShop()" style="padding:6px 14px;border:none;border-radius:8px;background:var(--pri);color:#fff;font-size:13px;font-weight:600;cursor:pointer">添加</button>
       </div>
     </div>
+  </div>`;
+
   // Remaining tips (food + rest)
   html += tips.slice(3).map((t) => {
     if (t.icon === '🍽️') {
@@ -1634,7 +1636,7 @@ function renderTips() {
         return `<div class="food-city-card">
           <div class="food-city-head" onclick="this.parentElement.classList.toggle('open')">
             <span class="food-city-icon">📍</span>
-            <span class="food-city-name">${g.city.replace(/ \(.*\)/, '')}</span>
+            <span class="food-city-name">${g.city.split(' (')[0]}</span>
             <span class="food-city-count">${g.items.length}家</span>
             <span class="food-city-arrow">▾</span>
           </div>
