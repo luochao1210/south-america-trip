@@ -55,6 +55,32 @@ body{
 .cd-lbl{font-size:11px;opacity:.7;margin-top:4px;display:block}
 .hero-tz{font-size:12px;opacity:.6;text-align:center;margin-top:10px}
 
+/* Hero todos */
+.hero-todo{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1}
+.hero-todo-title{font-size:12px;opacity:.7;margin-bottom:8px}
+.hero-todo-list{display:flex;flex-direction:column;gap:6px}
+.hero-todo-item{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;opacity:.9;
+  background:rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;
+}
+.hero-todo-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+}
+.hero-todo-dot.urgent{background:#F4845F}
+.hero-todo-dot.normal{background:#F4D890}
+.hero-todo-dot.low{background:#8BC6A0}
+.hero-todo-text{
+  flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hero-todo-link{
+  display:block;text-align:center;margin-top:10px;
+  font-size:12px;opacity:.7;color:#fff;text-decoration:none;
+  padding:4px 0;border-radius:4px;
+  background:rgba(255,255,255,.1);
+}
+.hero-todo-link:active{opacity:1}
+
 /* ===== Section ===== */
 .section{margin-bottom:24px}
 .section-title{
@@ -329,6 +355,7 @@ body{
       <div class="cd-unit"><span class="cd-num" id="cdS">-</span><span class="cd-lbl">秒</span></div>
     </div>
     <div class="hero-tz" id="heroTz"></div>
+    <div class="hero-todo" id="heroTodo"></div>
   </div>
 </div>
 
@@ -764,6 +791,23 @@ function tickCountdown() {
 tickCountdown();
 setInterval(tickCountdown, 1000);
 
+function renderTopTodos() {
+  const urgOrder = { urgent: 0, normal: 1, low: 2 };
+  const top3 = [...todos].sort((a, b) => urgOrder[a.urg] - urgOrder[b.urg]).slice(0, 3);
+
+  const items = top3.map(t =>
+    `<div class="hero-todo-item">
+      <span class="hero-todo-dot ${t.urg}"></span>
+      <span class="hero-todo-text">${t.txt}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('heroTodo').innerHTML =
+    `<div class="hero-todo-title">📋 当前待办 TOP 3</div>
+    <div class="hero-todo-list">${items}</div>
+    <a class="hero-todo-link" href="#todoList" onclick="document.getElementById('todoList').scrollIntoView({behavior:'smooth'});return false;">查看完整清单 →</a>`;
+}
+
 /* ============================
    RENDER: BOOKING (confirmed / unbooked)
    ============================ */
@@ -1018,6 +1062,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 renderBooking();
 renderItinerary();
 renderTodos();
+renderTopTodos();
 renderShopping();
 renderTips();
 </script>
