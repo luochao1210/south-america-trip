@@ -1973,24 +1973,29 @@ function previewCam(input) {
 function doOCR(imageData) {
   const textArea = document.getElementById('camText');
   const result = document.getElementById('camResult');
-  textArea.value = '正在识别图片中的文字...';
+  textArea.value = '正在加载识别引擎...';
   result.style.display = 'none';
-  // Detect language from selector (use source language for OCR)
+  if (typeof Tesseract === 'undefined') {
+    textArea.value = '识别引擎加载失败，请手动输入文字。或使用 Google Lens 按钮。';
+    return;
+  }
   const langPair = document.getElementById('camLang').value;
   const srcLang = langPair.split('|')[0];
   const tessLang = srcLang === 'zh-CN' ? 'chi_sim' : (srcLang === 'pt' ? 'por' : (srcLang === 'es' ? 'spa' : 'eng'));
   Tesseract.recognize(imageData, tessLang, {
     logger: m => {
-      if (m.status === 'recognizing text') {
-        textArea.value = '识别中... ' + Math.round(m.progress * 100) + '%';
-      }
+      if (m.status === 'loading tesseract core') textArea.value = '加载引擎中...';
+      else if (m.status === 'initializing tesseract') textArea.value = '初始化中...';
+      else if (m.status === 'loading language traineddata') textArea.value = '下载语言包中（首次较慢）... ' + Math.round(m.progress * 100) + '%';
+      else if (m.status === 'initializing api') textArea.value = '准备识别...';
+      else if (m.status === 'recognizing text') textArea.value = '识别中... ' + Math.round(m.progress * 100) + '%';
     }
   }).then(({ data: { text } }) => {
     const recognized = text.trim();
     textArea.value = recognized || '未识别到文字，请手动输入';
     if (recognized) doCamTranslate();
-  }).catch(() => {
-    textArea.value = '识别失败，请手动输入文字';
+  }).catch(e => {
+    textArea.value = '识别失败（' + (e.message || '网络错误') + '），请手动输入或使用 Google Lens';
   });
 }
 
@@ -2003,6 +2008,14 @@ function clearCam() {
   document.getElementById('camCapture').value = '';
 }
 
+function getTranslateURL(text, srcLang, tgtLang) {
+  const isChina = (new Date().getTimezoneOffset() / -60) === 8;
+  if (isChina) {
+    return 'https://fanyi.youdao.com/#/translate?i=' + encodeURIComponent(text) + '&from=' + srcLang + '&to=' + tgtLang;
+  }
+  return 'https://translate.google.com/?sl=' + srcLang + '&tl=' + tgtLang + '&text=' + encodeURIComponent(text) + '&op=translate';
+}
+
 function doCamTranslate() {
   const text = document.getElementById('camText').value.trim();
   const lang = document.getElementById('camLang').value;
@@ -2010,53 +2023,24 @@ function doCamTranslate() {
   if (!text) { result.textContent = '请先输入要翻译的文字'; result.style.display = 'block'; return; }
   result.textContent = '翻译中...';
   result.style.display = 'block';
-  // Split by lines first, then by sentence boundaries within 450 chars
-  const lines = text.split('\n').filter(l => l.trim());
-  const chunks = [];
-  lines.forEach(line => {
-    if (line.length <= 450) {
-      chunks.push(line.trim());
-    } else {
-      // Split long lines at sentence boundaries
-      const sentences = line.match(/[^.!?。！？]+[.!?。！？]?/g) || [line];
-      let buf = '';
-      sentences.forEach(s => {
-        if ((buf + s).length > 450 && buf) {
-          chunks.push(buf.trim());
-          buf = s;
-        } else {
-          buf += s;
-        }
-      });
-      if (buf.trim()) chunks.push(buf.trim());
-    }
-  });
-  if (chunks.length === 0) chunks.push(text);
-  const translated = [];
-  let done = 0;
-  chunks.forEach((chunk, idx) => {
-    const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(chunk) + '&langpair=' + lang;
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        let t = (data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : chunk;
-        // Clean up: fix extra spaces, normalize
-        t = t.replace(/\s+/g, ' ').trim();
-        translated[idx] = t;
-        done++;
-        result.textContent = '翻译中... ' + Math.round(done / chunks.length * 100) + '%';
-        if (done === chunks.length) {
-          result.innerHTML = translated.map(t => t.replace(/</g,'&lt;')).join('<br>');
-        }
-      })
-      .catch(() => {
-        translated[idx] = chunk;
-        done++;
-        if (done === chunks.length) {
-          result.innerHTML = translated.map(t => t.replace(/</g,'&lt;')).join('<br>');
-        }
-      });
-  });
+  const [srcLang, tgtLang] = lang.split('|');
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.substring(0, 450)) + '&langpair=' + srcLang + '|' + tgtLang;
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (data.responseData && data.responseData.translatedText && data.responseStatus === 200) {
+        result.innerHTML = data.responseData.translatedText;
+      } else {
+        const fUrl = getTranslateURL(text, srcLang, tgtLang);
+        const isChina = (new Date().getTimezoneOffset() / -60) === 8;
+        result.innerHTML = 'API 额度已用完，<a href="' + fUrl + '" target="_blank" style="color:var(--pri);font-weight:700">点击用' + (isChina ? '有道翻译' : 'Google 翻译') + ' →</a>';
+      }
+    })
+    .catch(() => {
+      const fUrl = getTranslateURL(text, srcLang, tgtLang);
+      const isChina = (new Date().getTimezoneOffset() / -60) === 8;
+      result.innerHTML = '网络错误，<a href="' + fUrl + '" target="_blank" style="color:var(--pri);font-weight:700">点击用' + (isChina ? '有道翻译' : 'Google 翻译') + ' →</a>';
+    });
 }
 
 let voiceRecognition = null;
@@ -2129,13 +2113,24 @@ function doVoiceTranslate() {
   if (!text) return;
   result.textContent = '翻译中...';
   result.style.display = 'block';
-  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + lang;
+  const [srcLang, tgtLang] = lang.split('|');
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + srcLang + '|' + tgtLang;
   fetch(url)
     .then(r => r.json())
     .then(data => {
-      result.textContent = (data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : '翻译失败';
+      if (data.responseData && data.responseData.translatedText && data.responseStatus === 200) {
+        result.innerHTML = data.responseData.translatedText;
+      } else {
+        const fUrl = getTranslateURL(text, srcLang, tgtLang);
+        const isChina = (new Date().getTimezoneOffset() / -60) === 8;
+        result.innerHTML = 'API 额度已用完，<a href="' + fUrl + '" target="_blank" style="color:var(--pri);font-weight:700">点击用' + (isChina ? '有道翻译' : 'Google 翻译') + ' →</a>';
+      }
     })
-    .catch(() => { result.textContent = '网络错误'; });
+    .catch(() => {
+      const fUrl = getTranslateURL(text, srcLang, tgtLang);
+      const isChina = (new Date().getTimezoneOffset() / -60) === 8;
+      result.innerHTML = '网络错误，<a href="' + fUrl + '" target="_blank" style="color:var(--pri);font-weight:700">点击用' + (isChina ? '有道翻译' : 'Google 翻译') + ' →</a>';
+    });
 }
 
 const FX_RATES = { SOL:1.95, BRL:1.30, CLP:0.0071, ARS:0.0045, UYU:0.17, USD:7.25, CNY:1 };
