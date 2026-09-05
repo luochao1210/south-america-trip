@@ -1069,7 +1069,6 @@ body{
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================
    UTILITIES
@@ -1091,74 +1090,51 @@ const UT = {
 };
 
 /* ============================
-   BOOKING DATA (Supabase)
+   BOOKING DATA
    ============================ */
-let flights = [];
-let trains = [];
-let hotels = [];
-let tickets = [];
+const flights = [
+  { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:24,dh:15,dmi:0, ay:2026,am:9,ad:25,ah:5,ami:0, air:'中国国航', ok:true, note:'T3 → T3' },
+  { no:'LA612', from:'GRU', to:'SCL', dy:2026,dm:9,dd:25,dh:12,dmi:5, ay:2026,am:9,ad:25,ah:16,ami:25, air:'南美航空', ok:true, note:'经济舱 · 无免费托运' },
+  { no:'LA843', from:'SCL', to:'IPC', dy:2026,dm:9,dd:26,dh:11,dmi:10, ay:2026,am:9,ad:26,ah:14,ami:45, air:'南美航空', ok:true, note:'经济舱 Basic' },
+  { no:'LA844', from:'IPC', to:'SCL', dy:2026,dm:9,dd:28,dh:17,dmi:30, ay:2026,am:9,ad:29,ah:0,ami:5, air:'南美航空', ok:true, note:'经济舱 Basic · 到达即09.29凌晨' },
+  { no:'LA2367', from:'SCL', to:'CUZ', dy:2026,dm:9,dd:29,dh:7,dmi:10, ay:2026,am:9,ad:29,ah:8,ami:40, air:'南美航空', ok:true, note:'无免费托运' },
+  { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:28,dh:15,dmi:0, ay:2026,am:9,ad:29,ah:5,ami:0, air:'中国国航', ok:true, note:'小何 小季 · T3→T3', grp2:true },
+  { no:'待定', from:'GRU', to:'CUZ', dy:2026,dm:9,dd:29,dh:0,dmi:0, ay:2026,am:9,ad:29,ah:0,ami:0, air:'待定', ok:false, note:'小何 小季 · 经利马中转', grp2:true },
+  { no:'待定', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:20,dmi:0, ay:2026,am:10,ad:1,ah:22,ami:30, air:'待定', ok:false, note:'飞行约1.5h' },
+  { no:'待定', from:'LIM', to:'EZE', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:7,ami:30, air:'待定', ok:false, note:'红眼航班' },
+  { no:'待定', from:'EZE', to:'USH', dy:2026,dm:10,dd:2,dh:16,dmi:40, ay:2026,am:10,ad:2,ah:20,ami:19, air:'待定', ok:false, note:'' },
+  { no:'待定', from:'USH', to:'EZE', dy:2026,dm:10,dd:3,dh:18,dmi:40, ay:2026,am:10,ad:3,ah:22,ami:10, air:'待定', ok:false, note:'' },
+  { no:'待定', from:'EZE', to:'GIG', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'10.04晚或10.05早' },
+  { no:'待定', from:'GIG', to:'GRU', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'基督山后飞圣保罗' },
+  { no:'CA898', from:'GRU', to:'PEK', dy:2026,dm:10,dd:6,dh:9,dmi:25, ay:2026,am:10,ad:7,ah:19,ami:30, air:'中国国航', ok:true, note:'T3 → T3' },
+];
+const trains = [
+  { date:'09.30', route:'库斯科 → 热水镇', company:'PeruRail / Inca Rail', ok:false },
+  { date:'10.01', route:'热水镇 → 库斯科', company:'PeruRail / Inca Rail', ok:false },
+];
+const hotels = [
+  { date:'09.25', city:'圣地亚哥', name:null },
+  { date:'09.26-27', city:'复活节岛', name:null },
+  { date:'09.28', city:'圣地亚哥', name:null },
+  { date:'09.29', city:'库斯科', name:null },
+  { date:'09.30', city:'热水镇', name:null },
+  { date:'10.02', city:'乌斯怀亚', name:null },
+  { date:'10.03-04', city:'布宜诺斯艾利斯', name:null },
+  { date:'10.05', city:'圣保罗', name:null },
+];
+const tickets = [
+  { name:'马丘比丘', date:'10.01', time:'08:00 AM', detail:'Circuito 1 · Ruta 1-B 上层平台', ok:true },
+  { name:'复活节岛国家公园', date:'09.27', time:'全天', detail:'待购票', ok:false },
+  { name:'世界尽头小火车', date:'10.03', time:'上午', detail:'乌斯怀亚', ok:false },
+  { name:'火地岛国家公园', date:'10.03', time:'上午', detail:'乌斯怀亚', ok:false },
+];
 let currentBookingCat = 'flights';
 
-function parseDate(s) {
-  const p = (s||'').split('/');
-  return { m: parseInt(p[0])||0, d: parseInt(p[1])||0 };
-}
-function parseTime(s) {
-  if (!s || s === '待定') return { h: 0, mi: 0 };
-  const p = s.split(':');
-  return { h: parseInt(p[0])||0, mi: parseInt(p[1])||0 };
-}
 
-async function fetchFlights() {
-  if (!_supabase) return;
-  const { data } = await _supabase.from('flights').select('*').order('id');
-  if (data) {
-    flights = data.map(f => {
-      const dep = parseDate(f.dep_date), arr = parseDate(f.arr_date || f.dep_date);
-      const depT = parseTime(f.dep_time), arrT = parseTime(f.arr_time);
-      return {
-        id: f.id, no: f.flight_no, from: f.from_code, to: f.to_code,
-        dy: 2026, dm: dep.m, dd: dep.d, dh: depT.h, dmi: depT.mi,
-        ay: 2026, am: arr.m, ad: arr.d, ah: arrT.h, ami: arrT.mi,
-        air: f.airline || '待定', ok: f.confirmed, note: f.note || '', grp2: f.grp2
-      };
-    });
-      }
-}
 
-async function fetchTrains() {
-  if (!_supabase) return;
-  const { data } = await _supabase.from('trains').select('*').order('id');
-  if (data) {
-    trains = data.map(t => ({ id: t.id, date: t.travel_date, route: t.route, company: t.company || '待定', ok: t.confirmed }));
-      }
-}
 
-async function fetchHotels() {
-  if (!_supabase) return;
-  const { data } = await _supabase.from('hotels').select('*').order('id');
-  if (data) {
-    hotels = data.map(h => ({ id: h.id, date: h.stay_date, city: h.city, name: h.hotel_name || null, ok: h.confirmed }));
-      }
-}
 
-async function fetchTickets() {
-  if (!_supabase) return;
-  const { data } = await _supabase.from('tickets').select('*').order('id');
-  if (data) {
-    tickets = data.map(t => ({ id: t.id, name: t.name, date: t.ticket_date, time: t.ticket_time || '', detail: t.detail || '', ok: t.confirmed }));
-      }
-}
 
-async function toggleBooking(table, id, currentConfirmed) {
-  if (_supabase) {
-    await _supabase.from(table).update({ confirmed: !currentConfirmed }).eq('id', id);
-    if (table === 'flights') await fetchFlights();
-    if (table === 'trains') await fetchTrains();
-    if (table === 'hotels') await fetchHotels();
-    if (table === 'tickets') await fetchTickets();
-  }
-}
 
 /* ============================
    RENDER: BOOKING
@@ -1171,8 +1147,7 @@ function flightCard(f) {
   const crossDay = f.ad > f.dd || f.am > f.dm;
   const tzFrom = UT.tzName[f.from]||'';
   const tzTo = UT.tzName[f.to]||'';
-  const click = f.id ? ' onclick="toggleBooking(\'flights\',' + f.id + ',' + f.ok + ')" style="cursor:pointer"' : '';
-  return '<div class="card flight"' + click + '>' +
+  return '<div class="card flight">' +
     '<div class="flight-head">' +
     '<span class="flight-no">' + (f.air||'待定') + ' ' + (f.no||'待定') + '</span>' +
     '<span class="flight-tag ' + (f.ok?'tag-ok':'tag-tbd') + '">' + (f.ok?'已出票':'待确认') + '</span>' +
@@ -1201,19 +1176,19 @@ function renderBooking() {
       confirmed: trains.filter(function(t){return t.ok}),
       unbooked: trains.filter(function(t){return !t.ok}),
       renderItem: function(t, ok) {
-        return '<div class="card info-card" onclick="toggleBooking(\'trains\',' + t.id + ',' + ok + ')" style="cursor:pointer"><div class="ic-title">' + t.route + ' ' + statusBadge(ok) + '</div><div class="ic-sub">' + t.date + ' · ' + t.company + '</div></div>';
+        return '<div class="card info-card" ><div class="ic-title">' + t.route + ' ' + statusBadge(ok) + '</div><div class="ic-sub">' + t.date + ' · ' + t.company + '</div></div>';
       } },
     { key:'hotels', icon:'🏨', label:'酒店',
       confirmed: hotels.filter(function(h){return h.name !== null}),
       unbooked: hotels.filter(function(h){return h.name === null}),
       renderItem: function(h, ok) {
-        return '<div class="card info-card" onclick="toggleBooking(\'hotels\',' + h.id + ',' + ok + ')" style="cursor:pointer"><div class="ic-title">' + h.city + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">' + h.date + '</span> ' + statusBadge(ok) + '</div><div class="ic-empty">' + (h.name || '待预订') + '</div></div>';
+        return '<div class="card info-card" ><div class="ic-title">' + h.city + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">' + h.date + '</span> ' + statusBadge(ok) + '</div><div class="ic-empty">' + (h.name || '待预订') + '</div></div>';
       } },
     { key:'tickets', icon:'🎫', label:'门票',
       confirmed: tickets.filter(function(t){return t.ok}),
       unbooked: tickets.filter(function(t){return !t.ok}),
       renderItem: function(t, ok) {
-        return '<div class="card info-card" onclick="toggleBooking(\'tickets\',' + t.id + ',' + ok + ')" style="cursor:pointer"><div class="ic-title">' + t.name + ' ' + statusBadge(ok) + '</div><div class="ic-sub">' + t.date + ' ' + t.time + ' · ' + t.detail + '</div></div>';
+        return '<div class="card info-card" ><div class="ic-title">' + t.name + ' ' + statusBadge(ok) + '</div><div class="ic-sub">' + t.date + ' ' + t.time + ' · ' + t.detail + '</div></div>';
       } },
   ];
   var tabsEl = document.getElementById('bookingTabs');
@@ -1422,81 +1397,75 @@ function renderItinerary() {
 }
 
 /* ============================
-   TODOS (Supabase)
+   TODOS
    ============================ */
-let _todos = [];
+const todos = [
+  { txt:'预订小何、小季 09.29 圣保罗→库斯科中转航班', urg:'urgent' },
+  { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
+  { txt:'预订 10.02 利马→布宜诺斯航班', urg:'normal' },
+  { txt:'预订 10.02 布宜诺斯→乌斯怀亚航班', urg:'normal' },
+  { txt:'预订 10.03 乌斯怀亚→布宜诺斯航班', urg:'normal' },
+  { txt:'预订 10.05 布宜诺斯→里约→圣保罗航班', urg:'normal' },
+  { txt:'预订库斯科↔热水镇火车票（PeruRail / Inca Rail）', urg:'normal' },
+  { txt:'预订全部酒店（12 晚）', urg:'normal' },
+  { txt:'购买复活节岛国家公园门票', urg:'normal' },
+  { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
+  { txt:'确认 10.04 布宜诺斯⇄科洛尼亚渡轮时刻（Buquebus / Colonia Express）', urg:'low' },
+];
 
-async function fetchTodos() {
-  if (!_supabase) return;
-  const { data } = await _supabase.from('todos').select('*').order('created_at', { ascending: true });
-  if (data) { _todos = data; renderTodos(); renderTopTodos(); }
+const TODO_KEY = 'sa_trip_todo_2026';
+function loadTodoState() {
+  try { return JSON.parse(localStorage.getItem(TODO_KEY)) || {}; } catch { return {}; }
+}
+function saveTodoState(state) {
+  try { localStorage.setItem(TODO_KEY, JSON.stringify(state)); } catch {}
+}
+function toggleTodo(idx) {
+  const state = loadTodoState();
+  state[idx] = !state[idx];
+  saveTodoState(state);
+  renderTodos();
+  renderTopTodos();
 }
 
-async function toggleTodoDone(id, currentDone) {
-  const newDone = !currentDone;
-  // Optimistic update
-  _todos.forEach(t => { if (t.id === id) t.done = newDone; });
-  renderTodos(); renderTopTodos();
-  if (_supabase) {
-    await _supabase.from('todos').update({ done: newDone }).eq('id', id);
-    await fetchTodos();
-    fetchFlights(); fetchTrains(); fetchHotels(); fetchTickets();
-  }
-}
 
-async function addTodo() {
-  const input = document.getElementById('todoAddInput');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  const record = { text, urgency: 'normal', done: false };
-  if (_supabase) {
-    await _supabase.from('todos').insert(record);
-    await fetchTodos();
-  }
-}
 
-async function deleteTodo(id) {
-  _todos = _todos.filter(t => t.id !== id);
-  renderTodos(); renderTopTodos();
-  if (_supabase) {
-    await _supabase.from('todos').delete().eq('id', id);
-    await fetchTodos();
-  }
-}
+
 
 /* ============================
    RENDER: TODOS
    ============================ */
 function renderTodos() {
   const el = document.getElementById('todoList');
+  const state = loadTodoState();
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
-  const sorted = [..._todos].sort((a, b) => {
+  const list = todos.map((t, i) => ({...t, idx: i, done: !!state[i]}));
+  const sorted = list.sort((a, b) => {
     if (a.done !== b.done) return a.done ? 1 : -1;
-    return (urgOrder[a.urgency] || 1) - (urgOrder[b.urgency] || 1);
+    return (urgOrder[a.urg] || 1) - (urgOrder[b.urg] || 1);
   });
   el.innerHTML = sorted.length === 0
     ? '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">暂无待办</div>'
     : sorted.map(t => {
       const done = t.done ? ' done' : '';
       return `<div class="todo-item${done}">
-        <span class="todo-check" onclick="toggleTodoDone(${t.id},${t.done})">✓</span>
-        <span class="todo-dot ${t.urgency}"></span>
-        <span style="flex:1">${t.text}</span>
-        <button class="exp-list-del" onclick="deleteTodo(${t.id})">×</button>
+        <span class="todo-check" onclick="toggleTodo(${t.idx})">✓</span>
+        <span class="todo-dot ${t.urg}"></span>
+        <span style="flex:1">${t.txt}</span>
       </div>`;
     }).join('');
 }
 
 function renderTopTodos() {
+  const state = loadTodoState();
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
-  const pending = _todos.filter(t => !t.done);
-  const top3 = pending.sort((a, b) => (urgOrder[a.urgency] || 1) - (urgOrder[b.urgency] || 1)).slice(0, 3);
+  const pending = todos.map((t, i) => ({...t, idx: i})).filter((t, i) => !state[i]);
+  const top3 = pending.sort((a, b) => (urgOrder[a.urg] || 1) - (urgOrder[b.urg] || 1)).slice(0, 3);
 
   const items = top3.map(t =>
     `<div class="hero-todo-item">
-      <span class="hero-todo-dot ${t.urgency}"></span>
-      <span class="hero-todo-text">${t.text}</span>
+      <span class="hero-todo-dot ${t.urg}"></span>
+      <span class="hero-todo-text">${t.txt}</span>
     </div>`
   ).join('');
 
@@ -2177,59 +2146,16 @@ function doConvert() {
 }
 
 /* ============================
-   EXPENSE TRACKER (Supabase)
+   EXPENSE TRACKER (localStorage)
    ============================ */
-const SUPABASE_URL = 'https://obnsdzfmxkjseuyoxbkk.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1iOWO9tS81um6is_We0-nw_5ZY36FvH';
+const EXP_KEY = 'sa_trip_expenses';
 const EXP_PEOPLE = ['小罗','小刘','小何','小季'];
 
-let _supabase = null;
-let _expenses = [];
-
-function initSupabase() {
-  try {
-    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    fetchExpenses();
-    // Real-time subscription
-    _supabase.channel('all-changes').on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => fetchExpenses()
-    ).on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'todos' }, () => fetchTodos()
-    ).on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'flights' }, () => fetchFlights()
-    ).on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'trains' }, () => fetchTrains()
-    ).on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'hotels' }, () => fetchHotels()
-    ).on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'tickets' }, () => fetchTickets()
-    ).subscribe();
-  } catch(e) {
-    console.error('Supabase init error:', e);
-    // Fallback: render all sections with empty/local data
-    _expenses = loadLocalExpenses();
-    renderExpenses();
-    renderTodos();
-    renderTopTodos();
-    renderBooking();
-  }
+function loadExpenses() {
+  try { return JSON.parse(localStorage.getItem(EXP_KEY)) || []; } catch { return []; }
 }
-
-function loadLocalExpenses() {
-  try { return JSON.parse(localStorage.getItem('sa_trip_expenses')) || []; } catch { return []; }
-}
-
-async function fetchExpenses() {
-  if (!_supabase) return;
-  try {
-    const { data, error } = await _supabase.from('expenses').select('*').order('created_at', { ascending: false });
-    if (!error) {
-      _expenses = data || [];
-      renderExpenses();
-    }
-  } catch(e) {
-    console.error('Fetch error:', e);
-  }
+function saveExpenses(list) {
+  try { localStorage.setItem(EXP_KEY, JSON.stringify(list)); } catch {}
 }
 
 function toggleExpForm() {
@@ -2244,7 +2170,7 @@ function getSplitPeople() {
   return Array.from(document.querySelectorAll('#expPeople .exp-person-btn.active')).map(b => b.dataset.name);
 }
 
-async function addExpense() {
+function addExpense() {
   const amount = parseFloat(document.getElementById('expAmount').value);
   const catVal = document.getElementById('expCategory').value;
   const curVal = document.getElementById('expCurrency').value;
@@ -2257,50 +2183,26 @@ async function addExpense() {
   const [curCode, rate] = curVal.split('|');
   const rmb = amount * parseFloat(rate);
   const record = {
+    id: Date.now(),
     amount, rmb, currency: curCode, rate: parseFloat(rate),
     category: catName, icon, payer, note,
     split_among: splitAmong,
     date: new Date().toISOString().slice(0, 10)
   };
-
-  if (_supabase) {
-    // Optimistic update: show immediately
-    record.id = Date.now();
-    _expenses.unshift(record);
-    renderExpenses();
-    const { error } = await _supabase.from('expenses').insert(record);
-    if (error) { console.error('Add error:', error); await fetchExpenses(); return; }
-    await fetchExpenses();
-  } else {
-    // Fallback to localStorage
-    record.id = Date.now();
-    const list = loadLocalExpenses();
-    list.unshift(record);
-    try { localStorage.setItem('sa_trip_expenses', JSON.stringify(list)); } catch {}
-    _expenses = list;
-    renderExpenses();
-  }
-
+  const list = loadExpenses();
+  list.unshift(record);
+  saveExpenses(list);
   document.getElementById('expAmount').value = '';
   document.getElementById('expNote').value = '';
   document.querySelectorAll('#expPeople .exp-person-btn').forEach(b => b.classList.add('active'));
   document.getElementById('expForm').classList.remove('show');
+  renderExpenses();
 }
 
-async function deleteExpense(id) {
-  if (_supabase) {
-    // Optimistic update: remove immediately
-    _expenses = _expenses.filter(e => e.id !== id);
-    renderExpenses();
-    const { error } = await _supabase.from('expenses').delete().eq('id', id);
-    if (error) { console.error('Delete error:', error); await fetchExpenses(); return; }
-    await fetchExpenses();
-  } else {
-    const list = loadLocalExpenses().filter(e => e.id !== id);
-    try { localStorage.setItem('sa_trip_expenses', JSON.stringify(list)); } catch {}
-    _expenses = list;
-    renderExpenses();
-  }
+function deleteExpense(id) {
+  const list = loadExpenses().filter(e => e.id !== id);
+  saveExpenses(list);
+  renderExpenses();
 }
 
 const CUR_SYMBOL = {'CNY':'¥','SOL':'S/.','BRL':'R$','CLP':'$','ARS':'$','UYU':'$U','USD':'$'};
@@ -2310,7 +2212,7 @@ function getRmb(e) {
 }
 
 function renderExpenses() {
-  const list = _expenses;
+  const list = loadExpenses();
   const total = list.reduce((s, e) => s + getRmb(e), 0);
   const perPerson = EXP_PEOPLE.length > 0 ? (total / EXP_PEOPLE.length) : 0;
 
@@ -2385,23 +2287,16 @@ function renderExpenses() {
 /* ============================
    INIT
    ============================ */
-// Render everything that uses hardcoded data first
 renderItinerary();
 renderRouteSummary();
 renderTimeline();
 renderTips();
 renderShopping();
-
-// Render Supabase-dependent sections with empty data immediately
 renderTodos();
 renderTopTodos();
 renderBooking();
-
-// Then try to load from Supabase (will re-render when data arrives)
-initSupabase();
+renderExpenses();
 fetchFxRates();
-
-// Fallback: if Supabase hasn't loaded data in 5 seconds, sections already show empty state
 // Back to top button
 (function() {
   const btn = document.createElement('button');
