@@ -1069,6 +1069,7 @@ body{
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================
    UTILITIES
@@ -2183,15 +2184,19 @@ function addExpense() {
   const [curCode, rate] = curVal.split('|');
   const rmb = amount * parseFloat(rate);
   const record = {
-    id: Date.now(),
     amount, rmb, currency: curCode, rate: parseFloat(rate),
     category: catName, icon, payer, note,
     split_among: splitAmong,
     date: new Date().toISOString().slice(0, 10)
   };
+  // Always save to localStorage as backup
   const list = loadExpenses();
-  list.unshift(record);
+  list.unshift({...record, id: Date.now()});
   saveExpenses(list);
+  // Also save to Supabase if available
+  if (_sb) {
+    _sb.from('expenses').insert(record).then(() => sbFetchExpenses());
+  }
   document.getElementById('expAmount').value = '';
   document.getElementById('expNote').value = '';
   document.querySelectorAll('#expPeople .exp-person-btn').forEach(b => b.classList.add('active'));
@@ -2202,6 +2207,9 @@ function addExpense() {
 function deleteExpense(id) {
   const list = loadExpenses().filter(e => e.id !== id);
   saveExpenses(list);
+  if (_sb) {
+    _sb.from('expenses').delete().eq('id', id).then(() => sbFetchExpenses());
+  }
   renderExpenses();
 }
 
@@ -2212,7 +2220,7 @@ function getRmb(e) {
 }
 
 function renderExpenses() {
-  const list = loadExpenses();
+  const list = _sbExpenses !== null ? _sbExpenses : loadExpenses();
   const total = list.reduce((s, e) => s + getRmb(e), 0);
   const perPerson = EXP_PEOPLE.length > 0 ? (total / EXP_PEOPLE.length) : 0;
 
@@ -2284,6 +2292,41 @@ function renderExpenses() {
 
 
 
+
+/* ============================
+   SUPABASE
+   ============================ */
+const SUPABASE_URL = 'https://obnsdzfmxkjseuyoxbkk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibnNkemZteGtqc2V1eW94YmtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDEzNjMsImV4cCI6MjEwNDE3NzM2M30.5kkerTxEq7JrAJueFU896d5FJMNaddiP35qmGuw2Ias';
+let _sb = null;
+
+function initSupabase() {
+  try {
+    if (!window.supabase) return;
+    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    sbFetchExpenses();
+    _sb.channel('all').on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => sbFetchExpenses()
+    ).subscribe();
+  } catch(e) {
+    console.error('Supabase error:', e);
+    _sb = null;
+  }
+}
+
+async function sbFetchExpenses() {
+  if (!_sb) return;
+  try {
+    const { data, error } = await _sb.from('expenses').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      _sbExpenses = data;
+      renderExpenses();
+    }
+  } catch(e) { console.error('Fetch expenses error:', e); }
+}
+
+let _sbExpenses = null; // null = use localStorage, array = use supabase data
+
 /* ============================
    INIT
    ============================ */
@@ -2297,6 +2340,7 @@ renderTopTodos();
 renderBooking();
 renderExpenses();
 fetchFxRates();
+initSupabase();
 // Back to top button
 (function() {
   const btn = document.createElement('button');
