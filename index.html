@@ -1763,17 +1763,34 @@ function doCamTranslate() {
   if (!text) { result.textContent = '请先输入要翻译的文字'; result.style.display = 'block'; return; }
   result.textContent = '翻译中...';
   result.style.display = 'block';
-  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + lang;
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      if (data.responseData && data.responseData.translatedText) {
-        result.textContent = data.responseData.translatedText;
-      } else {
-        result.textContent = '翻译失败，请尝试 Google Lens';
-      }
-    })
-    .catch(() => { result.textContent = '网络错误，请检查网络后重试'; });
+  // Split into chunks of 500 chars for API limit
+  const chunkSize = 450;
+  const chunks = [];
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+  const translated = [];
+  let done = 0;
+  chunks.forEach((chunk, idx) => {
+    const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(chunk) + '&langpair=' + lang;
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        translated[idx] = (data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : chunk;
+        done++;
+        result.textContent = '翻译中... ' + Math.round(done / chunks.length * 100) + '%';
+        if (done === chunks.length) {
+          result.textContent = translated.join('');
+        }
+      })
+      .catch(() => {
+        translated[idx] = chunk;
+        done++;
+        if (done === chunks.length) {
+          result.textContent = translated.join('');
+        }
+      });
+  });
 }
 
 function doConvert() {
