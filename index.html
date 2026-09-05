@@ -81,6 +81,26 @@ body{
 }
 .hero-todo-link:active{opacity:1}
 
+/* Quick Nav */
+.quick-nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg2);border-bottom:1px solid var(--brd);
+  padding:8px 0;margin-bottom:16px;
+  box-shadow:0 2px 8px var(--sh);
+}
+.quick-nav-inner{
+  display:flex;gap:4px;padding:0 12px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.quick-nav-inner::-webkit-scrollbar{display:none}
+.qn-btn{
+  padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;
+  white-space:nowrap;cursor:pointer;border:1px solid var(--brd);
+  background:var(--bg3);color:var(--tx2);transition:all .15s;
+  flex-shrink:0;
+}
+.qn-btn:active{background:var(--pri);color:#fff;border-color:var(--pri)}
+
 /* ===== Section ===== */
 .section{margin-bottom:24px}
 .section-title{
@@ -359,10 +379,22 @@ body{
   </div>
 </div>
 
+<!-- 快捷导航 -->
+<nav class="quick-nav">
+  <div class="quick-nav-inner">
+    <button class="qn-btn" onclick="scrollTo2('sec-map')">🗺️ 行程总览</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-booking')">📋 预订管理</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-itinerary')">📅 逐日行程</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-todo')">📋 待办清单</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-shop')">🛒 出发前准备</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-tips')">💡 实用贴士</button>
+  </div>
+</nav>
+
 <div class="container">
 
 <!-- 行程地图 -->
-<div class="section">
+<div class="section" id="sec-map">
   <div class="section-title"><span class="icon">🗺️</span> 行程总览</div>
   <div class="map-wrap">
     <svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" id="routeMap">
@@ -436,7 +468,7 @@ body{
 </div>
 
 <!-- 预订管理 -->
-<div class="section">
+<div class="section" id="sec-booking">
   <div class="section-title"><span class="icon">📋</span> 预订管理</div>
   <div class="scope-tabs">
     <button class="scope-tab active" onclick="switchScope('confirmed')">✅ 已确认</button>
@@ -447,25 +479,25 @@ body{
 </div>
 
 <!-- 逐日行程 -->
-<div class="section">
+<div class="section" id="sec-itinerary">
   <div class="section-title"><span class="icon">📅</span> 逐日行程</div>
   <div id="itinerary"></div>
 </div>
 
 <!-- 待办清单 -->
-<div class="section">
+<div class="section" id="sec-todo">
   <div class="section-title"><span class="icon">📋</span> 待办清单</div>
   <div class="todo-list" id="todoList"></div>
 </div>
 
-<!-- 出发前采购 -->
-<div class="section">
-  <div class="section-title"><span class="icon">🛒</span> 出发前采购</div>
+<!-- 出发前准备 -->
+<div class="section" id="sec-shop">
+  <div class="section-title"><span class="icon">🛒</span> 出发前准备</div>
   <div id="shopCards"></div>
 </div>
 
 <!-- 实用贴士 -->
-<div class="section">
+<div class="section" id="sec-tips">
   <div class="section-title"><span class="icon">💡</span> 实用贴士</div>
   <div class="tips-grid" id="tipsGrid"></div>
 </div>
@@ -790,6 +822,16 @@ function tickCountdown() {
 }
 tickCountdown();
 setInterval(tickCountdown, 1000);
+
+function scrollTo2(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    const nav = document.querySelector('.quick-nav');
+    const offset = nav ? nav.offsetHeight + 8 : 0;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+}
 
 function renderTopTodos() {
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
