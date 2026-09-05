@@ -133,7 +133,7 @@ body{
 
 /* Animated Avatars */
 .avatar-row{
-  display:flex;justify-content:center;gap:24px;margin-top:16px;
+  display:flex;justify-content:center;gap:20px;margin-top:16px;
 }
 .avatar{
   display:flex;flex-direction:column;align-items:center;
@@ -147,78 +147,9 @@ body{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-6px)}
 }
-.avatar-head{
-  width:52px;height:56px;position:relative;
-}
-/* Face */
-.avatar-face{
-  position:absolute;bottom:0;left:4px;
-  width:44px;height:44px;border-radius:50%;
-  background:#FFE0BD;
-  box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-/* Blush cheeks */
-.avatar-blush{
-  position:absolute;width:10px;height:7px;border-radius:50%;
-  background:#FFB6B6;opacity:.5;bottom:14px;
-}
-.avatar-blush.left{left:10px}
-.avatar-blush.right{right:10px}
-/* Eyes */
-.avatar-eye{
-  position:absolute;width:6px;height:8px;border-radius:50%;
-  background:#333;top:16px;
-}
-.avatar-eye.left{left:13px}
-.avatar-eye.right{right:13px}
-/* Eye shine */
-.avatar-eye::after{
-  content:'';position:absolute;width:2px;height:2px;
-  background:#fff;border-radius:50%;top:1px;right:1px;
-}
-/* Mouth */
-.avatar-mouth{
-  position:absolute;width:8px;height:4px;
-  border-bottom:2px solid #E07A5F;border-radius:0 0 4px 4px;
-  bottom:10px;left:50%;transform:translateX(-50%);
-}
-/* Male hair: short spiky */
-.avatar.male .avatar-hair{
-  position:absolute;top:0;left:2px;
-  width:48px;height:24px;
-  background:#4A3728;
-  border-radius:24px 24px 4px 4px;
-  z-index:1;
-}
-.avatar.male .avatar-hair::after{
-  content:'';position:absolute;
-  top:-3px;left:12px;
-  width:8px;height:8px;
-  background:#4A3728;
-  border-radius:50% 50% 0 0;
-  transform:rotate(-15deg);
-}
-/* Female hair: long with bangs */
-.avatar.female .avatar-hair{
-  position:absolute;top:4px;left:-4px;
-  width:56px;height:50px;
-  background:#5C3A1E;
-  border-radius:28px 28px 12px 12px;
-  z-index:0;
-}
-.avatar.female .avatar-hair::before{
-  content:'';position:absolute;
-  top:0;left:6px;right:6px;height:18px;
-  background:#5C3A1E;
-  border-radius:0 0 50% 50%;
-  z-index:2;
-}
-/* Female bow accessory */
-.avatar.female .avatar-bow{
-  position:absolute;top:2px;right:0;z-index:3;
-  width:12px;height:8px;
-  background:#FF8FAB;
-  border-radius:50%;
+.avatar svg{
+  width:60px;height:60px;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.1));
 }
 .avatar-name{
   font-size:12px;color:var(--tx2);text-align:center;margin-top:4px;font-weight:600;
@@ -590,58 +521,153 @@ body{
   <div class="trip-intro-quote">「四个人的南美冒险，从这一刻开始」</div>
   <div class="trip-intro-crew">小罗 · 小刘 · 小何 · 小季</div>
   <div class="avatar-row">
-    <div class="avatar male">
-      <div class="avatar-head">
-        <div class="avatar-hair"></div>
-        <div class="avatar-face">
-          <div class="avatar-eye left"></div>
-          <div class="avatar-eye right"></div>
-          <div class="avatar-blush left"></div>
-          <div class="avatar-blush right"></div>
-          <div class="avatar-mouth"></div>
-        </div>
-      </div>
+    <!-- 小罗 (男) -->
+    <div class="avatar">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hair back -->
+        <ellipse cx="30" cy="18" rx="20" ry="14" fill="#4A3728"/>
+        <!-- Face -->
+        <ellipse cx="30" cy="30" rx="16" ry="18" fill="#FFE0BD" stroke="#D4A574" stroke-width="1"/>
+        <!-- Ears -->
+        <ellipse cx="14" cy="30" rx="3" ry="4" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <ellipse cx="46" cy="30" rx="3" ry="4" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <!-- Hair front -->
+        <path d="M14 22 Q18 10 30 8 Q42 10 46 22 L44 18 Q38 12 30 11 Q22 12 16 18 Z" fill="#4A3728"/>
+        <path d="M24 11 L22 6 L26 9" fill="#4A3728"/>
+        <!-- Eyebrows -->
+        <path d="M20 24 Q23 22 26 24" stroke="#4A3728" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M34 24 Q37 22 40 24" stroke="#4A3728" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <ellipse cx="23" cy="28" rx="2.5" ry="3" fill="#333"/>
+        <ellipse cx="37" cy="28" rx="2.5" ry="3" fill="#333"/>
+        <circle cx="24" cy="27" r="1" fill="#fff"/>
+        <circle cx="38" cy="27" r="1" fill="#fff"/>
+        <!-- Nose -->
+        <path d="M30 30 L28 35 L32 35" stroke="#D4A574" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- Mouth -->
+        <path d="M25 39 Q30 43 35 39" stroke="#E07A5F" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Neck & shoulders -->
+        <rect x="26" y="47" width="8" height="6" rx="2" fill="#FFE0BD"/>
+        <path d="M18 60 Q22 52 30 53 Q38 52 42 60" fill="#5B8CDB" stroke="#4A7BC4" stroke-width=".8"/>
+      </svg>
       <div class="avatar-name">小罗</div>
     </div>
-    <div class="avatar female">
-      <div class="avatar-head">
-        <div class="avatar-hair"></div>
-        <div class="avatar-bow"></div>
-        <div class="avatar-face">
-          <div class="avatar-eye left"></div>
-          <div class="avatar-eye right"></div>
-          <div class="avatar-blush left"></div>
-          <div class="avatar-blush right"></div>
-          <div class="avatar-mouth"></div>
-        </div>
-      </div>
+    <!-- 小刘 (女) -->
+    <div class="avatar">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Long hair back -->
+        <path d="M10 20 Q10 6 30 4 Q50 6 50 20 L52 48 Q52 54 46 54 L44 30 L16 30 L14 54 Q8 54 8 48 Z" fill="#5C3A1E"/>
+        <!-- Face -->
+        <ellipse cx="30" cy="30" rx="15" ry="17" fill="#FFE0BD" stroke="#D4A574" stroke-width="1"/>
+        <!-- Ears -->
+        <ellipse cx="15" cy="30" rx="2.5" ry="3.5" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <ellipse cx="45" cy="30" rx="2.5" ry="3.5" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <!-- Bangs -->
+        <path d="M15 22 Q18 12 30 10 Q42 12 45 22 Q40 18 30 17 Q20 18 15 22 Z" fill="#5C3A1E"/>
+        <!-- Bow -->
+        <ellipse cx="43" cy="14" rx="5" ry="3.5" fill="#FF8FAB"/>
+        <circle cx="43" cy="14" r="1.5" fill="#FF6B8A"/>
+        <!-- Eyebrows -->
+        <path d="M20 24 Q23 22.5 26 24" stroke="#5C3A1E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M34 24 Q37 22.5 40 24" stroke="#5C3A1E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <ellipse cx="23" cy="28" rx="2.5" ry="3.5" fill="#333"/>
+        <ellipse cx="37" cy="28" rx="2.5" ry="3.5" fill="#333"/>
+        <circle cx="24" cy="27" r="1.2" fill="#fff"/>
+        <circle cx="38" cy="27" r="1.2" fill="#fff"/>
+        <!-- Eyelashes -->
+        <path d="M20 26 L19 24" stroke="#333" stroke-width=".8" stroke-linecap="round"/>
+        <path d="M40 26 L41 24" stroke="#333" stroke-width=".8" stroke-linecap="round"/>
+        <!-- Nose -->
+        <path d="M30 31 L28.5 35 L31.5 35" stroke="#D4A574" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- Mouth -->
+        <path d="M25 39 Q30 42 35 39" stroke="#E07A5F" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Blush -->
+        <ellipse cx="19" cy="35" rx="3.5" ry="2" fill="#FFB6B6" opacity=".4"/>
+        <ellipse cx="41" cy="35" rx="3.5" ry="2" fill="#FFB6B6" opacity=".4"/>
+        <!-- Neck & shoulders -->
+        <rect x="26" y="46" width="8" height="6" rx="2" fill="#FFE0BD"/>
+        <path d="M18 60 Q22 52 30 52 Q38 52 42 60" fill="#E87CA0" stroke="#D4698C" stroke-width=".8"/>
+      </svg>
       <div class="avatar-name">小刘</div>
     </div>
-    <div class="avatar male">
-      <div class="avatar-head">
-        <div class="avatar-hair"></div>
-        <div class="avatar-face">
-          <div class="avatar-eye left"></div>
-          <div class="avatar-eye right"></div>
-          <div class="avatar-blush left"></div>
-          <div class="avatar-blush right"></div>
-          <div class="avatar-mouth"></div>
-        </div>
-      </div>
+    <!-- 小何 (男) -->
+    <div class="avatar">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hair back -->
+        <ellipse cx="30" cy="17" rx="19" ry="13" fill="#3D2B1F"/>
+        <!-- Face (slightly squarer jaw) -->
+        <path d="M14 26 Q14 12 30 12 Q46 12 46 26 L46 34 Q46 46 30 48 Q14 46 14 34 Z" fill="#FFE0BD" stroke="#D4A574" stroke-width="1"/>
+        <!-- Ears -->
+        <ellipse cx="14" cy="30" rx="3" ry="4" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <ellipse cx="46" cy="30" rx="3" ry="4" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <!-- Hair front (side part) -->
+        <path d="M14 22 Q16 12 30 10 Q44 12 46 22 L44 16 Q38 12 30 11 Q22 12 16 16 Z" fill="#3D2B1F"/>
+        <path d="M16 18 Q18 10 28 10 L24 16 Z" fill="#3D2B1F"/>
+        <!-- Eyebrows (thicker) -->
+        <path d="M19 23 Q23 21 27 23" stroke="#3D2B1F" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M33 23 Q37 21 41 23" stroke="#3D2B1F" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <ellipse cx="23" cy="28" rx="2.5" ry="2.8" fill="#333"/>
+        <ellipse cx="37" cy="28" rx="2.5" ry="2.8" fill="#333"/>
+        <circle cx="24" cy="27" r="1" fill="#fff"/>
+        <circle cx="38" cy="27" r="1" fill="#fff"/>
+        <!-- Glasses -->
+        <circle cx="23" cy="28" r="6" stroke="#666" stroke-width="1.2" fill="none"/>
+        <circle cx="37" cy="28" r="6" stroke="#666" stroke-width="1.2" fill="none"/>
+        <path d="M29 28 L31 28" stroke="#666" stroke-width="1.2"/>
+        <!-- Nose -->
+        <path d="M30 31 L28 36 L32 36" stroke="#D4A574" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- Mouth -->
+        <path d="M26 40 Q30 43 34 40" stroke="#E07A5F" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Neck & shoulders -->
+        <rect x="26" y="47" width="8" height="6" rx="2" fill="#FFE0BD"/>
+        <path d="M18 60 Q22 52 30 53 Q38 52 42 60" fill="#4A9B6E" stroke="#3D8A5E" stroke-width=".8"/>
+      </svg>
       <div class="avatar-name">小何</div>
     </div>
-    <div class="avatar female">
-      <div class="avatar-head">
-        <div class="avatar-hair"></div>
-        <div class="avatar-bow"></div>
-        <div class="avatar-face">
-          <div class="avatar-eye left"></div>
-          <div class="avatar-eye right"></div>
-          <div class="avatar-blush left"></div>
-          <div class="avatar-blush right"></div>
-          <div class="avatar-mouth"></div>
-        </div>
-      </div>
+    <!-- 小季 (女) -->
+    <div class="avatar">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Long wavy hair back -->
+        <path d="M8 20 Q8 4 30 3 Q52 4 52 20 L54 50 Q54 56 48 54 Q50 40 48 30 L12 30 Q10 40 12 54 Q6 56 6 50 Z" fill="#8B5E3C"/>
+        <!-- Face (rounder) -->
+        <ellipse cx="30" cy="30" rx="16" ry="17" fill="#FFE0BD" stroke="#D4A574" stroke-width="1"/>
+        <!-- Ears (hidden by hair mostly) -->
+        <ellipse cx="14.5" cy="30" rx="2" ry="3" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <ellipse cx="45.5" cy="30" rx="2" ry="3" fill="#FFE0BD" stroke="#D4A574" stroke-width=".8"/>
+        <!-- Hair front (center part) -->
+        <path d="M14 24 Q16 10 30 8 Q44 10 46 24 L44 20 Q38 12 30 11 Q22 12 16 20 Z" fill="#8B5E3C"/>
+        <path d="M30 8 L28 16 L30 14 L32 16 Z" fill="#FFE0BD"/>
+        <!-- Flower accessory -->
+        <circle cx="44" cy="16" r="4" fill="#FFD93D"/>
+        <circle cx="44" cy="16" r="1.5" fill="#FF8C42"/>
+        <!-- Eyebrows (softer) -->
+        <path d="M20 24 Q23 23 26 24.5" stroke="#8B5E3C" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M34 24.5 Q37 23 40 24" stroke="#8B5E3C" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- Eyes (bigger, cuter) -->
+        <ellipse cx="23" cy="28" rx="3" ry="3.5" fill="#333"/>
+        <ellipse cx="37" cy="28" rx="3" ry="3.5" fill="#333"/>
+        <circle cx="24.5" cy="27" r="1.5" fill="#fff"/>
+        <circle cx="38.5" cy="27" r="1.5" fill="#fff"/>
+        <circle cx="22" cy="29" r=".8" fill="#fff"/>
+        <circle cx="36" cy="29" r=".8" fill="#fff"/>
+        <!-- Eyelashes -->
+        <path d="M19.5 26 L18 24.5" stroke="#333" stroke-width=".8" stroke-linecap="round"/>
+        <path d="M20.5 25 L19.5 23" stroke="#333" stroke-width=".8" stroke-linecap="round"/>
+        <path d="M40.5 26 L42 24.5" stroke="#333" stroke-width=".8" stroke-linecap="round"/>
+        <path d="M39.5 25 L40.5 23" stroke="#333" stroke-width=".8" stroke-linecap="round"/>
+        <!-- Nose -->
+        <circle cx="30" cy="34" r="1" fill="#D4A574"/>
+        <!-- Mouth (bigger smile) -->
+        <path d="M24 39 Q30 44 36 39" stroke="#E07A5F" stroke-width="1.5" fill="#FFE8E8" stroke-linecap="round"/>
+        <!-- Blush -->
+        <ellipse cx="18" cy="35" rx="4" ry="2.5" fill="#FFB6B6" opacity=".35"/>
+        <ellipse cx="42" cy="35" rx="4" ry="2.5" fill="#FFB6B6" opacity=".35"/>
+        <!-- Neck & shoulders -->
+        <rect x="26" y="46" width="8" height="6" rx="2" fill="#FFE0BD"/>
+        <path d="M18 60 Q22 52 30 52 Q38 52 42 60" fill="#9B7FD4" stroke="#8A6EC3" stroke-width=".8"/>
+      </svg>
       <div class="avatar-name">小季</div>
     </div>
   </div>
