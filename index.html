@@ -130,6 +130,52 @@ body{
 .trip-intro-crew{
   font-size:13px;color:var(--tx2);font-weight:600;letter-spacing:2px;
 }
+
+/* Animated Avatars */
+.avatar-row{
+  display:flex;justify-content:center;gap:20px;margin-top:16px;
+}
+.avatar{
+  width:48px;height:48px;position:relative;
+  animation:bounce 2s ease-in-out infinite;
+}
+.avatar:nth-child(1){animation-delay:0s}
+.avatar:nth-child(2){animation-delay:.3s}
+.avatar:nth-child(3){animation-delay:.6s}
+.avatar:nth-child(4){animation-delay:.9s}
+@keyframes bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+.avatar-face{
+  width:48px;height:48px;border-radius:50%;
+  background:#FFDCB5;position:relative;overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+.avatar-eye{
+  position:absolute;width:5px;height:5px;border-radius:50%;
+  background:#333;top:20px;
+}
+.avatar-eye.left{left:14px}
+.avatar-eye.right{right:14px}
+.avatar-mouth{
+  position:absolute;width:12px;height:6px;
+  border-bottom:2.5px solid #E07A5F;border-radius:0 0 6px 6px;
+  bottom:12px;left:50%;transform:translateX(-50%);
+}
+/* Male: short hair */
+.avatar.male .avatar-hair{
+  position:absolute;top:-2px;left:2px;right:2px;height:20px;
+  background:#4A3728;border-radius:24px 24px 0 0;
+}
+/* Female: long hair */
+.avatar.female .avatar-hair{
+  position:absolute;top:-2px;left:-3px;right:-3px;height:32px;
+  background:#5C3A1E;border-radius:26px 26px 8px 8px;
+}
+.avatar-name{
+  font-size:11px;color:var(--tx2);text-align:center;margin-top:6px;font-weight:600;
+}
 /* Bottom Nav */
 .bottom-nav{
   position:fixed;bottom:0;left:0;width:100%;z-index:100;
@@ -496,6 +542,44 @@ body{
 <div class="trip-intro">
   <div class="trip-intro-quote">「四个人的南美冒险，从这一刻开始」</div>
   <div class="trip-intro-crew">小罗 · 小刘 · 小何 · 小季</div>
+  <div class="avatar-row">
+    <div class="avatar male">
+      <div class="avatar-face">
+        <div class="avatar-hair"></div>
+        <div class="avatar-eye left"></div>
+        <div class="avatar-eye right"></div>
+        <div class="avatar-mouth"></div>
+      </div>
+      <div class="avatar-name">小罗</div>
+    </div>
+    <div class="avatar female">
+      <div class="avatar-face">
+        <div class="avatar-hair"></div>
+        <div class="avatar-eye left"></div>
+        <div class="avatar-eye right"></div>
+        <div class="avatar-mouth"></div>
+      </div>
+      <div class="avatar-name">小刘</div>
+    </div>
+    <div class="avatar male">
+      <div class="avatar-face">
+        <div class="avatar-hair"></div>
+        <div class="avatar-eye left"></div>
+        <div class="avatar-eye right"></div>
+        <div class="avatar-mouth"></div>
+      </div>
+      <div class="avatar-name">小何</div>
+    </div>
+    <div class="avatar female">
+      <div class="avatar-face">
+        <div class="avatar-hair"></div>
+        <div class="avatar-eye left"></div>
+        <div class="avatar-eye right"></div>
+        <div class="avatar-mouth"></div>
+      </div>
+      <div class="avatar-name">小季</div>
+    </div>
+  </div>
 </div>
 
 <!-- 行程地图 -->
