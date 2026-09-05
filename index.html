@@ -1472,15 +1472,18 @@ function renderTips() {
       </div>`;
     }
     if (t.icon === '🍽️') {
+      const totalRest = restaurants.reduce((sum, g) => sum + g.items.length, 0);
       const cities = restaurants.map(g => g.city);
       const cityBtns = cities.map((c, ci) =>
         `<button class="tip-city-btn" data-idx="${ci}" onclick="toggleTipCity(this)">${c.replace(/ \(.*\)/, '')}</button>`
       ).join('');
-      return `<div class="tip-card full">
-        <h4>${t.icon} ${t.title}</h4>
-        <p>${t.body}</p>
-        <div class="tip-food-cities">${cityBtns}</div>
-        <div class="tip-rest-list" id="tipRestList"></div>
+      return `<div class="tip-card full" id="foodTipCard">
+        <h4 style="cursor:pointer" onclick="toggleFoodTip()">${t.icon} ${t.title} <span style="float:right;font-size:12px;color:var(--tx3)">${cities.length}个城市 ${totalRest}家 ▾</span></h4>
+        <div id="foodTipBody" style="display:none">
+          <p>${t.body}</p>
+          <div class="tip-food-cities">${cityBtns}</div>
+          <div class="tip-rest-list" id="tipRestList"></div>
+        </div>
       </div>`;
     }
     return `<div class="tip-card">
@@ -1519,6 +1522,12 @@ function toggleShopTip() {
   const isHidden = body.style.display === 'none';
   body.style.display = isHidden ? 'block' : 'none';
   if (isHidden) renderShopping();
+}
+
+function toggleFoodTip() {
+  const body = document.getElementById('foodTipBody');
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
 }
 
 function loadCustomShops() {
