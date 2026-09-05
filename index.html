@@ -355,6 +355,21 @@ body{
 .tip-card p{font-size:12px;color:var(--tx2);line-height:1.5}
 .tip-card a{color:var(--pri);text-decoration:none}
 
+/* ===== Restaurant ===== */
+.rest-grid{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.rest-city{font-size:14px;font-weight:700;color:var(--pri);margin:8px 0 4px;display:flex;align-items:center;gap:6px}
+.rest-card{
+  background:var(--bg2);border:1px solid var(--brd);
+  border-radius:var(--rs);padding:12px 14px;
+}
+.rest-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.rest-meta{font-size:12px;color:var(--tx2);line-height:1.5}
+.rest-tag{
+  display:inline-block;font-size:11px;font-weight:600;
+  padding:1px 6px;border-radius:4px;margin-left:6px;
+  background:rgba(129,178,154,.15);color:var(--ok);
+}
+
 /* ===== Footer ===== */
 .footer{
   text-align:center;padding:30px 16px;font-size:12px;color:var(--tx3);
@@ -520,6 +535,12 @@ body{
 <div class="section" id="sec-tips">
   <div class="section-title"><span class="icon">💡</span> 实用贴士</div>
   <div class="tips-grid" id="tipsGrid"></div>
+</div>
+
+<!-- 美食推荐 -->
+<div class="section">
+  <div class="section-title"><span class="icon">🍽️</span> 美食推荐</div>
+  <div class="rest-grid" id="restGrid"></div>
 </div>
 
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
@@ -1150,6 +1171,54 @@ function renderRouteSummary() {
 }
 
 /* ============================
+   RENDER: RESTAURANTS
+   ============================ */
+const restaurants = [
+  { city:'圣地亚哥 (9.25)', items:[
+    { name:'Boragó', type:'新派智利菜', note:'拉丁美洲Top50餐厅，需提前预订', tag:'必吃' },
+    { name:'Bocanáriz', type:'智利菜', note:'海鲜炖锅 Paila Marina 是招牌', tag:'' },
+    { name:'Mercado Central', type:'海鲜市场', note:'现选海鲜现做，午餐好去处', tag:'' },
+  ]},
+  { city:'复活节岛 (9.26-27)', items:[
+    { name:'Te Ra'Ai', type:'波利尼西亚菜', note:'当地传统窑烤大餐 Umu Rapa Nui', tag:'特色' },
+    { name:'La Kaña', type:'海鲜', note:'酸橘汁腌鱼 Ceviche 性价比极高', tag:'' },
+    { name:'Mikafé', type:'咖啡简餐', note:'早餐推荐，波利尼西亚融合风', tag:'' },
+  ]},
+  { city:'库斯科 (9.29-10.1)', items:[
+    { name:'Chicha por Gastón Acurio', type:'秘鲁菜', note:'秘鲁名厨旗下，武器广场旁', tag:'必吃' },
+    { name:'Pachapapa', type:'传统安第斯', note:'烤天竺鼠 Cuy 和窑烤体验', tag:'特色' },
+    { name:'Mercado San Pedro', type:'本地市场', note:'鲜榨果汁+本地小吃，便宜地道', tag:'' },
+    { name:'Cicciolina', type:'地中海融合', note:'Tapas 风格，适合晚餐小酌', tag:'' },
+  ]},
+  { city:'布宜诺斯 (10.2-10.4)', items:[
+    { name:'Don Julio', type:'阿根廷牛排', note:'全球Top50餐厅，至少提前2周订', tag:'必吃' },
+    { name:'La Cabrera', type:'阿根廷烤肉', note:'Palermo 区，烤肉配小菜拼盘', tag:'' },
+    { name:'Café Tortoni', type:'百年咖啡馆', note:'1858年开业，体验 Porteño 文化', tag:'打卡' },
+    { name:'El Ateneo Grand Splendid', type:'书店咖啡', note:'最美书店里喝咖啡', tag:'打卡' },
+  ]},
+  { city:'乌斯怀亚 (10.2-10.3)', items:[
+    { name:'El Viejo Marino', type:'海鲜', note:'帝王蟹 Centolla 必点', tag:'必吃' },
+    { name:'Tía Elvira', type:'阿根廷菜', note:'烤羊肉 Cordero Patagónico 出色', tag:'' },
+  ]},
+  { city:'里约 (10.5)', items:[
+    { name:'Confeitaria Colombo', type:'百年甜品', note:'1894年开业，巴西蛋 Pastel de Nata', tag:'打卡' },
+    { name:'Cervantes', type:'巴西小吃', note:'本地人最爱的 Bolinho de Bacalhau 鳕鱼球', tag:'' },
+  ]},
+];
+
+function renderRestaurants() {
+  document.getElementById('restGrid').innerHTML = restaurants.map(group => {
+    const items = group.items.map(r =>
+      `<div class="rest-card">
+        <div class="rest-name">${r.name}${r.tag ? '<span class="rest-tag">'+r.tag+'</span>' : ''}</div>
+        <div class="rest-meta">${r.type} · ${r.note}</div>
+      </div>`
+    ).join('');
+    return `<div class="rest-city">📍 ${group.city}</div>${items}`;
+  }).join('');
+}
+
+/* ============================
    INIT
    ============================ */
 renderBooking();
@@ -1159,6 +1228,7 @@ renderTopTodos();
 renderRouteSummary();
 renderShopping();
 renderTips();
+renderRestaurants();
 </script>
 </body>
 </html>
