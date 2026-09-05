@@ -1307,30 +1307,64 @@ function flightCard(f) {
 }
 
 function renderBooking() {
+  const statusBadge = (ok) => ok
+    ? '<span style="float:right;font-size:11px;font-weight:700;color:var(--ok);background:rgba(129,178,154,.12);padding:2px 8px;border-radius:6px">已确认</span>'
+    : '<span style="float:right;font-size:11px;font-weight:700;color:#C89630;background:rgba(242,204,143,.15);padding:2px 8px;border-radius:6px">未预定</span>';
   const cats = [
     { key:'flights', icon:'✈️', label:'机票',
       confirmed: flights.filter(f => f.ok),
       unbooked: flights.filter(f => !f.ok),
-      renderItem: (f) => flightCard(f) },
+      renderItem: (f, ok) => {
+        const fromLabel = UT.label[f.from]||f.from;
+        const toLabel = UT.label[f.to]||f.to;
+        const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
+        const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
+        const crossDay = f.ad > f.dd || f.am > f.dm;
+        const tzFrom = UT.tzName[f.from]||'';
+        const tzTo = UT.tzName[f.to]||'';
+        return `<div class="card flight">
+          <div class="flight-head">
+            <span class="flight-no">${f.air} ${f.no}</span>
+            ${statusBadge(ok)}
+          </div>
+          <div class="flight-route">
+            <div class="flight-city left">
+              <div class="flight-time">${depTime}</div>
+              <div class="flight-code">${fromLabel} ${f.from}</div>
+              <div class="flight-date">${UT.fmtDate(f.dy,f.dm,f.dd)} ${tzFrom}</div>
+            </div>
+            <div class="flight-mid">
+              <div class="flight-dur">${crossDay?'+1天':''}</div>
+              <div class="flight-line"></div>
+            </div>
+            <div class="flight-city right">
+              <div class="flight-time">${arrTime}</div>
+              <div class="flight-code">${toLabel} ${f.to}</div>
+              <div class="flight-date">${crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' '}${tzTo}</div>
+            </div>
+          </div>
+          ${f.note ? '<div class="flight-note">'+(f.grp2?'👥 小何 小季 · ':'')+f.note+'</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')}
+        </div>`;
+      } },
     { key:'trains', icon:'🚂', label:'火车',
       confirmed: trains.filter(t => t.ok),
       unbooked: trains.filter(t => !t.ok),
-      renderItem: (t) => `<div class="card info-card">
-          <div class="ic-title">${t.route}</div>
+      renderItem: (t, ok) => `<div class="card info-card">
+          <div class="ic-title">${t.route} ${statusBadge(ok)}</div>
           <div class="ic-sub">${t.date} · ${t.company}</div>
         </div>` },
     { key:'hotels', icon:'🏨', label:'酒店',
       confirmed: hotels.filter(h => h.name !== null),
       unbooked: hotels.filter(h => h.name === null),
-      renderItem: (h) => `<div class="card info-card">
-          <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span></div>
+      renderItem: (h, ok) => `<div class="card info-card">
+          <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span> ${statusBadge(ok)}</div>
           <div class="ic-empty">${h.name || '待预订'}</div>
         </div>` },
     { key:'tickets', icon:'🎫', label:'门票',
       confirmed: tickets.filter(t => t.ok),
       unbooked: tickets.filter(t => !t.ok),
-      renderItem: (t) => `<div class="card info-card">
-          <div class="ic-title">${t.name} <span class="flight-tag ${t.ok?'tag-ok':'tag-tbd'}" style="margin-left:6px">${t.ok?'已购':'待购'}</span></div>
+      renderItem: (t, ok) => `<div class="card info-card">
+          <div class="ic-title">${t.name} ${statusBadge(ok)}</div>
           <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
         </div>` },
   ];
@@ -1347,21 +1381,12 @@ function renderBooking() {
 
   // Build panel for current category
   const cat = cats.find(c => c.key === currentBookingCat) || cats[0];
-  const statusLabel = (ok) => ok
-    ? '<span style="display:inline-block;font-size:11px;font-weight:700;color:var(--ok);background:rgba(129,178,154,.12);padding:2px 8px;border-radius:6px;margin-right:8px;flex-shrink:0">已确认</span>'
-    : '<span style="display:inline-block;font-size:11px;font-weight:700;color:#C89630;background:rgba(242,204,143,.15);padding:2px 8px;border-radius:6px;margin-right:8px;flex-shrink:0">未预定</span>';
   let panelHtml = '';
-  // Confirmed items first
   if (cat.confirmed.length > 0) {
-    panelHtml += cat.confirmed.map(item =>
-      `<div style="display:flex;align-items:flex-start;padding:0 16px;margin-bottom:2px">${statusLabel(true)}<div style="flex:1">${cat.renderItem(item)}</div></div>`
-    ).join('');
+    panelHtml += cat.confirmed.map(item => cat.renderItem(item, true)).join('');
   }
-  // Then unbooked items
   if (cat.unbooked.length > 0) {
-    panelHtml += cat.unbooked.map(item =>
-      `<div style="display:flex;align-items:flex-start;padding:0 16px;margin-bottom:2px">${statusLabel(false)}<div style="flex:1">${cat.renderItem(item)}</div></div>`
-    ).join('');
+    panelHtml += cat.unbooked.map(item => cat.renderItem(item, false)).join('');
   }
   if (!panelHtml) {
     panelHtml = '<div style="padding:20px 16px;text-align:center;color:var(--tx3)">暂无数据</div>';
