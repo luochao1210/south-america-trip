@@ -989,7 +989,18 @@ body{
   <button class="exp-toggle-btn" onclick="toggleExpForm()">➕ 记一笔</button>
   <div class="exp-form" id="expForm">
     <div class="exp-form-row">
-      <input class="exp-input" id="expAmount" type="number" inputmode="decimal" placeholder="金额">
+      <input class="exp-input" id="expAmount" type="number" inputmode="decimal" placeholder="金额" style="min-width:0">
+      <select class="exp-select" id="expCurrency" style="min-width:70px">
+        <option value="CNY|1">¥ 人民币</option>
+        <option value="SOL|1.95">S/. 索尔</option>
+        <option value="BRL|1.30">R$ 雷亚尔</option>
+        <option value="CLP|0.0071">$ 智利比索</option>
+        <option value="ARS|0.0045">$ 阿根廷比索</option>
+        <option value="UYU|0.17">$U 乌拉圭</option>
+        <option value="USD|7.25">$ 美元</option>
+      </select>
+    </div>
+    <div class="exp-form-row">
       <select class="exp-select" id="expCategory">
         <option value="🍽️|餐饮">🍽️ 餐饮</option>
         <option value="🚗|交通">🚗 交通</option>
@@ -2197,17 +2208,23 @@ function toggleExpForm() {
   document.getElementById('expForm').classList.toggle('show');
 }
 
+const CUR_SYMBOL = {'CNY':'¥','SOL':'S/.','BRL':'R$','CLP':'$','ARS':'$','UYU':'$U','USD':'$'};
+
 function addExpense() {
   const amount = parseFloat(document.getElementById('expAmount').value);
   const catVal = document.getElementById('expCategory').value;
+  const curVal = document.getElementById('expCurrency').value;
   const payer = document.getElementById('expPayer').value;
   const note = document.getElementById('expNote').value.trim();
   if (isNaN(amount) || amount <= 0) return;
   const [icon, catName] = catVal.split('|');
+  const [curCode, rate] = curVal.split('|');
+  const rmb = amount * parseFloat(rate);
   const list = loadExpenses();
   list.unshift({
     id: Date.now(),
-    amount, category: catName, icon, payer, note,
+    amount, rmb, currency: curCode, rate: parseFloat(rate),
+    category: catName, icon, payer, note,
     date: new Date().toISOString().slice(0, 10)
   });
   saveExpenses(list);
@@ -2223,9 +2240,13 @@ function deleteExpense(id) {
   renderExpenses();
 }
 
+function getRmb(e) {
+  return e.rmb !== undefined ? e.rmb : e.amount;
+}
+
 function renderExpenses() {
   const list = loadExpenses();
-  const total = list.reduce((s, e) => s + e.amount, 0);
+  const total = list.reduce((s, e) => s + getRmb(e), 0);
   const perPerson = EXP_PEOPLE.length > 0 ? (total / EXP_PEOPLE.length) : 0;
 
   // Title total
@@ -2233,14 +2254,14 @@ function renderExpenses() {
 
   // Summary boxes
   document.getElementById('expSummary').innerHTML =
-    '<div class="exp-box"><div class="exp-box-label">总花费</div><div class="exp-box-value">¥' + total.toFixed(2) + '</div></div>' +
+    '<div class="exp-box"><div class="exp-box-label">总花费（人民币）</div><div class="exp-box-value">¥' + total.toFixed(2) + '</div></div>' +
     '<div class="exp-box"><div class="exp-box-label">人均</div><div class="exp-box-value small">¥' + perPerson.toFixed(2) + '</div></div>';
 
   // Category breakdown
   const catMap = {};
   list.forEach(e => {
     if (!catMap[e.category]) catMap[e.category] = { icon: e.icon, amount: 0 };
-    catMap[e.category].amount += e.amount;
+    catMap[e.category].amount += getRmb(e);
   });
   const catEntries = Object.entries(catMap).sort((a, b) => b[1].amount - a[1].amount);
   const maxCat = catEntries.length > 0 ? catEntries[0][1].amount : 1;
@@ -2259,19 +2280,25 @@ function renderExpenses() {
   // Expense list
   document.getElementById('expList').innerHTML = list.length === 0
     ? '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">还没有消费记录，点击"记一笔"开始</div>'
-    : list.map(e =>
-      '<div class="exp-list-item">' +
-      '<span class="exp-list-icon">' + e.icon + '</span>' +
-      '<div class="exp-list-info"><div class="exp-list-note">' + (e.note || e.category) + '</div>' +
-      '<div class="exp-list-meta">' + e.payer + ' · ' + e.date + '</div></div>' +
-      '<span class="exp-list-amount">¥' + e.amount.toFixed(0) + '</span>' +
-      '<button class="exp-list-del" onclick="deleteExpense(' + e.id + ')">×</button></div>'
-    ).join('');
+    : list.map(e => {
+      const sym = CUR_SYMBOL[e.currency] || '¥';
+      const origAmount = e.currency && e.currency !== 'CNY'
+        ? sym + e.amount.toFixed(0) + ' ≈ '
+        : '';
+      return '<div class="exp-list-item">' +
+        '<span class="exp-list-icon">' + e.icon + '</span>' +
+        '<div class="exp-list-info"><div class="exp-list-note">' + (e.note || e.category) + '</div>' +
+        '<div class="exp-list-meta">' + e.payer + ' · ' + e.date + '</div></div>' +
+        '<div style="text-align:right;flex-shrink:0"><div class="exp-list-amount">¥' + getRmb(e).toFixed(0) + '</div>' +
+        (origAmount ? '<div style="font-size:11px;color:var(--tx3)">' + origAmount + '</div>' : '') +
+        '</div>' +
+        '<button class="exp-list-del" onclick="deleteExpense(' + e.id + ')">×</button></div>';
+    }).join('');
 
   // Split calculation
   const paidBy = {};
   EXP_PEOPLE.forEach(p => paidBy[p] = 0);
-  list.forEach(e => { if (paidBy[e.payer] !== undefined) paidBy[e.payer] += e.amount; });
+  list.forEach(e => { if (paidBy[e.payer] !== undefined) paidBy[e.payer] += getRmb(e); });
 
   document.getElementById('expSplit').innerHTML =
     '<div class="exp-split-title">AA 分账（人均 ¥' + perPerson.toFixed(0) + '）</div>' +
