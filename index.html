@@ -110,6 +110,21 @@ body{
 }
 .qn-btn:active{background:var(--pri);color:#fff;border-color:var(--pri)}
 
+/* Trip Intro */
+.trip-intro{
+  text-align:center;padding:24px 20px;margin:0 16px 20px;
+  background:linear-gradient(135deg,var(--pri-l) 0%,var(--bg2) 100%);
+  border:1px solid var(--brd);border-radius:var(--r);
+  box-shadow:0 2px 8px var(--sh);
+}
+.trip-intro-quote{
+  font-size:18px;font-weight:700;color:var(--pri);
+  line-height:1.6;margin-bottom:8px;
+}
+.trip-intro-crew{
+  font-size:13px;color:var(--tx2);font-weight:600;letter-spacing:2px;
+}
+
 /* ===== Section ===== */
 .section{margin-bottom:24px}
 .section-title{
@@ -448,6 +463,12 @@ body{
 </nav>
 
 <div class="container">
+
+<!-- 旅行宣言 -->
+<div class="trip-intro">
+  <div class="trip-intro-quote">「四个人的南美冒险，从这一刻开始」</div>
+  <div class="trip-intro-crew">小罗 · 小刘 · 小何 · 小季</div>
+</div>
 
 <!-- 行程地图 -->
 <div class="section" id="sec-map">
@@ -846,7 +867,7 @@ const GEO = {
 function amapURI(code) {
   const name = UT.label[code] || code;
   const g = GEO[code];
-  if (g) return 'https://uri.amap.com/search?keyword=' + encodeURIComponent(name) + '&around=' + g.lat + ',' + g.lng;
+  if (g) return 'https://uri.amap.com/marker?position=' + g.lng + ',' + g.lat + '&name=' + encodeURIComponent(name) + '&src=travel-handbook&coordinate=gaode&callnative=0';
   return 'https://uri.amap.com/search?keyword=' + encodeURIComponent(name);
 }
 
