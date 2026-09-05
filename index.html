@@ -1149,11 +1149,15 @@ const tips = [
   { icon:'💰', title:'汇率换算', body:'converter' },
   { icon:'📷', title:'拍照翻译', body:'camera' },
   { icon:'🎤', title:'语音翻译', body:'voice' },
-  { icon:'🍽️', title:'饮食', body:'秘鲁菜世界闻名必尝<br>马黛茶是阿根廷国饮<br>街头食物慎选<br>饮用水买瓶装' },
-  { icon:'🔌', title:'插头类型', body:'智利/秘鲁：Type C/L（圆头）<br>阿根廷：Type I（八字形）<br>巴西：Type N（三圆孔）<br>建议带万能转换头' },
-  { icon:'🏔️', title:'高原注意', body:'库斯科海拔 3400m<br>到达后慢动作、多喝水<br>提前 1 周吃红景天<br>严重高反立即就医' },
-  { icon:'🌡️', title:'天气提醒', body:'乌斯怀亚 10 月：0~10°C<br>复活节岛：18~24°C<br>里约/圣保罗：20~28°C<br>库斯科：5~20°C' },
-  { icon:'📱', title:'电话卡', body:'智利：4天卡（Entel/Movistar）<br>秘鲁：3天卡（Claro/Entel）<br>阿根廷：4天卡（Personal/Movistar）<br>巴西：2天卡（Vivo/TIM）' },
+  { icon:'🍽️', title:'饮食', body:'food' },
+  { icon:'📌', title:'提示事项', body:'notices' },
+];
+
+const noticeItems = [
+  { icon:'🔌', title:'插头类型', body:'智利/秘鲁：Type C/L（圆头）\n阿根廷：Type I（八字形）\n巴西：Type N（三圆孔）\n建议带万能转换头' },
+  { icon:'🏔️', title:'高原注意', body:'库斯科海拔 3400m\n到达后慢动作、多喝水\n提前 1 周吃红景天\n严重高反立即就医' },
+  { icon:'🌡️', title:'天气提醒', body:'乌斯怀亚 10 月：0~10°C\n复活节岛：18~24°C\n里约/圣保罗：20~28°C\n库斯科：5~20°C' },
+  { icon:'📱', title:'电话卡', body:'智利：4天卡（Entel/Movistar）\n秘鲁：3天卡（Claro/Entel）\n阿根廷：4天卡（Personal/Movistar）\n巴西：2天卡（Vivo/TIM）' },
 ];
 
 /* ============================
@@ -1652,6 +1656,26 @@ function renderTips() {
         </div>
       </div>`;
     }
+    if (t.icon === '📌') {
+      const noticeCards = noticeItems.map(n =>
+        `<div class="food-city-card">
+          <div class="food-city-head" onclick="this.parentElement.classList.toggle('open')">
+            <span class="food-city-icon">${n.icon}</span>
+            <span class="food-city-name">${n.title}</span>
+            <span class="food-city-arrow">▾</span>
+          </div>
+          <div class="food-city-body">
+            <div class="food-city-inner" style="font-size:13px;line-height:1.6;color:var(--tx2)">${n.body.replace(/\n/g, '<br>')}</div>
+          </div>
+        </div>`
+      ).join('');
+      return `<div class="tip-card full">
+        <h4 style="cursor:pointer" onclick="toggleNotices()">${t.icon} ${t.title} <span style="float:right;font-size:12px;color:var(--tx3)">${noticeItems.length}项 ▾</span></h4>
+        <div id="noticesTipBody" style="display:none">
+          <div class="food-city-list">${noticeCards}</div>
+        </div>
+      </div>`;
+    }
     return `<div class="tip-card">
       <h4>${t.icon} ${t.title}</h4>
       <p>${t.body}</p>
@@ -1670,6 +1694,12 @@ function toggleShopTip() {
 
 function toggleFoodTip() {
   const body = document.getElementById('foodTipBody');
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+}
+
+function toggleNotices() {
+  const body = document.getElementById('noticesTipBody');
   const isHidden = body.style.display === 'none';
   body.style.display = isHidden ? 'block' : 'none';
 }
