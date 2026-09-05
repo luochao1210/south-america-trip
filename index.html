@@ -216,6 +216,14 @@ body{
   max-height:0;overflow:hidden;transition:max-height .35s ease;
 }
 .day-card.open .day-body{max-height:2000px}
+.day-summary{
+  font-size:13px;color:var(--tx2);padding:0 16px 12px;
+  line-height:1.5;
+}
+.day-summary-text{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;
+}
 .day-inner{padding:0 16px 16px}
 
 /* Timeline */
@@ -978,6 +986,10 @@ function renderItinerary() {
       </div>`;
     }).join('');
 
+    // Build summary for header (show key events without clicking)
+    const summaryEvs = day.ev.filter(e => e.t && e.type !== 'hotel' && e.type !== 'info').slice(0, 4);
+    const summaryText = summaryEvs.map(e => e.t + ' ' + e.txt).join(' → ');
+
     // Collect nav points for this day
     const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>UT.label[e.c]);
     const uniqueNav = [...new Set(navPoints)];
@@ -989,6 +1001,7 @@ function renderItinerary() {
         <span class="day-date">${day.date}</span>
         <span class="day-arrow">▾</span>
       </div>
+      ${summaryText ? '<div class="day-summary"><div class="day-summary-text">'+summaryText+'</div></div>' : ''}
       <div class="day-body">
         <div class="day-inner">
           <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--tx2)">${day.title} <span style="font-weight:400;font-size:12px;color:var(--tx3)">· ${day.loc}</span></div>
