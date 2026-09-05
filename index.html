@@ -1091,51 +1091,151 @@ const UT = {
 };
 
 /* ============================
-   FLIGHT DATA
+   BOOKING DATA (Supabase)
    ============================ */
-const flights = [
-  // Group 1
-  { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:24,dh:15,dmi:0, ay:2026,am:9,ad:25,ah:5,ami:0, air:'中国国航', ok:true, note:'T3 → T3' },
-  { no:'LA612', from:'GRU', to:'SCL', dy:2026,dm:9,dd:25,dh:12,dmi:5, ay:2026,am:9,ad:25,ah:16,ami:25, air:'南美航空', ok:true, note:'经济舱 · 无免费托运' },
-  { no:'LA843', from:'SCL', to:'IPC', dy:2026,dm:9,dd:26,dh:11,dmi:10, ay:2026,am:9,ad:26,ah:14,ami:45, air:'南美航空', ok:true, note:'经济舱 Basic' },
-  { no:'LA844', from:'IPC', to:'SCL', dy:2026,dm:9,dd:28,dh:17,dmi:30, ay:2026,am:9,ad:29,ah:0,ami:5, air:'南美航空', ok:true, note:'经济舱 Basic · 到达即09.29凌晨' },
-  { no:'LA2367', from:'SCL', to:'CUZ', dy:2026,dm:9,dd:29,dh:7,dmi:10, ay:2026,am:9,ad:29,ah:8,ami:40, air:'南美航空', ok:true, note:'无免费托运' },
-  // Group 2 (小何 小季)
-  { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:28,dh:15,dmi:0, ay:2026,am:9,ad:29,ah:5,ami:0, air:'中国国航', ok:true, note:'小何 小季 · T3→T3', grp2:true },
-  { no:'待定', from:'GRU', to:'CUZ', dy:2026,dm:9,dd:29,dh:0,dmi:0, ay:2026,am:9,ad:29,ah:0,ami:0, air:'待定', ok:false, note:'小何 小季 · 经利马中转', grp2:true },
-  // Remaining (all 4)
-  { no:'待定', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:20,dmi:0, ay:2026,am:10,ad:1,ah:22,ami:30, air:'待定', ok:false, note:'飞行约1.5h' },
-  { no:'待定', from:'LIM', to:'EZE', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:7,ami:30, air:'待定', ok:false, note:'红眼航班' },
-  { no:'待定', from:'EZE', to:'USH', dy:2026,dm:10,dd:2,dh:16,dmi:40, ay:2026,am:10,ad:2,ah:20,ami:19, air:'待定', ok:false, note:'' },
-  { no:'待定', from:'USH', to:'EZE', dy:2026,dm:10,dd:3,dh:18,dmi:40, ay:2026,am:10,ad:3,ah:22,ami:10, air:'待定', ok:false, note:'' },
-  { no:'待定', from:'EZE', to:'GIG', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'10.04晚或10.05早' },
-  { no:'待定', from:'GIG', to:'GRU', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'基督山后飞圣保罗' },
-  { no:'CA898', from:'GRU', to:'PEK', dy:2026,dm:10,dd:6,dh:9,dmi:25, ay:2026,am:10,ad:7,ah:19,ami:30, air:'中国国航', ok:true, note:'T3 → T3' },
-];
+let flights = [];
+let trains = [];
+let hotels = [];
+let tickets = [];
+let currentBookingCat = 'flights';
+
+function parseDate(s) {
+  const p = (s||'').split('/');
+  return { m: parseInt(p[0])||0, d: parseInt(p[1])||0 };
+}
+function parseTime(s) {
+  if (!s || s === '待定') return { h: 0, mi: 0 };
+  const p = s.split(':');
+  return { h: parseInt(p[0])||0, mi: parseInt(p[1])||0 };
+}
+
+async function fetchFlights() {
+  if (!_supabase) return;
+  const { data } = await _supabase.from('flights').select('*').order('id');
+  if (data) {
+    flights = data.map(f => {
+      const dep = parseDate(f.dep_date), arr = parseDate(f.arr_date || f.dep_date);
+      const depT = parseTime(f.dep_time), arrT = parseTime(f.arr_time);
+      return {
+        id: f.id, no: f.flight_no, from: f.from_code, to: f.to_code,
+        dy: 2026, dm: dep.m, dd: dep.d, dh: depT.h, dmi: depT.mi,
+        ay: 2026, am: arr.m, ad: arr.d, ah: arrT.h, ami: arrT.mi,
+        air: f.airline || '待定', ok: f.confirmed, note: f.note || '', grp2: f.grp2
+      };
+    });
+      }
+}
+
+async function fetchTrains() {
+  if (!_supabase) return;
+  const { data } = await _supabase.from('trains').select('*').order('id');
+  if (data) {
+    trains = data.map(t => ({ id: t.id, date: t.travel_date, route: t.route, company: t.company || '待定', ok: t.confirmed }));
+      }
+}
+
+async function fetchHotels() {
+  if (!_supabase) return;
+  const { data } = await _supabase.from('hotels').select('*').order('id');
+  if (data) {
+    hotels = data.map(h => ({ id: h.id, date: h.stay_date, city: h.city, name: h.hotel_name || null, ok: h.confirmed }));
+      }
+}
+
+async function fetchTickets() {
+  if (!_supabase) return;
+  const { data } = await _supabase.from('tickets').select('*').order('id');
+  if (data) {
+    tickets = data.map(t => ({ id: t.id, name: t.name, date: t.ticket_date, time: t.ticket_time || '', detail: t.detail || '', ok: t.confirmed }));
+      }
+}
+
+async function toggleBooking(table, id, currentConfirmed) {
+  if (_supabase) {
+    await _supabase.from(table).update({ confirmed: !currentConfirmed }).eq('id', id);
+    if (table === 'flights') await fetchFlights();
+    if (table === 'trains') await fetchTrains();
+    if (table === 'hotels') await fetchHotels();
+    if (table === 'tickets') await fetchTickets();
+  }
+}
 
 /* ============================
-   ACCOMMODATION / TRAIN / TICKETS
+   RENDER: BOOKING
    ============================ */
-const hotels = [
-  { date:'09.25', city:'圣地亚哥', name:null },
-  { date:'09.26-27', city:'复活节岛', name:null },
-  { date:'09.28', city:'圣地亚哥', name:null },
-  { date:'09.29', city:'库斯科', name:null },
-  { date:'09.30', city:'热水镇', name:null },
-  { date:'10.02', city:'乌斯怀亚', name:null },
-  { date:'10.03-04', city:'布宜诺斯艾利斯', name:null },
-  { date:'10.05', city:'圣保罗', name:null },
-];
-const trains = [
-  { date:'09.30', route:'库斯科 → 热水镇', company:'待定 PeruRail / Inca Rail', ok:false },
-  { date:'10.01', route:'热水镇 → 库斯科', company:'待定 PeruRail / Inca Rail', ok:false },
-];
-const tickets = [
-  { name:'马丘比丘', date:'10.01', time:'08:00 AM', detail:'Circuito 1 · Ruta 1-B 上层平台', ok:true },
-  { name:'复活节岛国家公园', date:'09.27', time:'全天', detail:'待购票', ok:false },
-  { name:'世界尽头小火车', date:'10.03', time:'上午', detail:'乌斯怀亚', ok:false },
-  { name:'火地岛国家公园', date:'10.03', time:'上午', detail:'乌斯怀亚', ok:false },
-];
+function flightCard(f) {
+  const fromLabel = UT.label[f.from]||f.from;
+  const toLabel = UT.label[f.to]||f.to;
+  const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
+  const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
+  const crossDay = f.ad > f.dd || f.am > f.dm;
+  const tzFrom = UT.tzName[f.from]||'';
+  const tzTo = UT.tzName[f.to]||'';
+  const click = f.id ? ' onclick="toggleBooking(\'flights\',' + f.id + ',' + f.ok + ')" style="cursor:pointer"' : '';
+  return '<div class="card flight"' + click + '>' +
+    '<div class="flight-head">' +
+    '<span class="flight-no">' + (f.air||'待定') + ' ' + (f.no||'待定') + '</span>' +
+    '<span class="flight-tag ' + (f.ok?'tag-ok':'tag-tbd') + '">' + (f.ok?'已出票':'待确认') + '</span>' +
+    '</div>' +
+    '<div class="flight-route">' +
+    '<div class="flight-city left"><div class="flight-time">' + depTime + '</div><div class="flight-code">' + fromLabel + ' ' + f.from + '</div><div class="flight-date">' + UT.fmtDate(f.dy,f.dm,f.dd) + ' ' + tzFrom + '</div></div>' +
+    '<div class="flight-mid"><div class="flight-dur">' + (crossDay?'+1天':'') + '</div><div class="flight-line"></div></div>' +
+    '<div class="flight-city right"><div class="flight-time">' + arrTime + '</div><div class="flight-code">' + toLabel + ' ' + f.to + '</div><div class="flight-date">' + (crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' ') + tzTo + '</div></div>' +
+    '</div>' +
+    (f.note ? '<div class="flight-note">' + (f.grp2?'👥 小何 小季 · ':'') + f.note + '</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')) +
+    '</div>';
+}
+
+function renderBooking() {
+  var statusBadge = function(ok) {
+    return ok
+      ? '<span style="float:right;font-size:11px;font-weight:700;color:var(--ok);background:rgba(129,178,154,.12);padding:2px 8px;border-radius:6px">已确认</span>'
+      : '<span style="float:right;font-size:11px;font-weight:700;color:#C89630;background:rgba(242,204,143,.15);padding:2px 8px;border-radius:6px">未预定</span>';
+  };
+  var cats = [
+    { key:'flights', icon:'✈️', label:'机票',
+      confirmed: flights.filter(function(f){return f.ok}),
+      unbooked: flights.filter(function(f){return !f.ok}),
+      renderItem: function(f, ok) { return flightCard(f); } },
+    { key:'trains', icon:'🚂', label:'火车',
+      confirmed: trains.filter(function(t){return t.ok}),
+      unbooked: trains.filter(function(t){return !t.ok}),
+      renderItem: function(t, ok) {
+        return '<div class="card info-card" onclick="toggleBooking(\'trains\',' + t.id + ',' + ok + ')" style="cursor:pointer"><div class="ic-title">' + t.route + ' ' + statusBadge(ok) + '</div><div class="ic-sub">' + t.date + ' · ' + t.company + '</div></div>';
+      } },
+    { key:'hotels', icon:'🏨', label:'酒店',
+      confirmed: hotels.filter(function(h){return h.name !== null}),
+      unbooked: hotels.filter(function(h){return h.name === null}),
+      renderItem: function(h, ok) {
+        return '<div class="card info-card" onclick="toggleBooking(\'hotels\',' + h.id + ',' + ok + ')" style="cursor:pointer"><div class="ic-title">' + h.city + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">' + h.date + '</span> ' + statusBadge(ok) + '</div><div class="ic-empty">' + (h.name || '待预订') + '</div></div>';
+      } },
+    { key:'tickets', icon:'🎫', label:'门票',
+      confirmed: tickets.filter(function(t){return t.ok}),
+      unbooked: tickets.filter(function(t){return !t.ok}),
+      renderItem: function(t, ok) {
+        return '<div class="card info-card" onclick="toggleBooking(\'tickets\',' + t.id + ',' + ok + ')" style="cursor:pointer"><div class="ic-title">' + t.name + ' ' + statusBadge(ok) + '</div><div class="ic-sub">' + t.date + ' ' + t.time + ' · ' + t.detail + '</div></div>';
+      } },
+  ];
+  var tabsEl = document.getElementById('bookingTabs');
+  var panelsEl = document.getElementById('bookingPanels');
+  if (!tabsEl || !panelsEl) return;
+  tabsEl.innerHTML = cats.map(function(c, i) {
+    var total = c.confirmed.length + c.unbooked.length;
+    var active = c.key === currentBookingCat ? ' active' : '';
+    return '<button class="tab' + active + '" data-cat="' + c.key + '">' + c.icon + ' ' + c.label + ' ' + total + '</button>';
+  }).join('');
+  var cat = cats.find(function(c){return c.key === currentBookingCat}) || cats[0];
+  var panelHtml = '';
+  if (cat.confirmed.length > 0) panelHtml += cat.confirmed.map(function(item){return cat.renderItem(item, true)}).join('');
+  if (cat.unbooked.length > 0) panelHtml += cat.unbooked.map(function(item){return cat.renderItem(item, false)}).join('');
+  if (!panelHtml) panelHtml = '<div style="padding:20px 16px;text-align:center;color:var(--tx3)">暂无数据</div>';
+  panelsEl.innerHTML = panelHtml;
+  tabsEl.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      currentBookingCat = tab.dataset.cat;
+          });
+  });
+}
 
 /* ============================
    ITINERARY
@@ -1275,6 +1375,7 @@ async function toggleTodoDone(id, currentDone) {
   if (_supabase) {
     await _supabase.from('todos').update({ done: newDone }).eq('id', id);
     await fetchTodos();
+    fetchFlights(); fetchTrains(); fetchHotels(); fetchTickets();
   }
 }
 
@@ -1975,6 +2076,14 @@ function initSupabase() {
       'postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => fetchExpenses()
     ).on(
       'postgres_changes', { event: '*', schema: 'public', table: 'todos' }, () => fetchTodos()
+    ).on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'flights' }, () => fetchFlights()
+    ).on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'trains' }, () => fetchTrains()
+    ).on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'hotels' }, () => fetchHotels()
+    ).on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'tickets' }, () => fetchTickets()
     ).subscribe();
   } catch(e) {
     console.error('Supabase init error:', e);
@@ -2154,7 +2263,6 @@ function renderExpenses() {
 /* ============================
    INIT
    ============================ */
-renderBooking();
 renderItinerary();
 fetchTodos();
 renderRouteSummary();
