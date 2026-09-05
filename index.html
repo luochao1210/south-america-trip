@@ -517,14 +517,24 @@ body{
   font-size:15px;font-weight:700;color:var(--pri);
   text-align:center;
 }
-.tip-food-cities{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.tip-city-btn{
-  padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;
-  cursor:pointer;border:1px solid var(--brd);
-  background:var(--bg3);color:var(--tx2);transition:all .15s;
+/* Food city cards */
+.food-city-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.food-city-card{
+  background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rs);
+  overflow:hidden;
 }
-.tip-city-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
-.tip-rest-list{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.food-city-head{
+  display:flex;align-items:center;padding:10px 12px;gap:8px;
+  cursor:pointer;user-select:none;
+}
+.food-city-icon{font-size:12px;flex-shrink:0}
+.food-city-name{font-size:14px;font-weight:700;flex:1}
+.food-city-count{font-size:12px;color:var(--tx3)}
+.food-city-arrow{font-size:12px;color:var(--tx3);transition:transform .25s;flex-shrink:0}
+.food-city-card.open .food-city-arrow{transform:rotate(180deg)}
+.food-city-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.food-city-card.open .food-city-body{max-height:600px}
+.food-city-inner{padding:0 12px 10px;display:flex;flex-direction:column;gap:6px}
 .tip-rest-card{
   background:var(--bg3);border-radius:8px;padding:8px 12px;
 }
@@ -1526,16 +1536,29 @@ function renderTips() {
     }
     if (t.icon === '🍽️') {
       const totalRest = restaurants.reduce((sum, g) => sum + g.items.length, 0);
-      const cities = restaurants.map(g => g.city);
-      const cityBtns = cities.map((c, ci) =>
-        `<button class="tip-city-btn" data-idx="${ci}" onclick="toggleTipCity(this)">${c.replace(/ \(.*\)/, '')}</button>`
-      ).join('');
+      const cityCards = restaurants.map((g, gi) => {
+        const restItems = g.items.map(r =>
+          `<div class="tip-rest-card">
+            <div class="tip-rest-name">${r.name}${r.tag ? '<span class="tip-rest-tag">'+r.tag+'</span>' : ''}</div>
+            <div class="tip-rest-meta">${r.type} · ${r.note}</div>
+          </div>`
+        ).join('');
+        return `<div class="food-city-card">
+          <div class="food-city-head" onclick="this.parentElement.classList.toggle('open')">
+            <span class="food-city-icon">📍</span>
+            <span class="food-city-name">${g.city.replace(/ \(.*\)/, '')}</span>
+            <span class="food-city-count">${g.items.length}家</span>
+            <span class="food-city-arrow">▾</span>
+          </div>
+          <div class="food-city-body">
+            <div class="food-city-inner">${restItems}</div>
+          </div>
+        </div>`;
+      }).join('');
       return `<div class="tip-card full" id="foodTipCard">
-        <h4 style="cursor:pointer" onclick="toggleFoodTip()">${t.icon} ${t.title} <span style="float:right;font-size:12px;color:var(--tx3)">${cities.length}个城市 ${totalRest}家 ▾</span></h4>
+        <h4 style="cursor:pointer" onclick="toggleFoodTip()">${t.icon} ${t.title} <span style="float:right;font-size:12px;color:var(--tx3)">${restaurants.length}个城市 ${totalRest}家 ▾</span></h4>
         <div id="foodTipBody" style="display:none">
-          <p>${t.body}</p>
-          <div class="tip-food-cities">${cityBtns}</div>
-          <div class="tip-rest-list" id="tipRestList"></div>
+          <div class="food-city-list">${cityCards}</div>
         </div>
       </div>`;
     }
