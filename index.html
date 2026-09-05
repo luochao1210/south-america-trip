@@ -816,7 +816,22 @@ setInterval(setTheme, 60000);
 /* ============================
    AMAP NAVIGATION
    ============================ */
-function amapURI(name) {
+const GEO = {
+  'PEK': {lat:39.9042, lng:116.4074},
+  'GRU': {lat:-23.4425, lng:-46.4696},
+  'SCL': {lat:-33.4489, lng:-70.6693},
+  'IPC': {lat:-27.1127, lng:-109.3497},
+  'CUZ': {lat:-13.5319, lng:-71.9675},
+  'LIM': {lat:-12.0464, lng:-77.0428},
+  'EZE': {lat:-34.6037, lng:-58.3816},
+  'USH': {lat:-54.8019, lng:-68.3030},
+  'MVD': {lat:-34.4710, lng:-57.8394},
+  'GIG': {lat:-22.9068, lng:-43.1729},
+};
+function amapURI(code) {
+  const name = UT.label[code] || code;
+  const g = GEO[code];
+  if (g) return 'https://uri.amap.com/search?keyword=' + encodeURIComponent(name) + '&around=' + g.lat + ',' + g.lng;
   return 'https://uri.amap.com/search?keyword=' + encodeURIComponent(name);
 }
 
@@ -1011,7 +1026,7 @@ function renderItinerary() {
         ? `<a class="tl-badge ${badgeClass}" href="${e.bookUrl}" target="_blank" rel="noopener" style="text-decoration:none">${e.badge} ↗</a>`
         : `<span class="tl-badge ${badgeClass}">${e.badge}</span>`) : '';
       const locName = UT.label[e.c] || '';
-      const navLink = e.c && locName ? ` <a class="loc-link" href="${amapURI(locName)}" target="_blank" rel="noopener">📍</a>` : '';
+      const navLink = e.c && locName ? ` <a class="loc-link" href="${amapURI(e.c)}" target="_blank" rel="noopener">📍</a>` : '';
       return `<div class="tl-item">
         <div class="tl-time">${e.t||''}</div>
         <div class="tl-dot ${dotClass}"></div>
@@ -1024,9 +1039,9 @@ function renderItinerary() {
     const summaryText = summaryEvs.map(e => e.t + ' ' + e.txt).join(' → ');
 
     // Collect nav points for this day
-    const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>UT.label[e.c]);
+    const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>e.c);
     const uniqueNav = [...new Set(navPoints)];
-    const navBtns = uniqueNav.map(n=>`<a class="nav-btn" href="${amapURI(n)}" target="_blank" rel="noopener">📍 ${n}</a>`).join('');
+    const navBtns = uniqueNav.map(n=>`<a class="nav-btn" href="${amapURI(n)}" target="_blank" rel="noopener">📍 ${UT.label[n]}</a>`).join('');
 
     return `<div class="day-card${idx===0?' open':''}">
       <div class="day-head" onclick="this.parentElement.classList.toggle('open')">
