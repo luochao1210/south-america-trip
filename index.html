@@ -1065,9 +1065,9 @@ body{
    UTILITIES
    ============================ */
 const UT = {
-  off: { 'PEK':8, 'GRU':-3, 'SCL':-3, 'IPC':-5, 'CUZ':-5, 'LIM':-5, 'EZE':-3, 'USH':-3, 'MVD':-3, 'GIG':-3 },
-  label: { 'PEK':'北京','GRU':'圣保罗','SCL':'圣地亚哥','IPC':'复活节岛','CUZ':'库斯科','LIM':'利马','EZE':'布宜诺斯','USH':'乌斯怀亚','MVD':'科洛尼亚','GIG':'里约' },
-  tzName: { 'PEK':'CST +8','GRU':'BRT −3','SCL':'CLST −3','IPC':'EASST −5','CUZ':'PET −5','LIM':'PET −5','EZE':'ART −3','USH':'ART −3','MVD':'UYT −3','GIG':'BRT −3' },
+  off: { 'PEK':8, 'GRU':-3, 'SCL':-3, 'IPC':-5, 'CUZ':-5, 'LIM':-5, 'EZE':-3, 'AEP':-3, 'USH':-3, 'MVD':-3, 'GIG':-3 },
+  label: { 'PEK':'北京','GRU':'圣保罗','SCL':'圣地亚哥','IPC':'复活节岛','CUZ':'库斯科','LIM':'利马','EZE':'布宜诺斯','AEP':'布宜诺斯','USH':'乌斯怀亚','MVD':'科洛尼亚','GIG':'里约' },
+  tzName: { 'PEK':'CST +8','GRU':'BRT −3','SCL':'CLST −3','IPC':'EASST −5','CUZ':'PET −5','LIM':'PET −5','EZE':'ART −3','AEP':'ART −3','USH':'ART −3','MVD':'UYT −3','GIG':'BRT −3' },
   toUTC(y,mo,d,h,mi,code) {
     const o = this.off[code]||0;
     return Date.UTC(y,mo-1,d,h-o,mi);
@@ -1092,11 +1092,11 @@ const flights = [
   { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:28,dh:15,dmi:0, ay:2026,am:9,ad:29,ah:5,ami:0, air:'中国国航', ok:true, note:'小何 小季 · T3→T3', grp2:true },
   { no:'待定', from:'GRU', to:'CUZ', dy:2026,dm:9,dd:29,dh:0,dmi:0, ay:2026,am:9,ad:29,ah:0,ami:0, air:'待定', ok:false, note:'小何 小季 · 经利马中转', grp2:true },
   { no:'待定', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:20,dmi:0, ay:2026,am:10,ad:1,ah:22,ami:30, air:'待定', ok:false, note:'飞行约1.5h' },
-  { no:'待定', from:'LIM', to:'EZE', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:7,ami:30, air:'待定', ok:false, note:'红眼航班' },
-  { no:'待定', from:'EZE', to:'USH', dy:2026,dm:10,dd:2,dh:16,dmi:40, ay:2026,am:10,ad:2,ah:20,ami:19, air:'待定', ok:false, note:'' },
-  { no:'待定', from:'USH', to:'EZE', dy:2026,dm:10,dd:3,dh:18,dmi:40, ay:2026,am:10,ad:3,ah:22,ami:10, air:'待定', ok:false, note:'' },
-  { no:'待定', from:'EZE', to:'GIG', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'10.04晚或10.05早' },
-  { no:'待定', from:'GIG', to:'GRU', dy:2026,dm:10,dd:5,dh:0,dmi:0, ay:2026,am:10,ad:5,ah:0,ami:0, air:'待定', ok:false, note:'基督山后飞圣保罗' },
+  { no:'H25571', from:'LIM', to:'AEP', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:8,ami:30, air:'Sky Airline', ok:true, note:'空客320 · 无餐食 · 无免费托运 · ¥2264' },
+  { no:'AR1876', from:'AEP', to:'USH', dy:2026,dm:10,dd:2,dh:17,dmi:55, ay:2026,am:10,ad:2,ah:21,ami:35, air:'阿根廷航空', ok:true, note:'737-800 · 无免费托运' },
+  { no:'AR1885', from:'USH', to:'AEP', dy:2026,dm:10,dd:3,dh:20,dmi:40, ay:2026,am:10,ad:4,ah:0,ami:10, air:'阿根廷航空', ok:true, note:'737-800 · 无免费托运 · 到达即10.04凌晨' },
+  { no:'AR1308', from:'AEP', to:'GIG', dy:2026,dm:10,dd:5,dh:7,dmi:20, ay:2026,am:10,ad:5,ah:10,ami:15, air:'阿根廷航空', ok:true, note:'737-800 · 含小食 · 无免费托运' },
+  { no:'G31379', from:'GIG', to:'GRU', dy:2026,dm:10,dd:5,dh:20,dmi:15, ay:2026,am:10,ad:5,ah:21,ami:30, air:'巴西戈尔航空', ok:true, note:'波音737 · 含小食 · 无免费托运 · ¥994' },
   { no:'CA898', from:'GRU', to:'PEK', dy:2026,dm:10,dd:6,dh:9,dmi:25, ay:2026,am:10,ad:7,ah:19,ami:30, air:'中国国航', ok:true, note:'T3 → T3' },
 ];
 const trains = [
@@ -1317,11 +1317,11 @@ const days = [
   },
   { n:9, date:'10月2日 周四', title:'利马 → 布宜诺斯 → 乌斯怀亚', loc:'利马 → 布宜诺斯 → 乌斯怀亚',
     ev: [
-      { t:'02:00', c:'LIM', txt:'利马出发飞布宜诺斯', sub:'航班号待定 · 红眼航班', type:'dep' },
-      { t:'07:30', c:'EZE', txt:'到达布宜诺斯艾利斯', sub:'', type:'arr' },
-      { t:'白天', c:'EZE', txt:'布宜诺斯市区游览', sub:'背包随身带 · 可寄存', type:'act' },
-      { t:'16:40', c:'EZE', txt:'布宜诺斯出发飞乌斯怀亚', sub:'航班号待定', type:'dep' },
-      { t:'20:19', c:'USH', txt:'到达乌斯怀亚（世界尽头）', sub:'', type:'arr' },
+      { t:'02:00', c:'LIM', txt:'利马出发飞布宜诺斯', sub:'H25571 Sky Airline · 红眼航班 · 无餐食', type:'dep' },
+      { t:'08:30', c:'AEP', txt:'到达布宜诺斯 AEP', sub:'豪尔赫纽伯里机场', type:'arr' },
+      { t:'白天', c:'AEP', txt:'布宜诺斯市区游览', sub:'背包随身带 · 可寄存', type:'act' },
+      { t:'17:55', c:'AEP', txt:'布宜诺斯出发飞乌斯怀亚', sub:'AR1876 阿根廷航空 · 737-800', type:'dep' },
+      { t:'21:35', c:'USH', txt:'到达乌斯怀亚（世界尽头）', sub:'马尔维纳斯机场', type:'arr' },
       { t:'晚', c:'USH', txt:'住乌斯怀亚', sub:'', type:'hotel' },
     ]
   },
@@ -1330,24 +1330,25 @@ const days = [
       { t:'上午', c:'USH', txt:'世界尽头小火车', sub:'待购票', type:'act', badge:'订票', bookUrl:'https://www.trendelfindelmundo.com.ar/' },
       { t:'', c:'USH', txt:'火地岛国家公园', sub:'待购票', type:'act', badge:'订票', bookUrl:'https://www.tierradelfuego.org.ar/' },
       { t:'', c:'USH', txt:'乌斯怀亚港', sub:'', type:'act' },
-      { t:'18:40', c:'USH', txt:'乌斯怀亚出发飞布宜诺斯', sub:'航班号待定', type:'dep' },
-      { t:'22:10', c:'EZE', txt:'到达布宜诺斯艾利斯', sub:'', type:'arr' },
-      { t:'晚', c:'EZE', txt:'住布宜诺斯艾利斯', sub:'', type:'hotel' },
+      { t:'20:40', c:'USH', txt:'乌斯怀亚出发飞布宜诺斯', sub:'AR1885 阿根廷航空 · 737-800', type:'dep' },
+      { t:'00:10', c:'AEP', txt:'到达布宜诺斯（10.04 凌晨）', sub:'', type:'arr' },
     ]
   },
   { n:11, date:'10月4日 周六', title:'布宜诺斯 ⇄ 科洛尼亚', loc:'布宜诺斯 → 科洛尼亚 → 布宜诺斯',
     ev: [
-      { t:'上午', c:'EZE', txt:'坐船前往科洛尼亚（约 1h）', sub:'渡轮 · 往返共 $60', type:'act' },
+      { t:'上午', c:'AEP', txt:'坐船前往科洛尼亚（约 1h）', sub:'渡轮 · 往返共 $60', type:'act' },
       { t:'白天', c:'MVD', txt:'科洛尼亚世遗小镇漫步', sub:'世界文化遗产', type:'act' },
       { t:'傍晚', c:'MVD', txt:'坐船返回布宜诺斯', sub:'', type:'act' },
-      { t:'晚', c:'EZE', txt:'住布宜诺斯艾利斯', sub:'', type:'hotel' },
+      { t:'晚', c:'AEP', txt:'住布宜诺斯艾利斯', sub:'', type:'hotel' },
     ]
   },
   { n:12, date:'10月5日 周日', title:'里约基督山 → 圣保罗', loc:'布宜诺斯 → 里约 → 圣保罗',
     ev: [
-      { t:'', c:'EZE', txt:'布宜诺斯飞里约热内卢', sub:'航班待定', type:'dep' },
+      { t:'07:20', c:'AEP', txt:'布宜诺斯飞里约热内卢', sub:'AR1308 阿根廷航空 · 737-800 · 含小食', type:'dep' },
+      { t:'10:15', c:'GIG', txt:'到达里约 T2', sub:'', type:'arr' },
       { t:'白天', c:'GIG', txt:'基督山（Cristo Redentor）', sub:'', type:'act' },
-      { t:'傍晚', c:'GIG', txt:'里约飞圣保罗', sub:'航班待定', type:'dep' },
+      { t:'20:15', c:'GIG', txt:'里约飞圣保罗', sub:'G31379 巴西戈尔航空 · 波音737', type:'dep' },
+      { t:'21:30', c:'GRU', txt:'到达圣保罗 T2', sub:'', type:'arr' },
       { t:'晚', c:'GRU', txt:'住圣保罗', sub:'明早 09:25 航班！', type:'hotel' },
     ]
   },
@@ -1375,6 +1376,7 @@ const GEO = {
   'CUZ': {lat:-13.5319, lng:-71.9675},
   'LIM': {lat:-12.0464, lng:-77.0428},
   'EZE': {lat:-34.6037, lng:-58.3816},
+  'AEP': {lat:-34.5592, lng:-58.4157},
   'USH': {lat:-54.8019, lng:-68.3030},
   'MVD': {lat:-34.4710, lng:-57.8394},
   'GIG': {lat:-22.9068, lng:-43.1729},
@@ -1435,10 +1437,6 @@ function renderItinerary() {
 const todos = [
   { txt:'预订小何、小季 09.29 圣保罗→库斯科中转航班', urg:'urgent' },
   { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
-  { txt:'预订 10.02 利马→布宜诺斯航班', urg:'normal' },
-  { txt:'预订 10.02 布宜诺斯→乌斯怀亚航班', urg:'normal' },
-  { txt:'预订 10.03 乌斯怀亚→布宜诺斯航班', urg:'normal' },
-  { txt:'预订 10.05 布宜诺斯→里约→圣保罗航班', urg:'normal' },
   { txt:'预订库斯科↔热水镇火车票（PeruRail / Inca Rail）', urg:'normal' },
   { txt:'预订全部酒店（12 晚）', urg:'normal' },
   { txt:'购买复活节岛国家公园门票', urg:'normal' },
