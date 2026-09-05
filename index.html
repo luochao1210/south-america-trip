@@ -1048,6 +1048,7 @@ body{
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================
    UTILITIES
@@ -2214,23 +2215,52 @@ function doConvert() {
 }
 
 /* ============================
-   EXPENSE TRACKER
+   EXPENSE TRACKER (Supabase)
    ============================ */
-const EXP_KEY = 'sa_trip_expenses';
+const SUPABASE_URL = 'https://obnsdzfmxkjseuyoxbkk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_1iOWO9tS81um6is_We0-nw_5ZY36FvH';
 const EXP_PEOPLE = ['小罗','小刘','小何','小季'];
 
-function loadExpenses() {
-  try { return JSON.parse(localStorage.getItem(EXP_KEY)) || []; } catch { return []; }
+let _supabase = null;
+let _expenses = [];
+
+function initSupabase() {
+  try {
+    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    fetchExpenses();
+    // Real-time subscription
+    _supabase.channel('expenses').on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'expenses' },
+      () => fetchExpenses()
+    ).subscribe();
+  } catch(e) {
+    console.error('Supabase init error:', e);
+    // Fallback to localStorage
+    _expenses = loadLocalExpenses();
+    renderExpenses();
+  }
 }
-function saveExpenses(list) {
-  try { localStorage.setItem(EXP_KEY, JSON.stringify(list)); } catch {}
+
+function loadLocalExpenses() {
+  try { return JSON.parse(localStorage.getItem('sa_trip_expenses')) || []; } catch { return []; }
+}
+
+async function fetchExpenses() {
+  if (!_supabase) return;
+  try {
+    const { data, error } = await _supabase.from('expenses').select('*').order('created_at', { ascending: false });
+    if (!error) {
+      _expenses = data || [];
+      renderExpenses();
+    }
+  } catch(e) {
+    console.error('Fetch error:', e);
+  }
 }
 
 function toggleExpForm() {
   document.getElementById('expForm').classList.toggle('show');
 }
-
-const CUR_SYMBOL = {'CNY':'¥','SOL':'S/.','BRL':'R$','CLP':'$','ARS':'$','UYU':'$U','USD':'$'};
 
 function toggleExpPerson(btn) {
   btn.classList.toggle('active');
@@ -2240,7 +2270,7 @@ function getSplitPeople() {
   return Array.from(document.querySelectorAll('#expPeople .exp-person-btn.active')).map(b => b.dataset.name);
 }
 
-function addExpense() {
+async function addExpense() {
   const amount = parseFloat(document.getElementById('expAmount').value);
   const catVal = document.getElementById('expCategory').value;
   const curVal = document.getElementById('expCurrency').value;
@@ -2252,49 +2282,62 @@ function addExpense() {
   const [icon, catName] = catVal.split('|');
   const [curCode, rate] = curVal.split('|');
   const rmb = amount * parseFloat(rate);
-  const list = loadExpenses();
-  list.unshift({
-    id: Date.now(),
+  const record = {
     amount, rmb, currency: curCode, rate: parseFloat(rate),
     category: catName, icon, payer, note,
-    splitAmong,
+    split_among: splitAmong,
     date: new Date().toISOString().slice(0, 10)
-  });
-  saveExpenses(list);
+  };
+
+  if (_supabase) {
+    const { error } = await _supabase.from('expenses').insert(record);
+    if (error) console.error('Add error:', error);
+    // Real-time subscription will trigger fetchExpenses automatically
+  } else {
+    // Fallback to localStorage
+    record.id = Date.now();
+    const list = loadLocalExpenses();
+    list.unshift(record);
+    try { localStorage.setItem('sa_trip_expenses', JSON.stringify(list)); } catch {}
+    _expenses = list;
+    renderExpenses();
+  }
+
   document.getElementById('expAmount').value = '';
   document.getElementById('expNote').value = '';
-  // Reset split people to all active
   document.querySelectorAll('#expPeople .exp-person-btn').forEach(b => b.classList.add('active'));
   document.getElementById('expForm').classList.remove('show');
-  renderExpenses();
-fetchFxRates();
 }
 
-function deleteExpense(id) {
-  const list = loadExpenses().filter(e => e.id !== id);
-  saveExpenses(list);
-  renderExpenses();
-fetchFxRates();
+async function deleteExpense(id) {
+  if (_supabase) {
+    const { error } = await _supabase.from('expenses').delete().eq('id', id);
+    if (error) console.error('Delete error:', error);
+  } else {
+    const list = loadLocalExpenses().filter(e => e.id !== id);
+    try { localStorage.setItem('sa_trip_expenses', JSON.stringify(list)); } catch {}
+    _expenses = list;
+    renderExpenses();
+  }
 }
+
+const CUR_SYMBOL = {'CNY':'¥','SOL':'S/.','BRL':'R$','CLP':'$','ARS':'$','UYU':'$U','USD':'$'};
 
 function getRmb(e) {
   return e.rmb !== undefined ? e.rmb : e.amount;
 }
 
 function renderExpenses() {
-  const list = loadExpenses();
+  const list = _expenses;
   const total = list.reduce((s, e) => s + getRmb(e), 0);
   const perPerson = EXP_PEOPLE.length > 0 ? (total / EXP_PEOPLE.length) : 0;
 
-  // Title total
   document.getElementById('expTotal').textContent = total > 0 ? '共 ¥' + total.toFixed(0) : '';
 
-  // Summary boxes
   document.getElementById('expSummary').innerHTML =
     '<div class="exp-box"><div class="exp-box-label">总花费（人民币）</div><div class="exp-box-value">¥' + total.toFixed(2) + '</div></div>' +
     '<div class="exp-box"><div class="exp-box-label">人均</div><div class="exp-box-value small">¥' + perPerson.toFixed(2) + '</div></div>';
 
-  // Category breakdown
   const catMap = {};
   list.forEach(e => {
     if (!catMap[e.category]) catMap[e.category] = { icon: e.icon, amount: 0 };
@@ -2314,7 +2357,6 @@ function renderExpenses() {
       '<div class="exp-cat-pct">' + pct + '%</div></div></div>';
   }).join('');
 
-  // Expense list
   document.getElementById('expList').innerHTML = list.length === 0
     ? '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">还没有消费记录，点击"记一笔"开始</div>'
     : list.map(e => {
@@ -2323,25 +2365,26 @@ function renderExpenses() {
         ? sym + e.amount.toFixed(0) + ' ≈ '
         : '';
       return '<div class="exp-list-item">' +
-        '<span class="exp-list-icon">' + e.icon + '</span>' +
+        '<span class="exp-list-icon">' + (e.icon || '📦') + '</span>' +
         '<div class="exp-list-info"><div class="exp-list-note">' + (e.note || e.category) + '</div>' +
-        '<div class="exp-list-meta">' + e.payer + ' · ' + e.date + '</div></div>' +
+        '<div class="exp-list-meta">' + e.payer + ' · ' + e.date + (e.split_among ? ' · ' + (Array.isArray(e.split_among) ? e.split_among : []).join('') : '') + '</div></div>' +
         '<div style="text-align:right;flex-shrink:0"><div class="exp-list-amount">¥' + getRmb(e).toFixed(0) + '</div>' +
         (origAmount ? '<div style="font-size:11px;color:var(--tx3)">' + origAmount + '</div>' : '') +
         '</div>' +
         '<button class="exp-list-del" onclick="deleteExpense(' + e.id + ')">×</button></div>';
     }).join('');
 
-  // Split calculation (per-expense split)
+  // Split calculation
   const paidBy = {};
   const owedBy = {};
   EXP_PEOPLE.forEach(p => { paidBy[p] = 0; owedBy[p] = 0; });
   list.forEach(e => {
     const rmb = getRmb(e);
     if (paidBy[e.payer] !== undefined) paidBy[e.payer] += rmb;
-    const split = e.splitAmong || EXP_PEOPLE;
-    const share = rmb / split.length;
-    split.forEach(p => { if (owedBy[p] !== undefined) owedBy[p] += share; });
+    const split = e.split_among || EXP_PEOPLE;
+    const splitArr = Array.isArray(split) ? split : EXP_PEOPLE;
+    const share = rmb / splitArr.length;
+    splitArr.forEach(p => { if (owedBy[p] !== undefined) owedBy[p] += share; });
   });
 
   document.getElementById('expSplit').innerHTML =
@@ -2355,54 +2398,7 @@ function renderExpenses() {
     }).join('');
 }
 
-/* ============================
-   REAL-TIME EXCHANGE RATES
-   ============================ */
-const FX_RATES = { SOL:1.95, BRL:1.30, CLP:0.0071, ARS:0.0045, UYU:0.17, USD:7.25, CNY:1 };
-const FX_LABELS = {
-  CNY:'¥ 人民币', SOL:'S/. 索尔', BRL:'R$ 雷亚尔',
-  CLP:'$ 智利比索', ARS:'$ 阿根廷比索', UYU:'$U 乌拉圭', USD:'$ 美元'
-};
 
-function fetchFxRates() {
-  fetch('https://open.er-api.com/v6/latest/CNY')
-    .then(r => r.json())
-    .then(data => {
-      if (data.result === 'success' && data.rates) {
-        // API gives rates as X CNY = 1 foreign, we need 1 foreign = X CNY
-        if (data.rates.PEN) FX_RATES.SOL = 1 / data.rates.PEN;
-        if (data.rates.BRL) FX_RATES.BRL = 1 / data.rates.BRL;
-        if (data.rates.CLP) FX_RATES.CLP = 1 / data.rates.CLP;
-        if (data.rates.ARS) FX_RATES.ARS = 1 / data.rates.ARS;
-        if (data.rates.UYU) FX_RATES.UYU = 1 / data.rates.UYU;
-        if (data.rates.USD) FX_RATES.USD = 1 / data.rates.USD;
-        updateCurrencySelects();
-        console.log('Exchange rates updated:', FX_RATES);
-      }
-    })
-    .catch(() => console.log('Using fallback exchange rates'));
-}
-
-function updateCurrencySelects() {
-  const options = Object.entries(FX_LABELS).map(([code, label]) =>
-    '<option value="' + code + '|' + FX_RATES[code] + '">' + label + '</option>'
-  ).join('');
-  const expSel = document.getElementById('expCurrency');
-  const camSel = document.getElementById('camLang');
-  if (expSel) expSel.innerHTML = options;
-  // Update camera translate language selector too
-  if (camSel) {
-    const camOpts = [
-      '<option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>',
-      '<option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>',
-      '<option value="en|zh-CN">🇬🇧 英语 → 中文</option>',
-      '<option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>',
-      '<option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>',
-      '<option value="zh-CN|en">🇨🇳 中文 → 英语</option>'
-    ];
-    camSel.innerHTML = camOpts.join('');
-  }
-}
 
 /* ============================
    INIT
@@ -2414,7 +2410,7 @@ renderTopTodos();
 renderRouteSummary();
 renderTimeline();
 renderTips();
-renderExpenses();
+initSupabase();
 fetchFxRates();
 renderShopping();
 // Back to top button
