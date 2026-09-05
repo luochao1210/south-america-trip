@@ -1036,7 +1036,7 @@ function renderItinerary() {
 
     // Build summary for header (show key events without clicking)
     const summaryEvs = day.ev.filter(e => e.t && e.type !== 'hotel' && e.type !== 'info').slice(0, 4);
-    const summaryText = summaryEvs.map(e => e.t + ' ' + e.txt).join(' → ');
+    const summaryText = summaryEvs.map(e => e.txt).join(' → ');
 
     // Collect nav points for this day
     const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>e.c);
