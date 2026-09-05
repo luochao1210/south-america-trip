@@ -850,7 +850,7 @@ setTheme();
 setInterval(setTheme, 60000);
 
 /* ============================
-   AMAP NAVIGATION
+   GOOGLE MAPS NAVIGATION
    ============================ */
 const GEO = {
   'PEK': {lat:39.9042, lng:116.4074},
@@ -864,11 +864,11 @@ const GEO = {
   'MVD': {lat:-34.4710, lng:-57.8394},
   'GIG': {lat:-22.9068, lng:-43.1729},
 };
-function amapURI(code) {
+function gmapURI(code) {
   const name = UT.label[code] || code;
   const g = GEO[code];
-  if (g) return 'https://uri.amap.com/marker?position=' + g.lng + ',' + g.lat + '&name=' + encodeURIComponent(name) + '&src=travel-handbook&coordinate=gaode&callnative=0';
-  return 'https://uri.amap.com/search?keyword=' + encodeURIComponent(name);
+  if (g) return 'https://www.google.com/maps/search/?api=1&query=' + g.lat + ',' + g.lng;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name);
 }
 
 /* ============================
@@ -1064,7 +1064,7 @@ function renderItinerary() {
         ? `<a class="tl-badge ${badgeClass}" href="${e.bookUrl}" target="_blank" rel="noopener" style="text-decoration:none">${e.badge} ↗</a>`
         : `<span class="tl-badge ${badgeClass}">${e.badge}</span>`) : '';
       const locName = UT.label[e.c] || '';
-      const navLink = e.c && locName ? ` <a class="loc-link" href="${amapURI(e.c)}" target="_blank" rel="noopener">📍</a>` : '';
+      const navLink = e.c && locName ? ` <a class="loc-link" href="${gmapURI(e.c)}" target="_blank" rel="noopener">📍</a>` : '';
       return `<div class="tl-item">
         <div class="tl-time">${e.t||''}</div>
         <div class="tl-dot ${dotClass}"></div>
@@ -1079,7 +1079,7 @@ function renderItinerary() {
     // Collect nav points for this day
     const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>e.c);
     const uniqueNav = [...new Set(navPoints)];
-    const navBtns = uniqueNav.map(n=>`<a class="nav-btn" href="${amapURI(n)}" target="_blank" rel="noopener">📍 ${UT.label[n]}</a>`).join('');
+    const navBtns = uniqueNav.map(n=>`<a class="nav-btn" href="${gmapURI(n)}" target="_blank" rel="noopener">📍 ${UT.label[n]}</a>`).join('');
 
     return `<div class="day-card${idx===0?' open':''}">
       <div class="day-head" onclick="this.parentElement.classList.toggle('open')">
