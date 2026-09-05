@@ -430,13 +430,13 @@ body{
 
 /* ===== Back to Top ===== */
 .back-top{
-  position:fixed;right:16px;bottom:24px;z-index:99;
+  position:fixed;right:16px;bottom:76px;z-index:99;
   width:44px;height:44px;border-radius:50%;
   background:var(--pri);color:#fff;border:none;
   font-size:20px;cursor:pointer;
   box-shadow:0 3px 10px rgba(0,0,0,.2);
   display:flex;align-items:center;justify-content:center;
-  opacity:0;visibility:hidden;transition:all .25s;
+  opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;
 }
 .back-top.show{opacity:1;visibility:visible}
 .back-top:active{transform:scale(.9)}
@@ -1369,9 +1369,6 @@ renderTips();
       scrollTo2(btn.dataset.target);
     });
   });
-  // Adjust back-top button position to avoid overlap
-  const backTop = document.querySelector('.back-top');
-  if (backTop) backTop.style.bottom = '76px';
 })();
 </script>
 </body>
