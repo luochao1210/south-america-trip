@@ -288,7 +288,8 @@ body{
 }
 .timeline-wrap{
   overflow-x:auto;-webkit-overflow-scrolling:touch;
-  padding:0 0 8px;
+  padding:0 0 10px;margin-bottom:8px;
+  border-bottom:1px solid var(--brd);
 }
 .timeline-wrap::-webkit-scrollbar{display:none}
 .timeline{
@@ -799,6 +800,9 @@ body{
 <div class="section" id="sec-map">
   <div class="section-title"><span class="icon">🗺️</span> 行程总览</div>
   <div class="map-wrap">
+    <div class="timeline-wrap">
+      <div class="timeline" id="timelineStops"></div>
+    </div>
     <svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" id="routeMap">
       <!-- South America outline (simplified hand-drawn) -->
       <path d="M295,38 C310,32 340,28 365,35 Q385,42 395,55 Q400,68 395,85
@@ -859,9 +863,6 @@ body{
         <g class="city" data-name="科洛尼亚"><circle cx="330" cy="296" r="3" fill="#F2CC8F" stroke="#fff" stroke-width="1"/><text x="336" y="310" font-size="9" fill="var(--tx2)">科洛尼亚</text></g>
       </g>
     </svg>
-    <div class="timeline-wrap">
-      <div class="timeline" id="timelineStops"></div>
-    </div>
     <div class="map-legend">
       <span><i style="background:#E07A5F"></i>第1-2天</span>
       <span><i style="background:#F2CC8F"></i>第3-5天</span>
