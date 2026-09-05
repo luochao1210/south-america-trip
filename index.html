@@ -2199,6 +2199,37 @@ function doVoiceTranslate() {
     .catch(() => { result.textContent = '网络错误'; });
 }
 
+const FX_RATES = { SOL:1.95, BRL:1.30, CLP:0.0071, ARS:0.0045, UYU:0.17, USD:7.25, CNY:1 };
+const FX_LABELS = {
+  CNY:'¥ 人民币', SOL:'S/. 索尔', BRL:'R$ 雷亚尔',
+  CLP:'$ 智利比索', ARS:'$ 阿根廷比索', UYU:'$U 乌拉圭', USD:'$ 美元'
+};
+
+function fetchFxRates() {
+  fetch('https://open.er-api.com/v6/latest/CNY')
+    .then(r => r.json())
+    .then(data => {
+      if (data.result === 'success' && data.rates) {
+        if (data.rates.PEN) FX_RATES.SOL = 1 / data.rates.PEN;
+        if (data.rates.BRL) FX_RATES.BRL = 1 / data.rates.BRL;
+        if (data.rates.CLP) FX_RATES.CLP = 1 / data.rates.CLP;
+        if (data.rates.ARS) FX_RATES.ARS = 1 / data.rates.ARS;
+        if (data.rates.UYU) FX_RATES.UYU = 1 / data.rates.UYU;
+        if (data.rates.USD) FX_RATES.USD = 1 / data.rates.USD;
+        updateCurrencySelects();
+      }
+    })
+    .catch(() => console.log('Using fallback exchange rates'));
+}
+
+function updateCurrencySelects() {
+  const options = Object.entries(FX_LABELS).map(([code, label]) =>
+    '<option value="' + code + '|' + FX_RATES[code] + '">' + label + '</option>'
+  ).join('');
+  const expSel = document.getElementById('expCurrency');
+  if (expSel) expSel.innerHTML = options;
+}
+
 function doConvert() {
   const sel = document.getElementById('fxCurrency').value;
   const [curCode] = sel.split('|');
