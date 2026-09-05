@@ -2024,7 +2024,7 @@ function doCamTranslate() {
   result.textContent = '翻译中...';
   result.style.display = 'block';
   const [srcLang, tgtLang] = lang.split('|');
-  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.substring(0, 450)) + '&langpair=' + srcLang + '|' + tgtLang;
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.substring(0, 450)) + '&langpair=' + srcLang + '|' + tgtLang + '&de=travelhandbook2026@gmail.com';
   fetch(url)
     .then(r => r.json())
     .then(data => {
@@ -2114,7 +2114,7 @@ function doVoiceTranslate() {
   result.textContent = '翻译中...';
   result.style.display = 'block';
   const [srcLang, tgtLang] = lang.split('|');
-  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + srcLang + '|' + tgtLang;
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + srcLang + '|' + tgtLang + '&de=travelhandbook2026@gmail.com';
   fetch(url)
     .then(r => r.json())
     .then(data => {
