@@ -1003,10 +1003,6 @@ body{
 <div class="section" id="sec-todo">
   <div class="section-title"><span class="icon">📋</span> 待办清单</div>
   <div class="todo-list" id="todoList"></div>
-  <div class="todo-add-row">
-    <input class="todo-add-input" id="todoAddInput" placeholder="添加新待办..." onkeydown="if(event.key==='Enter')addTodo()">
-    <button class="todo-add-btn" onclick="addTodo()">添加</button>
-  </div>
 </div>
 
 <!-- 实用贴士 -->
@@ -1491,30 +1487,19 @@ function addTodo() {
    ============================ */
 function renderTodos() {
   const el = document.getElementById('todoList');
-  const state = loadTodoState();
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
-  const list = todos.map((t, i) => ({...t, idx: i, done: !!state[i]}));
-  const sorted = list.sort((a, b) => {
-    if (a.done !== b.done) return a.done ? 1 : -1;
-    return (urgOrder[a.urg] || 1) - (urgOrder[b.urg] || 1);
-  });
-  el.innerHTML = sorted.length === 0
-    ? '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">暂无待办</div>'
-    : sorted.map(t => {
-      const done = t.done ? ' done' : '';
-      return `<div class="todo-item${done}">
-        <span class="todo-check" onclick="toggleTodo(${t.idx})">✓</span>
-        <span class="todo-dot ${t.urg}"></span>
-        <span style="flex:1">${t.txt}</span>
-      </div>`;
-    }).join('');
+  const sorted = [...todos].sort((a, b) => (urgOrder[a.urg] || 1) - (urgOrder[b.urg] || 1));
+  el.innerHTML = sorted.map(t =>
+    `<div class="todo-item">
+      <span class="todo-dot ${t.urg}"></span>
+      <span style="flex:1">${t.txt}</span>
+    </div>`
+  ).join('');
 }
 
 function renderTopTodos() {
-  const state = loadTodoState();
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
-  const pending = todos.map((t, i) => ({...t, idx: i})).filter((t, i) => !state[i]);
-  const top3 = pending.sort((a, b) => (urgOrder[a.urg] || 1) - (urgOrder[b.urg] || 1)).slice(0, 3);
+  const top3 = [...todos].sort((a, b) => (urgOrder[a.urg] || 1) - (urgOrder[b.urg] || 1)).slice(0, 3);
 
   const items = top3.map(t =>
     `<div class="hero-todo-item">
