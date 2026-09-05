@@ -1748,7 +1748,9 @@ function doOCR(imageData) {
       }
     }
   }).then(({ data: { text } }) => {
-    textArea.value = text.trim() || '未识别到文字，请手动输入';
+    const recognized = text.trim();
+    textArea.value = recognized || '未识别到文字，请手动输入';
+    if (recognized) doCamTranslate();
   }).catch(() => {
     textArea.value = '识别失败，请手动输入文字';
   });
