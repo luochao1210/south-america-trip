@@ -1429,6 +1429,17 @@ function toggleTodo(idx) {
   renderTopTodos();
 }
 
+function addTodo() {
+  const input = document.getElementById('todoAddInput');
+  const text = input.value.trim();
+  if (!text) return;
+  // Add to hardcoded todos array and re-render
+  todos.push({ txt: text, urg: 'normal' });
+  input.value = '';
+  renderTodos();
+  renderTopTodos();
+}
+
 
 
 
@@ -2362,6 +2373,17 @@ initSupabase();
     btn.classList.toggle('show', window.scrollY > 400);
   });
 })();
+
+// Scroll to section
+function scrollTo2(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    const nav = document.querySelector('.bottom-nav');
+    const offset = nav ? nav.offsetHeight + 8 : 0;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+}
 
 // Bottom navigation
 (function() {
