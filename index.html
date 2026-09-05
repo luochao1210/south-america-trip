@@ -114,6 +114,7 @@ body{
 }
 .qn-btn .qn-icon{font-size:18px;line-height:1}
 .qn-btn:active{background:var(--bg3)}
+.qn-btn.active{background:var(--bg3);color:var(--tx1)}
 
 /* Trip Intro */
 .trip-intro{
@@ -1349,14 +1350,21 @@ renderTips();
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
   nav.innerHTML = `<div class="bottom-nav-inner">
-    <button class="qn-btn" onclick="scrollTo2('sec-map')"><span class="qn-icon">🗺️</span>总览</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-booking')"><span class="qn-icon">📋</span>预订</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-itinerary')"><span class="qn-icon">📅</span>日程</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-todo')"><span class="qn-icon">✅</span>待办</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-shop')"><span class="qn-icon">🛒</span>准备</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-tips')"><span class="qn-icon">💡</span>贴士</button>
+    <button class="qn-btn" data-target="sec-map"><span class="qn-icon">🗺️</span>总览</button>
+    <button class="qn-btn" data-target="sec-booking"><span class="qn-icon">📋</span>预订</button>
+    <button class="qn-btn" data-target="sec-itinerary"><span class="qn-icon">📅</span>日程</button>
+    <button class="qn-btn" data-target="sec-todo"><span class="qn-icon">✅</span>待办</button>
+    <button class="qn-btn" data-target="sec-shop"><span class="qn-icon">🛒</span>准备</button>
+    <button class="qn-btn" data-target="sec-tips"><span class="qn-icon">💡</span>贴士</button>
   </div>`;
   document.body.appendChild(nav);
+  nav.querySelectorAll('.qn-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      nav.querySelectorAll('.qn-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      scrollTo2(btn.dataset.target);
+    });
+  });
   // Adjust back-top button position to avoid overlap
   const backTop = document.querySelector('.back-top');
   if (backTop) backTop.style.bottom = '76px';
