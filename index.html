@@ -305,7 +305,10 @@ body{
   padding:10px 14px;background:var(--bg2);
   border:1px solid var(--brd);border-radius:var(--rs);
   margin-bottom:8px;font-size:14px;
+  cursor:pointer;user-select:none;transition:opacity .2s;
 }
+.todo-item.done{opacity:.4}
+.todo-item.done span:last-child{text-decoration:line-through;color:var(--tx3)}
 .todo-dot{
   width:8px;height:8px;border-radius:50%;flex-shrink:0;
 }
@@ -902,8 +905,10 @@ function scrollTo2(id) {
 }
 
 function renderTopTodos() {
+  const state = loadTodoState();
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
-  const top3 = [...todos].sort((a, b) => urgOrder[a.urg] - urgOrder[b.urg]).slice(0, 3);
+  const pending = todos.map((t, i) => ({ ...t, idx: i })).filter((t, i) => !state[i]);
+  const top3 = pending.sort((a, b) => urgOrder[a.urg] - urgOrder[b.urg]).slice(0, 3);
 
   const items = top3.map(t =>
     `<div class="hero-todo-item">
@@ -1076,14 +1081,34 @@ function renderItinerary() {
 /* ============================
    RENDER: TODOS
    ============================ */
+const TODO_KEY = 'sa_trip_todo_2026';
+function loadTodoState() {
+  try { return JSON.parse(localStorage.getItem(TODO_KEY)) || {}; } catch { return {}; }
+}
+function saveTodoState(state) {
+  try { localStorage.setItem(TODO_KEY, JSON.stringify(state)); } catch {}
+}
+
 function renderTodos() {
   const el = document.getElementById('todoList');
-  el.innerHTML = todos.map(t => `
-    <div class="todo-item">
+  const state = loadTodoState();
+  el.innerHTML = todos.map((t, i) => {
+    const done = state[i] ? ' done' : '';
+    return `<div class="todo-item${done}" data-idx="${i}" onclick="toggleTodo(this)">
       <span class="todo-dot ${t.urg}"></span>
       <span>${t.txt}</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+}
+
+function toggleTodo(el) {
+  const idx = el.dataset.idx;
+  const state = loadTodoState();
+  state[idx] = !state[idx];
+  saveTodoState(state);
+  el.classList.toggle('done');
+  // Update hero TOP 3
+  renderTopTodos();
 }
 
 /* ============================
