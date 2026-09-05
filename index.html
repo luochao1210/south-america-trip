@@ -815,12 +815,6 @@ body{
   <div class="todo-list" id="todoList"></div>
 </div>
 
-<!-- 出发前准备 -->
-<div class="section" id="sec-shop">
-  <div class="section-title"><span class="icon">🛒</span> 出发前准备</div>
-  <div id="shopCards"></div>
-</div>
-
 <!-- 实用贴士 -->
 <div class="section" id="sec-tips">
   <div class="section-title"><span class="icon">💡</span> 实用贴士</div>
@@ -1077,7 +1071,6 @@ const shops = [
    ============================ */
 const tips = [
   { icon:'💰', title:'汇率参考', body:'1 SOL ≈ 2 RMB<br>1 BRL ≈ 1.3 RMB<br>1 RMB ≈ 140 CLP<br>1 RMB ≈ 220 ARS<br>1 RMB ≈ 6 UYU' },
-  { icon:'🕐', title:'时区速查', body:'北京 CST +8<br>巴西/阿根廷 BRT/ART −3<br>复活节岛 EASST −5<br>秘鲁/哥伦比亚 PET −5' },
   { icon:'🔌', title:'插头类型', body:'智利/秘鲁：Type C/L（圆头）<br>阿根廷：Type I（八字形）<br>巴西：Type N（三圆孔）<br>建议带万能转换头' },
   { icon:'🏔️', title:'高原注意', body:'库斯科海拔 3400m<br>到达后慢动作、多喝水<br>提前 1 周吃红景天<br>严重高反立即就医' },
   { icon:'🌡️', title:'天气提醒', body:'乌斯怀亚 10 月：0~10°C<br>复活节岛：18~24°C<br>里约/圣保罗：20~28°C<br>库斯科：5~20°C' },
@@ -1443,7 +1436,12 @@ function toggleShop(el) {
    ============================ */
 function renderTips() {
   const el = document.getElementById('tipsGrid');
-  el.innerHTML = tips.map((t, i) => {
+  const state = loadShopState();
+  const shopDone = shops.filter((s,i) => state[i]).length;
+  const customShops = loadCustomShops();
+  const totalShops = shops.length + customShops.length;
+
+  let html = tips.map((t) => {
     if (t.icon === '🍽️') {
       const cities = restaurants.map(g => g.city);
       const cityBtns = cities.map((c, ci) =>
@@ -1461,6 +1459,62 @@ function renderTips() {
       <p>${t.body}</p>
     </div>`;
   }).join('');
+
+  // Shopping list tip card
+  html += `<div class="tip-card full" id="shopTipCard">
+    <h4 style="cursor:pointer" onclick="toggleShopTip()">🛒 准备清单 <span style="float:right;font-size:12px;color:var(--tx3)">${shopDone}/${totalShops} ▾</span></h4>
+    <div id="shopTipBody" style="display:none">
+      <div id="shopCards" style="margin-top:8px"></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <select id="addShopCat" style="padding:6px 8px;border:1px solid var(--brd);border-radius:8px;font-size:12px;background:var(--bg2);color:var(--tx1)">
+          <option value="其他">其他</option>
+          <option value="证件">证件</option>
+          <option value="电子">电子</option>
+          <option value="药品">药品</option>
+          <option value="衣物">衣物</option>
+          <option value="防护">防护</option>
+          <option value="日用">日用</option>
+          <option value="安全">安全</option>
+        </select>
+        <input id="addShopName" placeholder="添加新物品..." style="flex:1;padding:6px 10px;border:1px solid var(--brd);border-radius:8px;font-size:13px;background:var(--bg2);color:var(--tx1)" onkeydown="if(event.key==='Enter')addCustomShop()">
+        <button onclick="addCustomShop()" style="padding:6px 14px;border:none;border-radius:8px;background:var(--pri);color:#fff;font-size:13px;font-weight:600;cursor:pointer">添加</button>
+      </div>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+function toggleShopTip() {
+  const body = document.getElementById('shopTipBody');
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) renderShopping();
+}
+
+function loadCustomShops() {
+  try { return JSON.parse(localStorage.getItem('sa_trip_custom_shop')) || []; } catch { return []; }
+}
+function saveCustomShops(list) {
+  try { localStorage.setItem('sa_trip_custom_shop', JSON.stringify(list)); } catch {}
+}
+
+function addCustomShop() {
+  const cat = document.getElementById('addShopCat').value;
+  const name = document.getElementById('addShopName').value.trim();
+  if (!name) return;
+  const custom = loadCustomShops();
+  custom.push({ cat, name });
+  saveCustomShops(custom);
+  document.getElementById('addShopName').value = '';
+  // Update shops array and re-render
+  shops.push({ cat, name });
+  renderShopping();
+  // Update counter in tip header
+  const state = loadShopState();
+  const done = shops.filter((s,i) => state[i]).length;
+  const h4 = document.querySelector('#shopTipCard h4 span');
+  if (h4) h4.textContent = done + '/' + shops.length + ' ▾';
 }
 
 function toggleTipCity(btn) {
@@ -1608,7 +1662,6 @@ renderTips();
     <button class="qn-btn" data-target="sec-booking"><span class="qn-icon">📋</span>预订</button>
     <button class="qn-btn" data-target="sec-itinerary"><span class="qn-icon">📅</span>日程</button>
     <button class="qn-btn" data-target="sec-todo"><span class="qn-icon">✅</span>待办</button>
-    <button class="qn-btn" data-target="sec-shop"><span class="qn-icon">🛒</span>准备</button>
     <button class="qn-btn" data-target="sec-tips"><span class="qn-icon">💡</span>贴士</button>
   </div>`;
   document.body.appendChild(nav);
