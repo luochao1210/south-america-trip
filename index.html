@@ -29,7 +29,7 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   background:var(--bg);color:var(--tx1);
   line-height:1.6;min-height:100vh;
-  padding-bottom:calc(80px + env(safe-area-inset-bottom,20px));
+  padding-bottom:calc(64px + env(safe-area-inset-bottom,20px));
 }
 .container{max-width:680px;margin:0 auto;padding:0 16px}
 
@@ -107,7 +107,7 @@ body{
 .quick-nav-inner::-webkit-scrollbar{display:none}
 .qn-btn{
   display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 4px;border-radius:16px;font-size:11px;font-weight:600;
+  padding:6px 4px;border-radius:50%/40%;font-size:11px;font-weight:600;
   cursor:pointer;border:none;
   background:transparent;color:var(--tx2);transition:background .15s;
   flex:1;min-width:0;
@@ -1369,7 +1369,7 @@ renderTips();
   });
   // Adjust back-top button position to avoid overlap
   const backTop = document.querySelector('.back-top');
-  if (backTop) backTop.style.bottom = '90px';
+  if (backTop) backTop.style.bottom = '76px';
 })();
 </script>
 </body>
