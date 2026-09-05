@@ -1530,7 +1530,10 @@ function renderTips() {
           <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
         </select>
         <textarea class="cam-text" id="camText" placeholder="输入要翻译的文字"></textarea>
-        <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译</button>
+        <div class="cam-btns" style="margin-top:6px">
+          <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译</button>
+          <button class="cam-btn" onclick="clearCam()">清空</button>
+        </div>
         <div class="cam-result" id="camResult"></div>
       </div>`;
     }
@@ -1777,6 +1780,15 @@ function doOCR(imageData) {
   }).catch(() => {
     textArea.value = '识别失败，请手动输入文字';
   });
+}
+
+function clearCam() {
+  document.getElementById('camText').value = '';
+  document.getElementById('camPreview').src = '';
+  document.getElementById('camPreview').style.display = 'none';
+  document.getElementById('camResult').style.display = 'none';
+  document.getElementById('camFile').value = '';
+  document.getElementById('camCapture').value = '';
 }
 
 function doCamTranslate() {
