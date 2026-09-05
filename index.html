@@ -192,6 +192,17 @@ body{
 .map-legend span{display:flex;align-items:center;gap:4px}
 .map-legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
 
+/* Route summary */
+.route-summary{padding:12px 0 0;border-top:1px solid var(--brd);margin-top:12px}
+.route-group{
+  display:flex;gap:8px;padding:8px 0;
+  border-bottom:1px solid var(--brd);
+}
+.route-group:last-child{border-bottom:none}
+.route-bar{width:4px;border-radius:2px;flex-shrink:0;min-height:100%}
+.route-days{font-size:11px;font-weight:700;color:var(--tx3);white-space:nowrap;min-width:42px;padding-top:2px}
+.route-detail{font-size:13px;color:var(--tx1);line-height:1.5}
+
 /* ===== Itinerary ===== */
 .day-card{
   background:var(--bg2);border-radius:var(--r);
@@ -472,6 +483,7 @@ body{
       <span><i style="background:#3D8B8B"></i>第10-11天</span>
       <span><i style="background:#8B5CF6"></i>第12-13天</span>
     </div>
+    <div class="route-summary" id="routeSummary"></div>
   </div>
 </div>
 
@@ -1112,12 +1124,39 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 /* ============================
+   RENDER: ROUTE SUMMARY
+   ============================ */
+const routeGroups = [
+  { days:'1-2', dates:'9.24-25', color:'#E07A5F',
+    text:'北京 → 圣保罗（CA897 ~14h）→ 圣地亚哥（LA612 ~4h20m）' },
+  { days:'3-5', dates:'9.26-28', color:'#F2CC8F',
+    text:'圣地亚哥 → 复活节岛（LA843 ~3h35m），游览石像群 → 返程（LA844 ~5h35m）' },
+  { days:'6-9', dates:'9.29-10.1', color:'#81B29A',
+    text:'圣地亚哥 → 库斯科（LA2367 ~1h30m），四人汇合 → 火车去热水镇 → 马丘比丘 → 飞利马' },
+  { days:'10-11', dates:'10.2-4', color:'#3D8B8B',
+    text:'利马 → 布宜诺斯（红眼 ~5h30m）→ 乌斯怀亚（~3h40m），世界尽头+火地岛 → 布宜诺斯 ⇄ 科洛尼亚渡轮' },
+  { days:'12-14', dates:'10.5-7', color:'#8B5CF6',
+    text:'布宜诺斯 → 里约基督山 → 圣保罗 → 北京（CA898 ~24h），10.7 到家' },
+];
+
+function renderRouteSummary() {
+  document.getElementById('routeSummary').innerHTML = routeGroups.map(g =>
+    `<div class="route-group">
+      <div class="route-bar" style="background:${g.color}"></div>
+      <div class="route-days">D${g.days}<br><span style="font-weight:400;font-size:10px;color:var(--tx3)">${g.dates}</span></div>
+      <div class="route-detail">${g.text}</div>
+    </div>`
+  ).join('');
+}
+
+/* ============================
    INIT
    ============================ */
 renderBooking();
 renderItinerary();
 renderTodos();
 renderTopTodos();
+renderRouteSummary();
 renderShopping();
 renderTips();
 </script>
