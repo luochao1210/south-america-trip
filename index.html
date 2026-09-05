@@ -1162,6 +1162,47 @@ function flightCard(f) {
     '</div>';
 }
 
+/* ============================
+   COUNTDOWN & HERO
+   ============================ */
+function getAllEvents() {
+  const evs = [];
+  flights.forEach(f => {
+    if (f.dh === 0 && f.dmi === 0 && !f.ok) return;
+    const depUTC = UT.toUTC(f.dy,f.dm,f.dd,f.dh,f.dmi,f.from);
+    evs.push({ utc:depUTC, type:'dep', label:(f.grp2?'👥 ':'')+(f.air+' '+f.no), detail:UT.label[f.from]+' → '+UT.label[f.to], tz:f.from, sub:f.note });
+    if (f.ah !== 0 || f.ami !== 0) {
+      const arrUTC = UT.toUTC(f.ay,f.am,f.ad,f.ah,f.ami,f.to);
+      evs.push({ utc:arrUTC, type:'arr', label:(f.grp2?'👥 ':'')+'到达 '+UT.label[f.to], detail:f.air+' '+f.no, tz:f.to });
+    }
+  });
+  evs.push({ utc:UT.toUTC(2026,10,1,8,0,'CUZ'), type:'act', label:'🏛️ 马丘比丘入场', detail:'Circuito 1 Ruta 1-B', tz:'CUZ' });
+  evs.sort((a,b)=>a.utc-b.utc);
+  return evs;
+}
+
+const allEvents = getAllEvents();
+
+function tickCountdown() {
+  const now = Date.now();
+  let next = allEvents.find(e => e.utc > now);
+  if (!next) next = allEvents[allEvents.length-1];
+
+  document.getElementById('heroTitle').textContent = next.label;
+  document.getElementById('heroDetail').textContent = next.detail;
+  document.getElementById('heroTz').textContent = (next.tz ? UT.tzName[next.tz]+' · ' : '') + '北京时间倒计时';
+
+  let diff = Math.max(0, next.utc - now);
+  const d = Math.floor(diff/864e5); diff %= 864e5;
+  const h = Math.floor(diff/36e5); diff %= 36e5;
+  const m = Math.floor(diff/6e4); diff %= 6e4;
+  const s = Math.floor(diff/1e3);
+  document.getElementById('cdD').textContent = d;
+  document.getElementById('cdH').textContent = String(h).padStart(2,'0');
+  document.getElementById('cdM').textContent = String(m).padStart(2,'0');
+  document.getElementById('cdS').textContent = String(s).padStart(2,'0');
+}
+
 function renderBooking() {
   var statusBadge = function(ok) {
     return ok
@@ -1209,7 +1250,8 @@ function renderBooking() {
   tabsEl.querySelectorAll('.tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       currentBookingCat = tab.dataset.cat;
-          });
+      renderBooking();
+    });
   });
 }
 
@@ -2358,6 +2400,8 @@ renderTips();
 renderShopping();
 renderTodos();
 renderTopTodos();
+tickCountdown();
+setInterval(tickCountdown, 1000);
 renderBooking();
 renderExpenses();
 fetchFxRates();
