@@ -1357,6 +1357,71 @@ const days = [
 ];
 
 /* ============================
+   GOOGLE MAPS NAVIGATION
+   ============================ */
+const GEO = {
+  'PEK': {lat:39.9042, lng:116.4074},
+  'GRU': {lat:-23.4425, lng:-46.4696},
+  'SCL': {lat:-33.4489, lng:-70.6693},
+  'IPC': {lat:-27.1127, lng:-109.3497},
+  'CUZ': {lat:-13.5319, lng:-71.9675},
+  'LIM': {lat:-12.0464, lng:-77.0428},
+  'EZE': {lat:-34.6037, lng:-58.3816},
+  'USH': {lat:-54.8019, lng:-68.3030},
+  'MVD': {lat:-34.4710, lng:-57.8394},
+  'GIG': {lat:-22.9068, lng:-43.1729},
+};
+function gmapURI(code) {
+  const name = UT.label[code] || code;
+  const g = GEO[code];
+  if (g) return 'https://www.google.com/maps/search/?api=1&query=' + g.lat + ',' + g.lng;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name);
+}
+
+/* ============================
+   RENDER: ITINERARY
+   ============================ */
+function renderItinerary() {
+  const el = document.getElementById('itinerary');
+  el.innerHTML = days.map((day, idx) => {
+    const timeline = day.ev.map(e => {
+      const dotClass = e.type==='hotel'?'hotel':(e.type==='arr'?'done':'');
+      const badgeClass = e.badge==='门票'?'badge-ticket':e.badge==='汇合'?'badge-group':'badge-book';
+      const badgeHTML = e.badge ? (e.bookUrl
+        ? '<a class="tl-badge ' + badgeClass + '" href="' + e.bookUrl + '" target="_blank" rel="noopener" style="text-decoration:none">' + e.badge + ' ↗</a>'
+        : '<span class="tl-badge ' + badgeClass + '">' + e.badge + '</span>') : '';
+      const locName = UT.label[e.c] || '';
+      const navLink = e.c && locName ? ' <a class="loc-link" href="' + gmapURI(e.c) + '" target="_blank" rel="noopener">📍</a>' : '';
+      return '<div class="tl-item">' +
+        '<div class="tl-time">' + (e.t||'') + '</div>' +
+        '<div class="tl-dot ' + dotClass + '"></div>' +
+        '<div class="tl-content">' + e.txt + badgeHTML + navLink + (e.sub?'<div class="tl-sub">'+e.sub+'</div>':'') + '</div>' +
+        '</div>';
+    }).join('');
+
+    const summaryEvs = day.ev.filter(e => e.t && e.type !== 'hotel' && e.type !== 'info').slice(0, 4);
+    const summaryText = summaryEvs.map(e => e.txt).join(' → ');
+
+    const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>e.c);
+    const uniqueNav = [...new Set(navPoints)];
+    const navBtns = uniqueNav.map(n=>'<a class="nav-btn" href="' + gmapURI(n) + '" target="_blank" rel="noopener">📍 ' + UT.label[n] + '</a>').join('');
+
+    return '<div class="day-card' + (idx===0?' open':'') + '">' +
+      '<div class="day-head" onclick="this.parentElement.classList.toggle(\'open\')">' +
+      '<span class="day-num">D' + day.n + '</span>' +
+      '<span class="day-date">' + day.date + '</span>' +
+      '<span class="day-arrow">▾</span>' +
+      '</div>' +
+      (summaryText ? '<div class="day-summary"><div class="day-summary-text">' + summaryText + '</div></div>' : '') +
+      '<div class="day-body"><div class="day-inner">' +
+      '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--tx2)">' + day.title + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">· ' + day.loc + '</span></div>' +
+      '<div class="tl">' + timeline + '</div>' +
+      (navBtns?'<div class="day-nav">' + navBtns + '</div>':'') +
+      '</div></div></div>';
+  }).join('');
+}
+
+/* ============================
    TODOS (Supabase)
    ============================ */
 let _todos = [];
@@ -1442,6 +1507,45 @@ function renderTopTodos() {
 }
 
 /* ============================
+   SHOPPING LIST DATA
+   ============================ */
+const shops = [
+  { cat:'证件', name:'护照 + 复印件（2份分开放）' },
+  { cat:'证件', name:'签证材料打印件' },
+  { cat:'证件', name:'机票行程单打印' },
+  { cat:'证件', name:'酒店确认单打印' },
+  { cat:'证件', name:'旅行保险单' },
+  { cat:'电子', name:'万能转换插头（南美四种接口）' },
+  { cat:'电子', name:'充电宝 20000mAh' },
+  { cat:'电子', name:'手机充电线 ×2' },
+  { cat:'电子', name:'耳机（降噪款长途必备）' },
+  { cat:'药品', name:'高原安 / 红景天（提前一周吃）' },
+  { cat:'药品', name:'止泻药 + 肠胃药' },
+  { cat:'药品', name:'感冒药 + 退烧药' },
+  { cat:'药品', name:'创可贴 + 消炎药膏' },
+  { cat:'药品', name:'防蚊液（含 DEET）' },
+  { cat:'衣物', name:'冲锋衣 / 防风外套' },
+  { cat:'衣物', name:'抓绒衣（乌斯怀亚 0~10°C）' },
+  { cat:'衣物', name:'速干 T 恤 ×3' },
+  { cat:'衣物', name:'登山鞋 / 防滑徒步鞋' },
+  { cat:'衣物', name:'压缩袜 2 双（长途飞行防血栓）' },
+  { cat:'防护', name:'防晒霜 SPF50+（高原紫外线强）' },
+  { cat:'防护', name:'墨镜（偏光）' },
+  { cat:'防护', name:'遮阳帽' },
+  { cat:'日用', name:'颈枕（充气款省空间）' },
+  { cat:'日用', name:'保温杯' },
+  { cat:'日用', name:'密封袋若干（湿衣物 / 证件防水）' },
+  { cat:'日用', name:'小背包（20L 日用）' },
+  { cat:'安全', name:'防盗腰包 / 贴身钱包' },
+  { cat:'安全', name:'行李锁 ×2' },
+  { cat:'其他', name:'美元现金（小面额 $5/$10/$20）' },
+  { cat:'其他', name:'签字笔 ×2（填入境表用）' },
+  { cat:'其他', name:'飞机零食 / 口香糖' },
+  { cat:'其他', name:'离线地图 App 提前下载' },
+  { cat:'其他', name:'西班牙语翻译 App 离线包' },
+];
+
+/* ============================
    RENDER: SHOPPING LIST
    ============================ */
 const SHOP_KEY = 'sa_trip_shop_2026';
@@ -1505,6 +1609,14 @@ function toggleShop(el) {
 /* ============================
    RENDER: TIPS
    ============================ */
+const tips = [
+  { icon:'💰', title:'汇率换算', body:'converter' },
+  { icon:'📷', title:'拍照翻译', body:'camera' },
+  { icon:'🎤', title:'语音翻译', body:'voice' },
+  { icon:'🍽️', title:'饮食推荐', body:'food' },
+  { icon:'📌', title:'提示事项', body:'notices' },
+];
+
 function renderTips() {
   const el = document.getElementById('tipsGrid');
   const state = loadShopState();
