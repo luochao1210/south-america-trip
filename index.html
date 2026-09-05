@@ -2321,9 +2321,13 @@ async function addExpense() {
   };
 
   if (_supabase) {
+    // Optimistic update: show immediately
+    record.id = Date.now();
+    _expenses.unshift(record);
+    renderExpenses();
     const { error } = await _supabase.from('expenses').insert(record);
-    if (error) console.error('Add error:', error);
-    // Real-time subscription will trigger fetchExpenses automatically
+    if (error) { console.error('Add error:', error); await fetchExpenses(); return; }
+    await fetchExpenses();
   } else {
     // Fallback to localStorage
     record.id = Date.now();
@@ -2342,8 +2346,12 @@ async function addExpense() {
 
 async function deleteExpense(id) {
   if (_supabase) {
+    // Optimistic update: remove immediately
+    _expenses = _expenses.filter(e => e.id !== id);
+    renderExpenses();
     const { error } = await _supabase.from('expenses').delete().eq('id', id);
-    if (error) console.error('Delete error:', error);
+    if (error) { console.error('Delete error:', error); await fetchExpenses(); return; }
+    await fetchExpenses();
   } else {
     const list = loadLocalExpenses().filter(e => e.id !== id);
     try { localStorage.setItem('sa_trip_expenses', JSON.stringify(list)); } catch {}
