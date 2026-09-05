@@ -503,11 +503,6 @@ body{
 }
 .fx-select{min-width:100px}
 .fx-input{flex:1;min-width:0;font-family:"SF Mono",monospace;font-weight:700}
-.cam-preview{
-  width:100%;max-height:200px;object-fit:cover;
-  border-radius:10px;margin-top:8px;display:none;
-  border:1px solid var(--brd);
-}
 .cam-btns{display:flex;gap:8px;margin-top:8px}
 .cam-btn{
   flex:1;padding:8px;border:1px solid var(--brd);border-radius:10px;
@@ -515,7 +510,6 @@ body{
   cursor:pointer;text-align:center;
 }
 .cam-btn:active{background:var(--pri);color:#fff}
-.cam-input{display:none}
 .cam-text{
   width:100%;padding:8px 10px;border:1px solid var(--brd);border-radius:10px;
   font-size:13px;background:var(--bg2);color:var(--tx1);
@@ -1656,15 +1650,11 @@ function renderTips() {
       return `<div class="tip-card full">
         <h4 style="cursor:pointer" onclick="toggleTipBody('camBody',this)"><span class="tip-icon">${t.icon}</span>${t.title} <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
         <div id="camBody" style="display:none">
-          <div class="cam-btns">
-            <button class="cam-btn" onclick="document.getElementById('camFile').click()">📁 选择图片</button>
-            <button class="cam-btn" onclick="document.getElementById('camCapture').click()">📸 拍照</button>
-            <a class="cam-btn" href="https://lens.google.com/" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx1)">🔍 Google Lens</a>
+          <div style="background:var(--pri-l);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.5">
+            💡 <b>推荐用 Google Lens</b>（识别最准确）：打开 Google App → 点搜索栏右侧相机图标 → 拍照自动翻译
           </div>
-          <input class="cam-input" type="file" id="camFile" accept="image/*" onchange="previewCam(this)">
-          <input class="cam-input" type="file" id="camCapture" accept="image/*" capture="environment" onchange="previewCam(this)">
-          <img class="cam-preview" id="camPreview">
-          <select class="fx-select" id="camLang" style="margin-top:8px;width:100%">
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:6px">或手动输入/粘贴文字翻译：</div>
+          <select class="fx-select" id="camLang" style="width:100%;margin-bottom:6px">
             <option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>
             <option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>
             <option value="en|zh-CN">🇬🇧 英语 → 中文</option>
@@ -1672,9 +1662,10 @@ function renderTips() {
             <option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>
             <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
           </select>
-          <textarea class="cam-text" id="camText" placeholder="输入要翻译的文字"></textarea>
+          <textarea class="cam-text" id="camText" placeholder="在此输入或粘贴要翻译的文字..." style="min-height:80px"></textarea>
           <div class="cam-btns" style="margin-top:6px">
-            <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译</button>
+            <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none;flex:2">翻译</button>
+            <button class="cam-btn" onclick="copyCamText()">📋 复制</button>
             <button class="cam-btn" onclick="clearCam()">清空</button>
           </div>
           <div class="cam-result" id="camResult"></div>
@@ -1957,55 +1948,32 @@ const restaurants = [
   ]},
 ];
 
-function previewCam(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = document.getElementById('camPreview');
-      img.src = e.target.result;
-      img.style.display = 'block';
-      doOCR(e.target.result);
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function doOCR(imageData) {
-  const textArea = document.getElementById('camText');
-  const result = document.getElementById('camResult');
-  textArea.value = '正在加载识别引擎...';
-  result.style.display = 'none';
-  if (typeof Tesseract === 'undefined') {
-    textArea.value = '识别引擎加载失败，请手动输入文字。或使用 Google Lens 按钮。';
-    return;
-  }
-  const langPair = document.getElementById('camLang').value;
-  const srcLang = langPair.split('|')[0];
-  const tessLang = srcLang === 'zh-CN' ? 'chi_sim' : (srcLang === 'pt' ? 'por' : (srcLang === 'es' ? 'spa' : 'eng'));
-  Tesseract.recognize(imageData, tessLang, {
-    logger: m => {
-      if (m.status === 'loading tesseract core') textArea.value = '加载引擎中...';
-      else if (m.status === 'initializing tesseract') textArea.value = '初始化中...';
-      else if (m.status === 'loading language traineddata') textArea.value = '下载语言包中（首次较慢）... ' + Math.round(m.progress * 100) + '%';
-      else if (m.status === 'initializing api') textArea.value = '准备识别...';
-      else if (m.status === 'recognizing text') textArea.value = '识别中... ' + Math.round(m.progress * 100) + '%';
-    }
-  }).then(({ data: { text } }) => {
-    const recognized = text.trim();
-    textArea.value = recognized || '未识别到文字，请手动输入';
-    if (recognized) doCamTranslate();
-  }).catch(e => {
-    textArea.value = '识别失败（' + (e.message || '网络错误') + '），请手动输入或使用 Google Lens';
-  });
-}
-
 function clearCam() {
   document.getElementById('camText').value = '';
-  document.getElementById('camPreview').src = '';
-  document.getElementById('camPreview').style.display = 'none';
   document.getElementById('camResult').style.display = 'none';
-  document.getElementById('camFile').value = '';
-  document.getElementById('camCapture').value = '';
+}
+
+function copyCamText() {
+  const text = document.getElementById('camText').value || document.getElementById('camResult').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const result = document.getElementById('camResult');
+    result.textContent = '✅ 已复制到剪贴板';
+    result.style.display = 'block';
+    setTimeout(() => { result.style.display = 'none'; }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const result = document.getElementById('camResult');
+    result.textContent = '✅ 已复制到剪贴板';
+    result.style.display = 'block';
+    setTimeout(() => { result.style.display = 'none'; }, 2000);
+  });
 }
 
 function getTranslateURL(text, srcLang, tgtLang) {
@@ -2431,6 +2399,5 @@ function scrollTo2(id) {
   });
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </body>
 </html>
