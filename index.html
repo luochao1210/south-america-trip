@@ -483,6 +483,30 @@ body{
 }
 .fx-select{min-width:100px}
 .fx-input{flex:1;min-width:0;font-family:"SF Mono",monospace;font-weight:700}
+.cam-preview{
+  width:100%;max-height:200px;object-fit:cover;
+  border-radius:10px;margin-top:8px;display:none;
+  border:1px solid var(--brd);
+}
+.cam-btns{display:flex;gap:8px;margin-top:8px}
+.cam-btn{
+  flex:1;padding:8px;border:1px solid var(--brd);border-radius:10px;
+  background:var(--bg2);color:var(--tx1);font-size:13px;font-weight:600;
+  cursor:pointer;text-align:center;
+}
+.cam-btn:active{background:var(--pri);color:#fff}
+.cam-input{display:none}
+.cam-text{
+  width:100%;padding:8px 10px;border:1px solid var(--brd);border-radius:10px;
+  font-size:13px;background:var(--bg2);color:var(--tx1);
+  margin-top:8px;min-height:60px;resize:vertical;font-family:inherit;
+}
+.cam-result{
+  margin-top:8px;padding:10px 14px;
+  background:var(--pri-l);border-radius:10px;
+  font-size:14px;font-weight:600;color:var(--pri);
+  display:none;word-break:break-word;
+}
 .fx-result{
   margin-top:10px;padding:10px 14px;
   background:var(--pri-l);border-radius:10px;
@@ -1083,6 +1107,7 @@ const shops = [
    ============================ */
 const tips = [
   { icon:'💰', title:'汇率换算', body:'converter' },
+  { icon:'📷', title:'拍照翻译', body:'camera' },
   { icon:'🔌', title:'插头类型', body:'智利/秘鲁：Type C/L（圆头）<br>阿根廷：Type I（八字形）<br>巴西：Type N（三圆孔）<br>建议带万能转换头' },
   { icon:'🏔️', title:'高原注意', body:'库斯科海拔 3400m<br>到达后慢动作、多喝水<br>提前 1 周吃红景天<br>严重高反立即就医' },
   { icon:'🌡️', title:'天气提醒', body:'乌斯怀亚 10 月：0~10°C<br>复活节岛：18~24°C<br>里约/圣保罗：20~28°C<br>库斯科：5~20°C' },
@@ -1471,6 +1496,27 @@ function renderTips() {
         <div class="fx-result" id="fxResult">输入金额自动换算人民币</div>
       </div>`;
     }
+    if (t.icon === '📷') {
+      return `<div class="tip-card full">
+        <h4>${t.icon} ${t.title}</h4>
+        <div class="cam-btns">
+          <button class="cam-btn" onclick="document.getElementById('camFile').click()">📁 选择图片</button>
+          <button class="cam-btn" onclick="document.getElementById('camCapture').click()">📸 拍照</button>
+          <a class="cam-btn" href="https://lens.google.com/" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx1)">🔍 Google Lens</a>
+        </div>
+        <input class="cam-input" type="file" id="camFile" accept="image/*" onchange="previewCam(this)">
+        <input class="cam-input" type="file" id="camCapture" accept="image/*" capture="environment" onchange="previewCam(this)">
+        <img class="cam-preview" id="camPreview">
+        <select class="fx-select" id="camLang" style="margin-top:8px;width:100%">
+          <option value="es">🇪🇸 西班牙语 → 中文</option>
+          <option value="pt">🇧🇷 葡萄牙语 → 中文</option>
+          <option value="en">🇬🇧 英语 → 中文</option>
+        </select>
+        <textarea class="cam-text" id="camText" placeholder="输入图片中的外文（或手动复制菜单文字），自动翻译成中文"></textarea>
+        <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译成中文</button>
+        <div class="cam-result" id="camResult"></div>
+      </div>`;
+    }
     if (t.icon === '🍽️') {
       const totalRest = restaurants.reduce((sum, g) => sum + g.items.length, 0);
       const cities = restaurants.map(g => g.city);
@@ -1665,6 +1711,38 @@ const restaurants = [
     { name:'Cervantes', type:'巴西小吃', note:'本地人最爱的 Bolinho de Bacalhau 鳕鱼球', tag:'' },
   ]},
 ];
+
+function previewCam(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById('camPreview');
+      img.src = e.target.result;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function doCamTranslate() {
+  const text = document.getElementById('camText').value.trim();
+  const lang = document.getElementById('camLang').value;
+  const result = document.getElementById('camResult');
+  if (!text) { result.textContent = '请先输入要翻译的文字'; result.style.display = 'block'; return; }
+  result.textContent = '翻译中...';
+  result.style.display = 'block';
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + lang + '|zh-CN';
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (data.responseData && data.responseData.translatedText) {
+        result.textContent = data.responseData.translatedText;
+      } else {
+        result.textContent = '翻译失败，请尝试 Google Lens';
+      }
+    })
+    .catch(() => { result.textContent = '网络错误，请检查网络后重试'; });
+}
 
 function doConvert() {
   const rate = parseFloat(document.getElementById('fxCurrency').value);
