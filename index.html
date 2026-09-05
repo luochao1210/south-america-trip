@@ -579,6 +579,11 @@ body{
 .tip-rest-meta{font-size:11px;color:var(--tx2);margin-top:2px}
 
 /* ===== Expense ===== */
+.exp-wrap{
+  background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);
+  padding:16px;margin:0 16px 12px;
+  box-shadow:0 2px 8px var(--sh);
+}
 .exp-summary{
   display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;
 }
@@ -992,6 +997,7 @@ body{
 <!-- 记账 -->
 <div class="section" id="sec-expense">
   <div class="section-title"><span class="icon">💰</span> 记账 <span style="font-size:12px;font-weight:400;color:var(--tx3)" id="expTotal"></span></div>
+  <div class="exp-wrap">
   <div class="exp-summary" id="expSummary"></div>
   <div class="exp-cat-list" id="expCatList"></div>
   <button class="exp-toggle-btn" onclick="toggleExpForm()">➕ 记一笔</button>
@@ -1036,6 +1042,7 @@ body{
   </div>
   <div id="expList"></div>
   <div class="exp-split" id="expSplit"></div>
+  </div>
 </div>
 
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
@@ -1699,12 +1706,12 @@ function renderTips() {
         <div id="fxBody" style="display:none">
           <div class="fx-row">
             <select class="fx-select" id="fxCurrency" onchange="doConvert()">
-              <option value="1.95">🇵🇪 SOL 秘鲁索尔</option>
-              <option value="1.30">🇧🇷 BRL 巴西雷亚尔</option>
-              <option value="0.0071">🇨🇱 CLP 智利比索</option>
-              <option value="0.0045">🇦🇷 ARS 阿根廷比索</option>
-              <option value="0.17">🇺🇾 UYU 乌拉圭比索</option>
-              <option value="7.25">🇺🇸 USD 美元</option>
+              <option value="SOL|1.95">🇵🇪 SOL 秘鲁索尔</option>
+              <option value="BRL|1.30">🇧🇷 BRL 巴西雷亚尔</option>
+              <option value="CLP|0.0071">🇨🇱 CLP 智利比索</option>
+              <option value="ARS|0.0045">🇦🇷 ARS 阿根廷比索</option>
+              <option value="UYU|0.17">🇺🇾 UYU 乌拉圭比索</option>
+              <option value="USD|7.25">🇺🇸 USD 美元</option>
             </select>
             <input class="fx-input" id="fxAmount" type="number" inputmode="decimal" placeholder="金额" oninput="doConvert()">
           </div>
@@ -2192,7 +2199,9 @@ function doVoiceTranslate() {
 }
 
 function doConvert() {
-  const rate = parseFloat(document.getElementById('fxCurrency').value);
+  const sel = document.getElementById('fxCurrency').value;
+  const [curCode] = sel.split('|');
+  const rate = FX_RATES[curCode] || parseFloat(sel.split('|')[1]);
   const amount = parseFloat(document.getElementById('fxAmount').value);
   const result = document.getElementById('fxResult');
   if (isNaN(amount) || amount <= 0) {
@@ -2200,7 +2209,7 @@ function doConvert() {
     return;
   }
   const rmb = (amount * rate).toFixed(2);
-  const currencyName = document.getElementById('fxCurrency').selectedOptions[0].text.split(' ')[1];
+  const currencyName = FX_LABELS[curCode] || curCode;
   result.textContent = amount + ' ' + currencyName + ' ≈ ¥' + rmb + ' 人民币';
 }
 
@@ -2258,12 +2267,14 @@ function addExpense() {
   document.querySelectorAll('#expPeople .exp-person-btn').forEach(b => b.classList.add('active'));
   document.getElementById('expForm').classList.remove('show');
   renderExpenses();
+fetchFxRates();
 }
 
 function deleteExpense(id) {
   const list = loadExpenses().filter(e => e.id !== id);
   saveExpenses(list);
   renderExpenses();
+fetchFxRates();
 }
 
 function getRmb(e) {
@@ -2345,6 +2356,55 @@ function renderExpenses() {
 }
 
 /* ============================
+   REAL-TIME EXCHANGE RATES
+   ============================ */
+const FX_RATES = { SOL:1.95, BRL:1.30, CLP:0.0071, ARS:0.0045, UYU:0.17, USD:7.25, CNY:1 };
+const FX_LABELS = {
+  CNY:'¥ 人民币', SOL:'S/. 索尔', BRL:'R$ 雷亚尔',
+  CLP:'$ 智利比索', ARS:'$ 阿根廷比索', UYU:'$U 乌拉圭', USD:'$ 美元'
+};
+
+function fetchFxRates() {
+  fetch('https://open.er-api.com/v6/latest/CNY')
+    .then(r => r.json())
+    .then(data => {
+      if (data.result === 'success' && data.rates) {
+        // API gives rates as X CNY = 1 foreign, we need 1 foreign = X CNY
+        if (data.rates.PEN) FX_RATES.SOL = 1 / data.rates.PEN;
+        if (data.rates.BRL) FX_RATES.BRL = 1 / data.rates.BRL;
+        if (data.rates.CLP) FX_RATES.CLP = 1 / data.rates.CLP;
+        if (data.rates.ARS) FX_RATES.ARS = 1 / data.rates.ARS;
+        if (data.rates.UYU) FX_RATES.UYU = 1 / data.rates.UYU;
+        if (data.rates.USD) FX_RATES.USD = 1 / data.rates.USD;
+        updateCurrencySelects();
+        console.log('Exchange rates updated:', FX_RATES);
+      }
+    })
+    .catch(() => console.log('Using fallback exchange rates'));
+}
+
+function updateCurrencySelects() {
+  const options = Object.entries(FX_LABELS).map(([code, label]) =>
+    '<option value="' + code + '|' + FX_RATES[code] + '">' + label + '</option>'
+  ).join('');
+  const expSel = document.getElementById('expCurrency');
+  const camSel = document.getElementById('camLang');
+  if (expSel) expSel.innerHTML = options;
+  // Update camera translate language selector too
+  if (camSel) {
+    const camOpts = [
+      '<option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>',
+      '<option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>',
+      '<option value="en|zh-CN">🇬🇧 英语 → 中文</option>',
+      '<option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>',
+      '<option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>',
+      '<option value="zh-CN|en">🇨🇳 中文 → 英语</option>'
+    ];
+    camSel.innerHTML = camOpts.join('');
+  }
+}
+
+/* ============================
    INIT
    ============================ */
 renderBooking();
@@ -2355,6 +2415,7 @@ renderRouteSummary();
 renderTimeline();
 renderTips();
 renderExpenses();
+fetchFxRates();
 renderShopping();
 // Back to top button
 (function() {
