@@ -790,6 +790,9 @@ body{
         <g class="city" data-name="科洛尼亚"><circle cx="330" cy="296" r="3" fill="#F2CC8F" stroke="#fff" stroke-width="1"/><text x="336" y="310" font-size="9" fill="var(--tx2)">科洛尼亚</text></g>
       </g>
     </svg>
+    <div class="timeline-wrap">
+      <div class="timeline" id="timelineStops"></div>
+    </div>
     <div class="map-legend">
       <span><i style="background:#E07A5F"></i>第1-2天</span>
       <span><i style="background:#F2CC8F"></i>第3-5天</span>
@@ -798,10 +801,6 @@ body{
       <span><i style="background:#8B5CF6"></i>第12-13天</span>
     </div>
     <div class="route-summary" id="routeSummary"></div>
-    <div class="route-header" id="routeHeader"></div>
-    <div class="timeline-wrap">
-      <div class="timeline" id="timelineStops"></div>
-    </div>
   </div>
 </div>
 
@@ -1616,8 +1615,6 @@ const routeStops = [
 ];
 
 function renderTimeline() {
-  document.getElementById('routeHeader').textContent =
-    '北京 → 圣保罗 → 圣地亚哥 → 复活节岛 → 库斯科 → 热水镇 → 利马 → 布宜诺斯 → 乌斯怀亚 → 科洛尼亚 → 里约 → 北京（共' + routeStops.length + '站）';
   document.getElementById('timelineStops').innerHTML = routeStops.map(s =>
     `<div class="tl-stop">
       <div class="tl-dot"></div>
