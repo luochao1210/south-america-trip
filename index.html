@@ -1508,12 +1508,15 @@ function renderTips() {
         <input class="cam-input" type="file" id="camCapture" accept="image/*" capture="environment" onchange="previewCam(this)">
         <img class="cam-preview" id="camPreview">
         <select class="fx-select" id="camLang" style="margin-top:8px;width:100%">
-          <option value="es">🇪🇸 西班牙语 → 中文</option>
-          <option value="pt">🇧🇷 葡萄牙语 → 中文</option>
-          <option value="en">🇬🇧 英语 → 中文</option>
+          <option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>
+          <option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>
+          <option value="en|zh-CN">🇬🇧 英语 → 中文</option>
+          <option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>
+          <option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>
+          <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
         </select>
-        <textarea class="cam-text" id="camText" placeholder="输入图片中的外文（或手动复制菜单文字），自动翻译成中文"></textarea>
-        <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译成中文</button>
+        <textarea class="cam-text" id="camText" placeholder="输入要翻译的文字"></textarea>
+        <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译</button>
         <div class="cam-result" id="camResult"></div>
       </div>`;
     }
@@ -1731,7 +1734,7 @@ function doCamTranslate() {
   if (!text) { result.textContent = '请先输入要翻译的文字'; result.style.display = 'block'; return; }
   result.textContent = '翻译中...';
   result.style.display = 'block';
-  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + lang + '|zh-CN';
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + lang;
   fetch(url)
     .then(r => r.json())
     .then(data => {
