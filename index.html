@@ -106,11 +106,13 @@ body{
 }
 .quick-nav-inner::-webkit-scrollbar{display:none}
 .qn-btn{
-  padding:6px 12px;border-radius:16px;font-size:13px;font-weight:600;
-  white-space:nowrap;cursor:pointer;border:2px solid transparent;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;
+  cursor:pointer;border:2px solid transparent;
   background:transparent;color:var(--tx2);transition:all .15s;
-  flex-shrink:0;
+  flex:1;min-width:0;
 }
+.qn-btn .qn-icon{font-size:18px;line-height:1}
 .qn-btn:active{border-color:var(--pri);color:var(--pri);background:var(--pri-l)}
 
 /* Trip Intro */
@@ -132,15 +134,13 @@ body{
   position:fixed;bottom:0;left:0;right:0;z-index:100;
   background:var(--bg2);border-top:1px solid var(--brd);
   box-shadow:0 -2px 10px var(--sh);
-  padding:8px 12px;
-  padding-bottom:max(8px,env(safe-area-inset-bottom));
+  padding:6px 0;
+  padding-bottom:max(6px,env(safe-area-inset-bottom));
 }
 .bottom-nav-inner{
-  display:flex;gap:4px;justify-content:center;
+  display:flex;justify-content:space-around;
   max-width:680px;margin:0 auto;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;
 }
-.bottom-nav-inner::-webkit-scrollbar{display:none}
 
 /* ===== Section ===== */
 .section{margin-bottom:24px}
@@ -1348,12 +1348,12 @@ renderTips();
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
   nav.innerHTML = `<div class="bottom-nav-inner">
-    <button class="qn-btn" onclick="scrollTo2('sec-map')">🗺️ 行程总览</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-booking')">📋 预订管理</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-itinerary')">📅 逐日行程</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-todo')">📋 待办清单</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-shop')">🛒 出发前准备</button>
-    <button class="qn-btn" onclick="scrollTo2('sec-tips')">💡 实用贴士</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-map')"><span class="qn-icon">🗺️</span>总览</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-booking')"><span class="qn-icon">📋</span>预订</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-itinerary')"><span class="qn-icon">📅</span>日程</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-todo')"><span class="qn-icon">✅</span>待办</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-shop')"><span class="qn-icon">🛒</span>准备</button>
+    <button class="qn-btn" onclick="scrollTo2('sec-tips')"><span class="qn-icon">💡</span>贴士</button>
   </div>`;
   document.body.appendChild(nav);
   // Adjust back-top button position to avoid overlap
