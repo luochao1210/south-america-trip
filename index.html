@@ -124,6 +124,10 @@ body{
 .trip-intro-crew{
   font-size:13px;color:var(--tx2);font-weight:600;letter-spacing:2px;
 }
+.trip-intro-nav{
+  display:flex;gap:6px;justify-content:center;flex-wrap:wrap;
+  margin-top:16px;
+}
 
 /* ===== Section ===== */
 .section{margin-bottom:24px}
@@ -451,8 +455,13 @@ body{
 </div>
 
 <!-- 快捷导航 -->
-<nav class="quick-nav">
-  <div class="quick-nav-inner">
+<div class="container">
+
+<!-- 旅行宣言 -->
+<div class="trip-intro">
+  <div class="trip-intro-quote">「四个人的南美冒险，从这一刻开始」</div>
+  <div class="trip-intro-crew">小罗 · 小刘 · 小何 · 小季</div>
+  <div class="trip-intro-nav">
     <button class="qn-btn" onclick="scrollTo2('sec-map')">🗺️ 行程总览</button>
     <button class="qn-btn" onclick="scrollTo2('sec-booking')">📋 预订管理</button>
     <button class="qn-btn" onclick="scrollTo2('sec-itinerary')">📅 逐日行程</button>
@@ -460,14 +469,6 @@ body{
     <button class="qn-btn" onclick="scrollTo2('sec-shop')">🛒 出发前准备</button>
     <button class="qn-btn" onclick="scrollTo2('sec-tips')">💡 实用贴士</button>
   </div>
-</nav>
-
-<div class="container">
-
-<!-- 旅行宣言 -->
-<div class="trip-intro">
-  <div class="trip-intro-quote">「四个人的南美冒险，从这一刻开始」</div>
-  <div class="trip-intro-crew">小罗 · 小刘 · 小何 · 小季</div>
 </div>
 
 <!-- 行程地图 -->
