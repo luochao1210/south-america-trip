@@ -1310,47 +1310,28 @@ function renderBooking() {
     { key:'flights', icon:'✈️', label:'机票',
       confirmed: flights.filter(f => f.ok),
       unbooked: flights.filter(f => !f.ok),
-      renderConfirmed: () => flights.filter(f => f.ok).map(f => flightCard(f)).join(''),
-      renderUnbooked: () => flights.filter(f => !f.ok).map(f => flightCard(f)).join('') },
+      renderItem: (f) => flightCard(f) },
     { key:'trains', icon:'🚂', label:'火车',
       confirmed: trains.filter(t => t.ok),
       unbooked: trains.filter(t => !t.ok),
-      renderConfirmed: () => trains.filter(t => t.ok).map(t => `
-        <div class="card info-card">
+      renderItem: (t) => `<div class="card info-card">
           <div class="ic-title">${t.route}</div>
           <div class="ic-sub">${t.date} · ${t.company}</div>
-        </div>`).join(''),
-      renderUnbooked: () => trains.filter(t => !t.ok).map(t => `
-        <div class="card info-card">
-          <div class="ic-title">${t.route}</div>
-          <div class="ic-sub">${t.date} · ${t.company}</div>
-        </div>`).join('') },
+        </div>` },
     { key:'hotels', icon:'🏨', label:'酒店',
       confirmed: hotels.filter(h => h.name !== null),
       unbooked: hotels.filter(h => h.name === null),
-      renderConfirmed: () => hotels.filter(h => h.name !== null).map(h => `
-        <div class="card info-card">
+      renderItem: (h) => `<div class="card info-card">
           <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span></div>
-          <div class="ic-empty">${h.name}</div>
-        </div>`).join(''),
-      renderUnbooked: () => hotels.filter(h => h.name === null).map(h => `
-        <div class="card info-card">
-          <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span></div>
-          <div class="ic-empty">待预订</div>
-        </div>`).join('') },
+          <div class="ic-empty">${h.name || '待预订'}</div>
+        </div>` },
     { key:'tickets', icon:'🎫', label:'门票',
       confirmed: tickets.filter(t => t.ok),
       unbooked: tickets.filter(t => !t.ok),
-      renderConfirmed: () => tickets.filter(t => t.ok).map(t => `
-        <div class="card info-card">
-          <div class="ic-title">${t.name} <span class="flight-tag tag-ok" style="margin-left:6px">已购</span></div>
+      renderItem: (t) => `<div class="card info-card">
+          <div class="ic-title">${t.name} <span class="flight-tag ${t.ok?'tag-ok':'tag-tbd'}" style="margin-left:6px">${t.ok?'已购':'待购'}</span></div>
           <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
-        </div>`).join(''),
-      renderUnbooked: () => tickets.filter(t => !t.ok).map(t => `
-        <div class="card info-card">
-          <div class="ic-title">${t.name} <span class="flight-tag tag-tbd" style="margin-left:6px">待购</span></div>
-          <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
-        </div>`).join('') },
+        </div>` },
   ];
 
   const tabsEl = document.getElementById('bookingTabs');
@@ -1365,14 +1346,21 @@ function renderBooking() {
 
   // Build panel for current category
   const cat = cats.find(c => c.key === currentBookingCat) || cats[0];
+  const statusLabel = (ok) => ok
+    ? '<span style="display:inline-block;font-size:11px;font-weight:700;color:var(--ok);background:rgba(129,178,154,.12);padding:2px 8px;border-radius:6px;margin-right:8px;flex-shrink:0">已确认</span>'
+    : '<span style="display:inline-block;font-size:11px;font-weight:700;color:#C89630;background:rgba(242,204,143,.15);padding:2px 8px;border-radius:6px;margin-right:8px;flex-shrink:0">未预定</span>';
   let panelHtml = '';
+  // Confirmed items first
   if (cat.confirmed.length > 0) {
-    panelHtml += `<div class="sub-header">✅ 已确认 ${cat.confirmed.length}</div>`;
-    panelHtml += cat.renderConfirmed();
+    panelHtml += cat.confirmed.map(item =>
+      `<div style="display:flex;align-items:flex-start;padding:0 16px;margin-bottom:2px">${statusLabel(true)}<div style="flex:1">${cat.renderItem(item)}</div></div>`
+    ).join('');
   }
+  // Then unbooked items
   if (cat.unbooked.length > 0) {
-    panelHtml += `<div class="sub-header">📝 未预定 ${cat.unbooked.length}</div>`;
-    panelHtml += cat.renderUnbooked();
+    panelHtml += cat.unbooked.map(item =>
+      `<div style="display:flex;align-items:flex-start;padding:0 16px;margin-bottom:2px">${statusLabel(false)}<div style="flex:1">${cat.renderItem(item)}</div></div>`
+    ).join('');
   }
   if (!panelHtml) {
     panelHtml = '<div style="padding:20px 16px;text-align:center;color:var(--tx3)">暂无数据</div>';
