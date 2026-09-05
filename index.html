@@ -281,6 +281,44 @@ body{
 .route-days{font-size:11px;font-weight:700;color:var(--tx3);white-space:nowrap;min-width:42px;padding-top:2px}
 .route-detail{font-size:13px;color:var(--tx1);line-height:1.5}
 
+/* Timeline stops */
+.route-header{
+  font-size:14px;font-weight:700;color:var(--pri);
+  text-align:center;margin:16px 0 12px;
+}
+.timeline-wrap{
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:0 0 8px;
+}
+.timeline-wrap::-webkit-scrollbar{display:none}
+.timeline{
+  display:flex;align-items:flex-start;
+  position:relative;min-width:max-content;
+  padding:0 12px;
+}
+.timeline::before{
+  content:'';position:absolute;top:6px;
+  left:24px;right:24px;height:2px;
+  background:var(--brd);border-radius:1px;
+}
+.tl-stop{
+  display:flex;flex-direction:column;align-items:center;
+  min-width:60px;position:relative;padding:0 4px;
+}
+.tl-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--pri);border:3px solid var(--bg2);
+  box-shadow:0 0 0 2px var(--pri);
+  position:relative;z-index:1;flex-shrink:0;
+}
+.tl-loc{
+  font-size:12px;font-weight:700;color:var(--tx1);
+  margin-top:8px;white-space:nowrap;text-align:center;
+}
+.tl-date{
+  font-size:10px;color:var(--tx3);margin-top:2px;white-space:nowrap;
+}
+
 /* ===== Itinerary ===== */
 .day-card{
   background:var(--bg2);border-radius:var(--r);
@@ -747,6 +785,10 @@ body{
       <span><i style="background:#8B5CF6"></i>第12-13天</span>
     </div>
     <div class="route-summary" id="routeSummary"></div>
+    <div class="route-header" id="routeHeader"></div>
+    <div class="timeline-wrap">
+      <div class="timeline" id="timelineStops"></div>
+    </div>
   </div>
 </div>
 
@@ -1474,6 +1516,33 @@ function renderRouteSummary() {
   ).join('');
 }
 
+const routeStops = [
+  { loc:'北京', date:'9/24' },
+  { loc:'圣保罗', date:'9/25' },
+  { loc:'圣地亚哥', date:'9/25' },
+  { loc:'复活节岛', date:'9/26' },
+  { loc:'库斯科', date:'9/29' },
+  { loc:'热水镇', date:'9/30' },
+  { loc:'利马', date:'10/1' },
+  { loc:'布宜诺斯', date:'10/2' },
+  { loc:'乌斯怀亚', date:'10/3' },
+  { loc:'科洛尼亚', date:'10/4' },
+  { loc:'里约', date:'10/5' },
+  { loc:'北京', date:'10/7' },
+];
+
+function renderTimeline() {
+  document.getElementById('routeHeader').textContent =
+    '北京 → 圣保罗 → 圣地亚哥 → 复活节岛 → 库斯科 → 热水镇 → 利马 → 布宜诺斯 → 乌斯怀亚 → 科洛尼亚 → 里约 → 北京（共' + routeStops.length + '站）';
+  document.getElementById('timelineStops').innerHTML = routeStops.map(s =>
+    `<div class="tl-stop">
+      <div class="tl-dot"></div>
+      <div class="tl-loc">${s.loc}</div>
+      <div class="tl-date">${s.date}</div>
+    </div>`
+  ).join('');
+}
+
 const restaurants = [
   { city:'圣地亚哥 (9.25)', items:[
     { name:'Boragó', type:'新派智利菜', note:'拉丁美洲Top50餐厅，需提前预订', tag:'必吃' },
@@ -1515,6 +1584,7 @@ renderItinerary();
 renderTodos();
 renderTopTodos();
 renderRouteSummary();
+renderTimeline();
 renderShopping();
 renderTips();
 // Back to top button
