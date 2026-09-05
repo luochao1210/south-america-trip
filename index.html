@@ -2206,9 +2206,12 @@ function initSupabase() {
     ).subscribe();
   } catch(e) {
     console.error('Supabase init error:', e);
-    // Fallback to localStorage
+    // Fallback: render all sections with empty/local data
     _expenses = loadLocalExpenses();
     renderExpenses();
+    renderTodos();
+    renderTopTodos();
+    renderBooking();
   }
 }
 
@@ -2382,14 +2385,23 @@ function renderExpenses() {
 /* ============================
    INIT
    ============================ */
+// Render everything that uses hardcoded data first
 renderItinerary();
-fetchTodos();
 renderRouteSummary();
 renderTimeline();
 renderTips();
+renderShopping();
+
+// Render Supabase-dependent sections with empty data immediately
+renderTodos();
+renderTopTodos();
+renderBooking();
+
+// Then try to load from Supabase (will re-render when data arrives)
 initSupabase();
 fetchFxRates();
-renderShopping();
+
+// Fallback: if Supabase hasn't loaded data in 5 seconds, sections already show empty state
 // Back to top button
 (function() {
   const btn = document.createElement('button');
