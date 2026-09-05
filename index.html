@@ -578,6 +578,87 @@ body{
 }
 .tip-rest-meta{font-size:11px;color:var(--tx2);margin-top:2px}
 
+/* ===== Expense ===== */
+.exp-summary{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;
+}
+.exp-box{
+  background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rs);
+  padding:14px;text-align:center;
+}
+.exp-box-label{font-size:12px;color:var(--tx3);margin-bottom:4px}
+.exp-box-value{font-size:22px;font-weight:800;color:var(--pri);font-family:"SF Mono",monospace}
+.exp-box-value.small{font-size:16px}
+.exp-cat-list{margin-bottom:16px}
+.exp-cat-item{
+  display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid var(--brd);
+}
+.exp-cat-item:last-child{border-bottom:none}
+.exp-cat-icon{font-size:18px;flex-shrink:0}
+.exp-cat-info{flex:1;min-width:0}
+.exp-cat-name{font-size:13px;font-weight:600}
+.exp-cat-bar{
+  height:6px;border-radius:3px;background:var(--bg3);margin-top:4px;overflow:hidden;
+}
+.exp-cat-bar-fill{height:100%;border-radius:3px;background:var(--pri);transition:width .3s}
+.exp-cat-amount{
+  font-size:13px;font-weight:700;color:var(--tx1);flex-shrink:0;text-align:right;min-width:60px;
+}
+.exp-cat-pct{font-size:11px;color:var(--tx3);text-align:right}
+.exp-form{
+  background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rs);
+  padding:14px;margin-bottom:16px;display:none;
+}
+.exp-form.show{display:block}
+.exp-form-row{display:flex;gap:8px;margin-bottom:8px}
+.exp-input{
+  flex:1;padding:8px 10px;border:1px solid var(--brd);border-radius:8px;
+  font-size:14px;background:var(--bg2);color:var(--tx1);font-family:inherit;
+}
+.exp-select{
+  padding:8px 10px;border:1px solid var(--brd);border-radius:8px;
+  font-size:13px;background:var(--bg2);color:var(--tx1);min-width:80px;
+}
+.exp-add-btn{
+  width:100%;padding:10px;border:none;border-radius:10px;
+  background:var(--pri);color:#fff;font-size:15px;font-weight:700;
+  cursor:pointer;margin-top:4px;
+}
+.exp-add-btn:active{opacity:.8}
+.exp-toggle-btn{
+  width:100%;padding:12px;border:2px dashed var(--brd);border-radius:10px;
+  background:transparent;color:var(--tx2);font-size:14px;font-weight:600;
+  cursor:pointer;margin-bottom:16px;
+}
+.exp-list-item{
+  display:flex;align-items:center;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--brd);
+}
+.exp-list-item:last-child{border-bottom:none}
+.exp-list-icon{font-size:16px;flex-shrink:0}
+.exp-list-info{flex:1;min-width:0}
+.exp-list-note{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-list-meta{font-size:11px;color:var(--tx3);margin-top:2px}
+.exp-list-amount{font-size:15px;font-weight:700;color:var(--pri);flex-shrink:0}
+.exp-list-del{
+  width:24px;height:24px;border-radius:50%;border:none;
+  background:var(--bg3);color:var(--tx3);font-size:14px;
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.exp-split{
+  background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rs);
+  padding:14px;margin-top:16px;
+}
+.exp-split-title{font-size:14px;font-weight:700;margin-bottom:8px}
+.exp-split-item{
+  display:flex;justify-content:space-between;padding:4px 0;font-size:13px;
+}
+.exp-split-pay{color:var(--tx2)}
+.exp-split-amount{font-weight:600}
+.exp-split-amount.plus{color:var(--ok)}
+.exp-split-amount.minus{color:var(--danger)}
+
 /* ===== Back to Top ===== */
 .back-top{
   position:fixed;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:101;
@@ -898,6 +979,39 @@ body{
 <div class="section" id="sec-tips">
   <div class="section-title"><span class="icon">💡</span> 实用贴士</div>
   <div class="tips-grid" id="tipsGrid"></div>
+</div>
+
+<!-- 记账 -->
+<div class="section" id="sec-expense">
+  <div class="section-title"><span class="icon">💰</span> 记账 <span style="font-size:12px;font-weight:400;color:var(--tx3)" id="expTotal"></span></div>
+  <div class="exp-summary" id="expSummary"></div>
+  <div class="exp-cat-list" id="expCatList"></div>
+  <button class="exp-toggle-btn" onclick="toggleExpForm()">➕ 记一笔</button>
+  <div class="exp-form" id="expForm">
+    <div class="exp-form-row">
+      <input class="exp-input" id="expAmount" type="number" inputmode="decimal" placeholder="金额">
+      <select class="exp-select" id="expCategory">
+        <option value="🍽️|餐饮">🍽️ 餐饮</option>
+        <option value="🚗|交通">🚗 交通</option>
+        <option value="🎫|门票">🎫 门票</option>
+        <option value="🏨|住宿">🏨 住宿</option>
+        <option value="🛍️|购物">🛍️ 购物</option>
+        <option value="📦|其他">📦 其他</option>
+      </select>
+    </div>
+    <div class="exp-form-row">
+      <select class="exp-select" id="expPayer">
+        <option value="小罗">小罗</option>
+        <option value="小刘">小刘</option>
+        <option value="小何">小何</option>
+        <option value="小季">小季</option>
+      </select>
+      <input class="exp-input" id="expNote" placeholder="备注（如：午餐 烤肉）">
+    </div>
+    <button class="exp-add-btn" onclick="addExpense()">添加</button>
+  </div>
+  <div id="expList"></div>
+  <div class="exp-split" id="expSplit"></div>
 </div>
 
 <div class="footer">南美旅行手册 · 小罗 小刘 小何 小季 · 2026.09.24 – 10.07</div>
@@ -2067,6 +2181,111 @@ function doConvert() {
 }
 
 /* ============================
+   EXPENSE TRACKER
+   ============================ */
+const EXP_KEY = 'sa_trip_expenses';
+const EXP_PEOPLE = ['小罗','小刘','小何','小季'];
+
+function loadExpenses() {
+  try { return JSON.parse(localStorage.getItem(EXP_KEY)) || []; } catch { return []; }
+}
+function saveExpenses(list) {
+  try { localStorage.setItem(EXP_KEY, JSON.stringify(list)); } catch {}
+}
+
+function toggleExpForm() {
+  document.getElementById('expForm').classList.toggle('show');
+}
+
+function addExpense() {
+  const amount = parseFloat(document.getElementById('expAmount').value);
+  const catVal = document.getElementById('expCategory').value;
+  const payer = document.getElementById('expPayer').value;
+  const note = document.getElementById('expNote').value.trim();
+  if (isNaN(amount) || amount <= 0) return;
+  const [icon, catName] = catVal.split('|');
+  const list = loadExpenses();
+  list.unshift({
+    id: Date.now(),
+    amount, category: catName, icon, payer, note,
+    date: new Date().toISOString().slice(0, 10)
+  });
+  saveExpenses(list);
+  document.getElementById('expAmount').value = '';
+  document.getElementById('expNote').value = '';
+  document.getElementById('expForm').classList.remove('show');
+  renderExpenses();
+}
+
+function deleteExpense(id) {
+  const list = loadExpenses().filter(e => e.id !== id);
+  saveExpenses(list);
+  renderExpenses();
+}
+
+function renderExpenses() {
+  const list = loadExpenses();
+  const total = list.reduce((s, e) => s + e.amount, 0);
+  const perPerson = EXP_PEOPLE.length > 0 ? (total / EXP_PEOPLE.length) : 0;
+
+  // Title total
+  document.getElementById('expTotal').textContent = total > 0 ? '共 ¥' + total.toFixed(0) : '';
+
+  // Summary boxes
+  document.getElementById('expSummary').innerHTML =
+    '<div class="exp-box"><div class="exp-box-label">总花费</div><div class="exp-box-value">¥' + total.toFixed(2) + '</div></div>' +
+    '<div class="exp-box"><div class="exp-box-label">人均</div><div class="exp-box-value small">¥' + perPerson.toFixed(2) + '</div></div>';
+
+  // Category breakdown
+  const catMap = {};
+  list.forEach(e => {
+    if (!catMap[e.category]) catMap[e.category] = { icon: e.icon, amount: 0 };
+    catMap[e.category].amount += e.amount;
+  });
+  const catEntries = Object.entries(catMap).sort((a, b) => b[1].amount - a[1].amount);
+  const maxCat = catEntries.length > 0 ? catEntries[0][1].amount : 1;
+
+  document.getElementById('expCatList').innerHTML = catEntries.map(([name, data]) => {
+    const pct = total > 0 ? (data.amount / total * 100).toFixed(1) : 0;
+    const barW = maxCat > 0 ? (data.amount / maxCat * 100) : 0;
+    return '<div class="exp-cat-item">' +
+      '<span class="exp-cat-icon">' + data.icon + '</span>' +
+      '<div class="exp-cat-info"><div class="exp-cat-name">' + name + '</div>' +
+      '<div class="exp-cat-bar"><div class="exp-cat-bar-fill" style="width:' + barW + '%"></div></div></div>' +
+      '<div><div class="exp-cat-amount">¥' + data.amount.toFixed(0) + '</div>' +
+      '<div class="exp-cat-pct">' + pct + '%</div></div></div>';
+  }).join('');
+
+  // Expense list
+  document.getElementById('expList').innerHTML = list.length === 0
+    ? '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">还没有消费记录，点击"记一笔"开始</div>'
+    : list.map(e =>
+      '<div class="exp-list-item">' +
+      '<span class="exp-list-icon">' + e.icon + '</span>' +
+      '<div class="exp-list-info"><div class="exp-list-note">' + (e.note || e.category) + '</div>' +
+      '<div class="exp-list-meta">' + e.payer + ' · ' + e.date + '</div></div>' +
+      '<span class="exp-list-amount">¥' + e.amount.toFixed(0) + '</span>' +
+      '<button class="exp-list-del" onclick="deleteExpense(' + e.id + ')">×</button></div>'
+    ).join('');
+
+  // Split calculation
+  const paidBy = {};
+  EXP_PEOPLE.forEach(p => paidBy[p] = 0);
+  list.forEach(e => { if (paidBy[e.payer] !== undefined) paidBy[e.payer] += e.amount; });
+
+  document.getElementById('expSplit').innerHTML =
+    '<div class="exp-split-title">AA 分账（人均 ¥' + perPerson.toFixed(0) + '）</div>' +
+    EXP_PEOPLE.map(p => {
+      const diff = paidBy[p] - perPerson;
+      const cls = diff > 0.01 ? 'plus' : (diff < -0.01 ? 'minus' : '');
+      const sign = diff > 0.01 ? '+' : '';
+      const label = diff > 0.01 ? '多付' : (diff < -0.01 ? '少付' : '刚好');
+      return '<div class="exp-split-item"><span class="exp-split-pay">' + p + '（已付 ¥' + paidBy[p].toFixed(0) + '）</span>' +
+        '<span class="exp-split-amount ' + cls + '">' + (Math.abs(diff) > 0.01 ? sign + '¥' + diff.toFixed(0) + ' ' + label : '✓ 刚好') + '</span></div>';
+    }).join('');
+}
+
+/* ============================
    INIT
    ============================ */
 renderBooking();
@@ -2076,6 +2295,7 @@ renderTopTodos();
 renderRouteSummary();
 renderTimeline();
 renderTips();
+renderExpenses();
 renderShopping();
 // Back to top button
 (function() {
@@ -2099,6 +2319,7 @@ renderShopping();
     <button class="qn-btn" data-target="sec-itinerary"><span class="qn-icon">📅</span>日程</button>
     <button class="qn-btn" data-target="sec-todo"><span class="qn-icon">✅</span>待办</button>
     <button class="qn-btn" data-target="sec-tips"><span class="qn-icon">💡</span>贴士</button>
+    <button class="qn-btn" data-target="sec-expense"><span class="qn-icon">💰</span>记账</button>
   </div>`;
   document.body.appendChild(nav);
   nav.querySelectorAll('.qn-btn').forEach(btn => {
