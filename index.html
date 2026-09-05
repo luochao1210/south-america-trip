@@ -798,7 +798,7 @@ body{
 
 <!-- 行程地图 -->
 <div class="section" id="sec-map">
-  <div class="section-title"><span class="icon">🗺️</span> 行程总览</div>
+  <div class="section-title"><span class="icon">🗺️</span> 行程总览 <span style="font-size:12px;font-weight:400;color:var(--tx3)" id="routeStopsCount"></span></div>
   <div class="map-wrap">
     <div class="timeline-wrap">
       <div class="timeline" id="timelineStops"></div>
@@ -1829,6 +1829,7 @@ const routeStops = [
 ];
 
 function renderTimeline() {
+  document.getElementById('routeStopsCount').textContent = '（全程' + routeStops.length + '站）';
   document.getElementById('timelineStops').innerHTML = routeStops.map(s =>
     `<div class="tl-stop">
       <div class="tl-dot"></div>
