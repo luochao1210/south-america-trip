@@ -2308,6 +2308,8 @@ function initSupabase() {
     _sb.channel('all').on(
       'postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => sbFetchExpenses()
     ).subscribe();
+    // Polling fallback: 每10秒拉一次最新数据（国内 WebSocket 不稳定）
+    setInterval(sbFetchExpenses, 10000);
   } catch(e) {
     console.error('Supabase error:', e);
     _sb = null;
@@ -2319,8 +2321,16 @@ async function sbFetchExpenses() {
   try {
     const { data, error } = await _sb.from('expenses').select('*').order('created_at', { ascending: false });
     if (!error && data) {
-      _sbExpenses = data;
-      renderExpenses();
+      const newLen = data.length;
+      const oldLen = _sbExpenses ? _sbExpenses.length : -1;
+      // Only re-render if data count changed (avoid unnecessary DOM updates)
+      if (newLen !== oldLen || (_sbExpenses && JSON.stringify(data[0]?.id) !== JSON.stringify(_sbExpenses[0]?.id))) {
+        _sbExpenses = data;
+        renderExpenses();
+      } else if (_sbExpenses === null) {
+        _sbExpenses = data;
+        renderExpenses();
+      }
     }
   } catch(e) { console.error('Fetch expenses error:', e); }
 }
