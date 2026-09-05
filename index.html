@@ -413,6 +413,23 @@ body{
 }
 .todo-item.done{opacity:.4}
 .todo-item.done span:last-child{text-decoration:line-through;color:var(--tx3)}
+.todo-check{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--brd);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:transparent;cursor:pointer;transition:all .15s;
+}
+.todo-item.done .todo-check{background:var(--ok);border-color:var(--ok);color:#fff}
+.todo-add-row{
+  display:flex;gap:6px;padding:0 16px;margin-top:8px;
+}
+.todo-add-input{
+  flex:1;padding:8px 10px;border:1px solid var(--brd);border-radius:8px;
+  font-size:13px;background:var(--bg2);color:var(--tx1);
+}
+.todo-add-btn{
+  padding:8px 14px;border:none;border-radius:8px;
+  background:var(--pri);color:#fff;font-size:13px;font-weight:600;cursor:pointer;
+}
 .todo-dot{
   width:8px;height:8px;border-radius:50%;flex-shrink:0;
 }
@@ -986,6 +1003,10 @@ body{
 <div class="section" id="sec-todo">
   <div class="section-title"><span class="icon">📋</span> 待办清单</div>
   <div class="todo-list" id="todoList"></div>
+  <div class="todo-add-row">
+    <input class="todo-add-input" id="todoAddInput" placeholder="添加新待办..." onkeydown="if(event.key==='Enter')addTodo()">
+    <button class="todo-add-btn" onclick="addTodo()">添加</button>
+  </div>
 </div>
 
 <!-- 实用贴士 -->
@@ -1236,175 +1257,80 @@ const days = [
 ];
 
 /* ============================
-   TODOS
+   TODOS (Supabase)
    ============================ */
-const todos = [
-  { txt:'预订小何、小季 09.29 圣保罗→库斯科中转航班', urg:'urgent' },
-  { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
-  { txt:'预订 10.02 利马→布宜诺斯航班', urg:'normal' },
-  { txt:'预订 10.02 布宜诺斯→乌斯怀亚航班', urg:'normal' },
-  { txt:'预订 10.03 乌斯怀亚→布宜诺斯航班', urg:'normal' },
-  { txt:'预订 10.05 布宜诺斯→里约→圣保罗航班', urg:'normal' },
-  { txt:'预订库斯科↔热水镇火车票（PeruRail / Inca Rail）', urg:'normal' },
-  { txt:'预订全部酒店（12 晚）', urg:'normal' },
-  { txt:'购买复活节岛国家公园门票', urg:'normal' },
-  { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
-  { txt:'确认 10.04 布宜诺斯⇄科洛尼亚渡轮时刻（Buquebus / Colonia Express）', urg:'low' },
-];
+let _todos = [];
 
-/* ============================
-   SHOPPING LIST
-   ============================ */
-const shops = [
-  { cat:'证件', name:'护照 + 复印件（2份分开放）' },
-  { cat:'证件', name:'签证材料打印件' },
-  { cat:'证件', name:'机票行程单打印' },
-  { cat:'证件', name:'酒店确认单打印' },
-  { cat:'证件', name:'旅行保险单' },
-  { cat:'电子', name:'万能转换插头（南美四种接口）' },
-  { cat:'电子', name:'充电宝 20000mAh' },
-  { cat:'电子', name:'手机充电线 ×2' },
-  { cat:'电子', name:'耳机（降噪款长途必备）' },
-  { cat:'药品', name:'高原安 / 红景天（提前一周吃）' },
-  { cat:'药品', name:'止泻药 + 肠胃药' },
-  { cat:'药品', name:'感冒药 + 退烧药' },
-  { cat:'药品', name:'创可贴 + 消炎药膏' },
-  { cat:'药品', name:'防蚊液（含 DEET）' },
-  { cat:'衣物', name:'冲锋衣 / 防风外套' },
-  { cat:'衣物', name:'抓绒衣（乌斯怀亚 0~10°C）' },
-  { cat:'衣物', name:'速干 T 恤 ×3' },
-  { cat:'衣物', name:'登山鞋 / 防滑徒步鞋' },
-  { cat:'衣物', name:'压缩袜 2 双（长途飞行防血栓）' },
-  { cat:'防护', name:'防晒霜 SPF50+（高原紫外线强）' },
-  { cat:'防护', name:'墨镜（偏光）' },
-  { cat:'防护', name:'遮阳帽' },
-  { cat:'日用', name:'颈枕（充气款省空间）' },
-  { cat:'日用', name:'保温杯' },
-  { cat:'日用', name:'密封袋若干（湿衣物 / 证件防水）' },
-  { cat:'日用', name:'小背包（20L 日用）' },
-  { cat:'安全', name:'防盗腰包 / 贴身钱包' },
-  { cat:'安全', name:'行李锁 ×2' },
-  { cat:'其他', name:'美元现金（小面额 $5/$10/$20）' },
-  { cat:'其他', name:'签字笔 ×2（填入境表用）' },
-  { cat:'其他', name:'飞机零食 / 口香糖' },
-  { cat:'其他', name:'离线地图 App 提前下载' },
-  { cat:'其他', name:'西班牙语翻译 App 离线包' },
-];
-
-/* ============================
-   TIPS
-   ============================ */
-const tips = [
-  { icon:'💰', title:'汇率换算', body:'converter' },
-  { icon:'📷', title:'拍照翻译', body:'camera' },
-  { icon:'🎤', title:'语音翻译', body:'voice' },
-  { icon:'🍽️', title:'饮食推荐', body:'food' },
-  { icon:'📌', title:'提示事项', body:'notices' },
-];
-
-const noticeItems = [
-  { icon:'🔌', title:'插头类型', body:'智利/秘鲁：Type C/L（圆头）\n阿根廷：Type I（八字形）\n巴西：Type N（三圆孔）\n建议带万能转换头' },
-  { icon:'🏔️', title:'高原注意', body:'库斯科海拔 3400m\n到达后慢动作、多喝水\n提前 1 周吃红景天\n严重高反立即就医' },
-  { icon:'🌡️', title:'天气提醒', body:'乌斯怀亚 10 月：0~10°C\n复活节岛：18~24°C\n里约/圣保罗：20~28°C\n库斯科：5~20°C' },
-  { icon:'📱', title:'电话卡', body:'智利：4天卡（Entel/Movistar）\n秘鲁：3天卡（Claro/Entel）\n阿根廷：4天卡（Personal/Movistar）\n巴西：2天卡（Vivo/TIM）' },
-];
-
-/* ============================
-   THEME (day/night)
-   ============================ */
-function setTheme() {
-  const h = new Date().getHours();
-  document.documentElement.classList.toggle('dark', h < 6 || h >= 19);
-}
-setTheme();
-setInterval(setTheme, 60000);
-
-/* ============================
-   GOOGLE MAPS NAVIGATION
-   ============================ */
-const GEO = {
-  'PEK': {lat:39.9042, lng:116.4074},
-  'GRU': {lat:-23.4425, lng:-46.4696},
-  'SCL': {lat:-33.4489, lng:-70.6693},
-  'IPC': {lat:-27.1127, lng:-109.3497},
-  'CUZ': {lat:-13.5319, lng:-71.9675},
-  'LIM': {lat:-12.0464, lng:-77.0428},
-  'EZE': {lat:-34.6037, lng:-58.3816},
-  'USH': {lat:-54.8019, lng:-68.3030},
-  'MVD': {lat:-34.4710, lng:-57.8394},
-  'GIG': {lat:-22.9068, lng:-43.1729},
-};
-function gmapURI(code) {
-  const name = UT.label[code] || code;
-  const g = GEO[code];
-  if (g) return 'https://www.google.com/maps/search/?api=1&query=' + g.lat + ',' + g.lng;
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name);
+async function fetchTodos() {
+  if (!_supabase) return;
+  const { data } = await _supabase.from('todos').select('*').order('created_at', { ascending: true });
+  if (data) { _todos = data; renderTodos(); renderTopTodos(); }
 }
 
-/* ============================
-   COUNTDOWN & HERO
-   ============================ */
-function getAllEvents() {
-  const evs = [];
-  flights.forEach(f => {
-    if (f.dh === 0 && f.dmi === 0 && !f.ok) return; // skip TBD with no time
-    const depUTC = UT.toUTC(f.dy,f.dm,f.dd,f.dh,f.dmi,f.from);
-    evs.push({ utc:depUTC, type:'dep', label:(f.grp2?'👥 ':'')+(f.air+' '+f.no), detail:UT.label[f.from]+' → '+UT.label[f.to], tz:f.from, sub:f.note });
-    if (f.ah !== 0 || f.ami !== 0) {
-      const arrUTC = UT.toUTC(f.ay,f.am,f.ad,f.ah,f.ami,f.to);
-      evs.push({ utc:arrUTC, type:'arr', label:(f.grp2?'👥 ':'')+'到达 '+UT.label[f.to], detail:f.air+' '+f.no, tz:f.to });
-    }
-  });
-  // Machu Picchu
-  evs.push({ utc:UT.toUTC(2026,10,1,8,0,'CUZ'), type:'act', label:'🏛️ 马丘比丘入场', detail:'Circuito 1 Ruta 1-B', tz:'CUZ' });
-  evs.sort((a,b)=>a.utc-b.utc);
-  return evs;
-}
-
-const allEvents = getAllEvents();
-
-function tickCountdown() {
-  const now = Date.now();
-  let next = allEvents.find(e => e.utc > now);
-  if (!next) next = allEvents[allEvents.length-1];
-
-  document.getElementById('heroTitle').textContent = next.label;
-  document.getElementById('heroDetail').textContent = next.detail;
-  document.getElementById('heroTz').textContent = (next.tz ? UT.tzName[next.tz]+' · ' : '') + '北京时间倒计时';
-
-  let diff = Math.max(0, next.utc - now);
-  const d = Math.floor(diff/864e5); diff %= 864e5;
-  const h = Math.floor(diff/36e5); diff %= 36e5;
-  const m = Math.floor(diff/6e4); diff %= 6e4;
-  const s = Math.floor(diff/1e3);
-  document.getElementById('cdD').textContent = d;
-  document.getElementById('cdH').textContent = String(h).padStart(2,'0');
-  document.getElementById('cdM').textContent = String(m).padStart(2,'0');
-  document.getElementById('cdS').textContent = String(s).padStart(2,'0');
-}
-tickCountdown();
-setInterval(tickCountdown, 1000);
-
-function scrollTo2(id) {
-  const el = document.getElementById(id);
-  if (el) {
-    const nav = document.querySelector('.quick-nav');
-    const offset = nav ? nav.offsetHeight + 8 : 0;
-    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
-    window.scrollTo({ top, behavior: 'smooth' });
+async function toggleTodoDone(id, currentDone) {
+  const newDone = !currentDone;
+  // Optimistic update
+  _todos.forEach(t => { if (t.id === id) t.done = newDone; });
+  renderTodos(); renderTopTodos();
+  if (_supabase) {
+    await _supabase.from('todos').update({ done: newDone }).eq('id', id);
+    await fetchTodos();
   }
 }
 
-function renderTopTodos() {
-  const state = loadTodoState();
+async function addTodo() {
+  const input = document.getElementById('todoAddInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const record = { text, urgency: 'normal', done: false };
+  if (_supabase) {
+    await _supabase.from('todos').insert(record);
+    await fetchTodos();
+  }
+}
+
+async function deleteTodo(id) {
+  _todos = _todos.filter(t => t.id !== id);
+  renderTodos(); renderTopTodos();
+  if (_supabase) {
+    await _supabase.from('todos').delete().eq('id', id);
+    await fetchTodos();
+  }
+}
+
+/* ============================
+   RENDER: TODOS
+   ============================ */
+function renderTodos() {
+  const el = document.getElementById('todoList');
   const urgOrder = { urgent: 0, normal: 1, low: 2 };
-  const pending = todos.map((t, i) => ({ ...t, idx: i })).filter((t, i) => !state[i]);
-  const top3 = pending.sort((a, b) => urgOrder[a.urg] - urgOrder[b.urg]).slice(0, 3);
+  const sorted = [..._todos].sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return (urgOrder[a.urgency] || 1) - (urgOrder[b.urgency] || 1);
+  });
+  el.innerHTML = sorted.length === 0
+    ? '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">暂无待办</div>'
+    : sorted.map(t => {
+      const done = t.done ? ' done' : '';
+      return `<div class="todo-item${done}">
+        <span class="todo-check" onclick="toggleTodoDone(${t.id},${t.done})">✓</span>
+        <span class="todo-dot ${t.urgency}"></span>
+        <span style="flex:1">${t.text}</span>
+        <button class="exp-list-del" onclick="deleteTodo(${t.id})">×</button>
+      </div>`;
+    }).join('');
+}
+
+function renderTopTodos() {
+  const urgOrder = { urgent: 0, normal: 1, low: 2 };
+  const pending = _todos.filter(t => !t.done);
+  const top3 = pending.sort((a, b) => (urgOrder[a.urgency] || 1) - (urgOrder[b.urgency] || 1)).slice(0, 3);
 
   const items = top3.map(t =>
     `<div class="hero-todo-item">
-      <span class="hero-todo-dot ${t.urg}"></span>
-      <span class="hero-todo-text">${t.txt}</span>
+      <span class="hero-todo-dot ${t.urgency}"></span>
+      <span class="hero-todo-text">${t.text}</span>
     </div>`
   ).join('');
 
@@ -1412,221 +1338,6 @@ function renderTopTodos() {
     `<div class="hero-todo-title">📋 当前待办 TOP 3</div>
     <div class="hero-todo-list">${items}</div>
     <a class="hero-todo-link" href="#todoList" onclick="document.getElementById('todoList').scrollIntoView({behavior:'smooth'});return false;">查看完整清单 →</a>`;
-}
-
-/* ============================
-   RENDER: BOOKING (confirmed / unbooked)
-   ============================ */
-let currentBookingCat = 'flights';
-
-function flightCard(f) {
-  const fromLabel = UT.label[f.from]||f.from;
-  const toLabel = UT.label[f.to]||f.to;
-  const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
-  const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
-  const crossDay = f.ad > f.dd || f.am > f.dm;
-  const tzFrom = UT.tzName[f.from]||'';
-  const tzTo = UT.tzName[f.to]||'';
-  return `<div class="card flight">
-    <div class="flight-head">
-      <span class="flight-no">${f.air} ${f.no}</span>
-      <span class="flight-tag ${f.ok?'tag-ok':'tag-tbd'}">${f.ok?'已出票':'待确认'}</span>
-    </div>
-    <div class="flight-route">
-      <div class="flight-city left">
-        <div class="flight-time">${depTime}</div>
-        <div class="flight-code">${fromLabel} ${f.from}</div>
-        <div class="flight-date">${UT.fmtDate(f.dy,f.dm,f.dd)} ${tzFrom}</div>
-      </div>
-      <div class="flight-mid">
-        <div class="flight-dur">${crossDay?'+1天':''}</div>
-        <div class="flight-line"></div>
-      </div>
-      <div class="flight-city right">
-        <div class="flight-time">${arrTime}</div>
-        <div class="flight-code">${toLabel} ${f.to}</div>
-        <div class="flight-date">${crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' '}${tzTo}</div>
-      </div>
-    </div>
-    ${f.note ? '<div class="flight-note">'+(f.grp2?'👥 小何 小季 · ':'')+f.note+'</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')}
-  </div>`;
-}
-
-function renderBooking() {
-  const statusBadge = (ok) => ok
-    ? '<span style="float:right;font-size:11px;font-weight:700;color:var(--ok);background:rgba(129,178,154,.12);padding:2px 8px;border-radius:6px">已确认</span>'
-    : '<span style="float:right;font-size:11px;font-weight:700;color:#C89630;background:rgba(242,204,143,.15);padding:2px 8px;border-radius:6px">未预定</span>';
-  const cats = [
-    { key:'flights', icon:'✈️', label:'机票',
-      confirmed: flights.filter(f => f.ok),
-      unbooked: flights.filter(f => !f.ok),
-      renderItem: (f, ok) => {
-        const fromLabel = UT.label[f.from]||f.from;
-        const toLabel = UT.label[f.to]||f.to;
-        const depTime = (f.dh||f.dmi) ? UT.fmt(f.dh,f.dmi) : '待定';
-        const arrTime = (f.ah||f.ami) ? UT.fmt(f.ah,f.ami) : '待定';
-        const crossDay = f.ad > f.dd || f.am > f.dm;
-        const tzFrom = UT.tzName[f.from]||'';
-        const tzTo = UT.tzName[f.to]||'';
-        return `<div class="card flight">
-          <div class="flight-head">
-            <span class="flight-no">${f.air} ${f.no}</span>
-            ${statusBadge(ok)}
-          </div>
-          <div class="flight-route">
-            <div class="flight-city left">
-              <div class="flight-time">${depTime}</div>
-              <div class="flight-code">${fromLabel} ${f.from}</div>
-              <div class="flight-date">${UT.fmtDate(f.dy,f.dm,f.dd)} ${tzFrom}</div>
-            </div>
-            <div class="flight-mid">
-              <div class="flight-dur">${crossDay?'+1天':''}</div>
-              <div class="flight-line"></div>
-            </div>
-            <div class="flight-city right">
-              <div class="flight-time">${arrTime}</div>
-              <div class="flight-code">${toLabel} ${f.to}</div>
-              <div class="flight-date">${crossDay?UT.fmtDate(f.ay,f.am,f.ad)+' ':' '}${tzTo}</div>
-            </div>
-          </div>
-          ${f.note ? '<div class="flight-note">'+(f.grp2?'👥 小何 小季 · ':'')+f.note+'</div>' : (f.grp2?'<div class="flight-note">👥 小何 小季</div>':'')}
-        </div>`;
-      } },
-    { key:'trains', icon:'🚂', label:'火车',
-      confirmed: trains.filter(t => t.ok),
-      unbooked: trains.filter(t => !t.ok),
-      renderItem: (t, ok) => `<div class="card info-card">
-          <div class="ic-title">${t.route} ${statusBadge(ok)}</div>
-          <div class="ic-sub">${t.date} · ${t.company}</div>
-        </div>` },
-    { key:'hotels', icon:'🏨', label:'酒店',
-      confirmed: hotels.filter(h => h.name !== null),
-      unbooked: hotels.filter(h => h.name === null),
-      renderItem: (h, ok) => `<div class="card info-card">
-          <div class="ic-title">${h.city} <span style="font-weight:400;font-size:12px;color:var(--tx3)">${h.date}</span> ${statusBadge(ok)}</div>
-          <div class="ic-empty">${h.name || '待预订'}</div>
-        </div>` },
-    { key:'tickets', icon:'🎫', label:'门票',
-      confirmed: tickets.filter(t => t.ok),
-      unbooked: tickets.filter(t => !t.ok),
-      renderItem: (t, ok) => `<div class="card info-card">
-          <div class="ic-title">${t.name} ${statusBadge(ok)}</div>
-          <div class="ic-sub">${t.date} ${t.time} · ${t.detail}</div>
-        </div>` },
-  ];
-
-  const tabsEl = document.getElementById('bookingTabs');
-  const panelsEl = document.getElementById('bookingPanels');
-
-  // Build tabs (show all 4 categories with total count)
-  tabsEl.innerHTML = cats.map((c, i) => {
-    const total = c.confirmed.length + c.unbooked.length;
-    const active = c.key === currentBookingCat ? ' active' : '';
-    return `<button class="tab${active}" data-cat="${c.key}">${c.icon} ${c.label} ${total}</button>`;
-  }).join('');
-
-  // Build panel for current category
-  const cat = cats.find(c => c.key === currentBookingCat) || cats[0];
-  let panelHtml = '';
-  if (cat.confirmed.length > 0) {
-    panelHtml += cat.confirmed.map(item => cat.renderItem(item, true)).join('');
-  }
-  if (cat.unbooked.length > 0) {
-    panelHtml += cat.unbooked.map(item => cat.renderItem(item, false)).join('');
-  }
-  if (!panelHtml) {
-    panelHtml = '<div style="padding:20px 16px;text-align:center;color:var(--tx3)">暂无数据</div>';
-  }
-  panelsEl.innerHTML = panelHtml;
-
-  // Tab click handlers
-  tabsEl.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      currentBookingCat = tab.dataset.cat;
-      renderBooking();
-    });
-  });
-}
-
-/* ============================
-   RENDER: ITINERARY
-   ============================ */
-function renderItinerary() {
-  const el = document.getElementById('itinerary');
-  el.innerHTML = days.map((day, idx) => {
-    const timeline = day.ev.map(e => {
-      const dotClass = e.type==='hotel'?'hotel':(e.type==='arr'?'done':'');
-      const badgeClass = e.badge==='门票'?'badge-ticket':e.badge==='汇合'?'badge-group':'badge-book';
-      const badgeHTML = e.badge ? (e.bookUrl
-        ? `<a class="tl-badge ${badgeClass}" href="${e.bookUrl}" target="_blank" rel="noopener" style="text-decoration:none">${e.badge} ↗</a>`
-        : `<span class="tl-badge ${badgeClass}">${e.badge}</span>`) : '';
-      const locName = UT.label[e.c] || '';
-      const navLink = e.c && locName ? ` <a class="loc-link" href="${gmapURI(e.c)}" target="_blank" rel="noopener">📍</a>` : '';
-      return `<div class="tl-item">
-        <div class="tl-time">${e.t||''}</div>
-        <div class="tl-dot ${dotClass}"></div>
-        <div class="tl-content">${e.txt}${badgeHTML}${navLink}${e.sub?'<div class="tl-sub">'+e.sub+'</div>':''}</div>
-      </div>`;
-    }).join('');
-
-    // Build summary for header (show key events without clicking)
-    const summaryEvs = day.ev.filter(e => e.t && e.type !== 'hotel' && e.type !== 'info').slice(0, 4);
-    const summaryText = summaryEvs.map(e => e.txt).join(' → ');
-
-    // Collect nav points for this day
-    const navPoints = day.ev.filter(e=>e.c && UT.label[e.c]).map(e=>e.c);
-    const uniqueNav = [...new Set(navPoints)];
-    const navBtns = uniqueNav.map(n=>`<a class="nav-btn" href="${gmapURI(n)}" target="_blank" rel="noopener">📍 ${UT.label[n]}</a>`).join('');
-
-    return `<div class="day-card${idx===0?' open':''}">
-      <div class="day-head" onclick="this.parentElement.classList.toggle('open')">
-        <span class="day-num">D${day.n}</span>
-        <span class="day-date">${day.date}</span>
-        <span class="day-arrow">▾</span>
-      </div>
-      ${summaryText ? '<div class="day-summary"><div class="day-summary-text">'+summaryText+'</div></div>' : ''}
-      <div class="day-body">
-        <div class="day-inner">
-          <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--tx2)">${day.title} <span style="font-weight:400;font-size:12px;color:var(--tx3)">· ${day.loc}</span></div>
-          <div class="tl">${timeline}</div>
-          ${navBtns?'<div class="day-nav">'+navBtns+'</div>':''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ============================
-   RENDER: TODOS
-   ============================ */
-const TODO_KEY = 'sa_trip_todo_2026';
-function loadTodoState() {
-  try { return JSON.parse(localStorage.getItem(TODO_KEY)) || {}; } catch { return {}; }
-}
-function saveTodoState(state) {
-  try { localStorage.setItem(TODO_KEY, JSON.stringify(state)); } catch {}
-}
-
-function renderTodos() {
-  const el = document.getElementById('todoList');
-  const state = loadTodoState();
-  el.innerHTML = todos.map((t, i) => {
-    const done = state[i] ? ' done' : '';
-    return `<div class="todo-item${done}" data-idx="${i}" onclick="toggleTodo(this)">
-      <span class="todo-dot ${t.urg}"></span>
-      <span>${t.txt}</span>
-    </div>`;
-  }).join('');
-}
-
-function toggleTodo(el) {
-  const idx = el.dataset.idx;
-  const state = loadTodoState();
-  state[idx] = !state[idx];
-  saveTodoState(state);
-  el.classList.toggle('done');
-  // Update hero TOP 3
-  renderTopTodos();
 }
 
 /* ============================
@@ -2260,9 +1971,10 @@ function initSupabase() {
     _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     fetchExpenses();
     // Real-time subscription
-    _supabase.channel('expenses').on(
-      'postgres_changes', { event: '*', schema: 'public', table: 'expenses' },
-      () => fetchExpenses()
+    _supabase.channel('all-changes').on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => fetchExpenses()
+    ).on(
+      'postgres_changes', { event: '*', schema: 'public', table: 'todos' }, () => fetchTodos()
     ).subscribe();
   } catch(e) {
     console.error('Supabase init error:', e);
@@ -2444,8 +2156,7 @@ function renderExpenses() {
    ============================ */
 renderBooking();
 renderItinerary();
-renderTodos();
-renderTopTodos();
+fetchTodos();
 renderRouteSummary();
 renderTimeline();
 renderTips();
