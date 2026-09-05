@@ -1543,62 +1543,68 @@ function renderTips() {
   let html = tips.slice(0, 3).map((t) => {
     if (t.icon === '💰') {
       return `<div class="tip-card full">
-        <h4>${t.icon} ${t.title}</h4>
-        <div class="fx-row">
-          <select class="fx-select" id="fxCurrency" onchange="doConvert()">
-            <option value="1.95">🇵🇪 SOL 秘鲁索尔</option>
-            <option value="1.30">🇧🇷 BRL 巴西雷亚尔</option>
-            <option value="0.0071">🇨🇱 CLP 智利比索</option>
-            <option value="0.0045">🇦🇷 ARS 阿根廷比索</option>
-            <option value="0.17">🇺🇾 UYU 乌拉圭比索</option>
-            <option value="7.25">🇺🇸 USD 美元</option>
-          </select>
-          <input class="fx-input" id="fxAmount" type="number" inputmode="decimal" placeholder="金额" oninput="doConvert()">
+        <h4 style="cursor:pointer" onclick="toggleTipBody('fxBody',this)"><span class="tip-icon">${t.icon}</span>${t.title} <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
+        <div id="fxBody" style="display:none">
+          <div class="fx-row">
+            <select class="fx-select" id="fxCurrency" onchange="doConvert()">
+              <option value="1.95">🇵🇪 SOL 秘鲁索尔</option>
+              <option value="1.30">🇧🇷 BRL 巴西雷亚尔</option>
+              <option value="0.0071">🇨🇱 CLP 智利比索</option>
+              <option value="0.0045">🇦🇷 ARS 阿根廷比索</option>
+              <option value="0.17">🇺🇾 UYU 乌拉圭比索</option>
+              <option value="7.25">🇺🇸 USD 美元</option>
+            </select>
+            <input class="fx-input" id="fxAmount" type="number" inputmode="decimal" placeholder="金额" oninput="doConvert()">
+          </div>
+          <div class="fx-result" id="fxResult">输入金额自动换算人民币</div>
         </div>
-        <div class="fx-result" id="fxResult">输入金额自动换算人民币</div>
       </div>`;
     }
     if (t.icon === '📷') {
       return `<div class="tip-card full">
-        <h4>${t.icon} ${t.title}</h4>
-        <div class="cam-btns">
-          <button class="cam-btn" onclick="document.getElementById('camFile').click()">📁 选择图片</button>
-          <button class="cam-btn" onclick="document.getElementById('camCapture').click()">📸 拍照</button>
-          <a class="cam-btn" href="https://lens.google.com/" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx1)">🔍 Google Lens</a>
+        <h4 style="cursor:pointer" onclick="toggleTipBody('camBody',this)"><span class="tip-icon">${t.icon}</span>${t.title} <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
+        <div id="camBody" style="display:none">
+          <div class="cam-btns">
+            <button class="cam-btn" onclick="document.getElementById('camFile').click()">📁 选择图片</button>
+            <button class="cam-btn" onclick="document.getElementById('camCapture').click()">📸 拍照</button>
+            <a class="cam-btn" href="https://lens.google.com/" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx1)">🔍 Google Lens</a>
+          </div>
+          <input class="cam-input" type="file" id="camFile" accept="image/*" onchange="previewCam(this)">
+          <input class="cam-input" type="file" id="camCapture" accept="image/*" capture="environment" onchange="previewCam(this)">
+          <img class="cam-preview" id="camPreview">
+          <select class="fx-select" id="camLang" style="margin-top:8px;width:100%">
+            <option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>
+            <option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>
+            <option value="en|zh-CN">🇬🇧 英语 → 中文</option>
+            <option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>
+            <option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>
+            <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
+          </select>
+          <textarea class="cam-text" id="camText" placeholder="输入要翻译的文字"></textarea>
+          <div class="cam-btns" style="margin-top:6px">
+            <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译</button>
+            <button class="cam-btn" onclick="clearCam()">清空</button>
+          </div>
+          <div class="cam-result" id="camResult"></div>
         </div>
-        <input class="cam-input" type="file" id="camFile" accept="image/*" onchange="previewCam(this)">
-        <input class="cam-input" type="file" id="camCapture" accept="image/*" capture="environment" onchange="previewCam(this)">
-        <img class="cam-preview" id="camPreview">
-        <select class="fx-select" id="camLang" style="margin-top:8px;width:100%">
-          <option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>
-          <option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>
-          <option value="en|zh-CN">🇬🇧 英语 → 中文</option>
-          <option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>
-          <option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>
-          <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
-        </select>
-        <textarea class="cam-text" id="camText" placeholder="输入要翻译的文字"></textarea>
-        <div class="cam-btns" style="margin-top:6px">
-          <button class="cam-btn" onclick="doCamTranslate()" style="background:var(--pri);color:#fff;border:none">翻译</button>
-          <button class="cam-btn" onclick="clearCam()">清空</button>
-        </div>
-        <div class="cam-result" id="camResult"></div>
       </div>`;
     }
     if (t.icon === '🎤') {
       return `<div class="tip-card full">
-        <h4>${t.icon} ${t.title}</h4>
-        <select class="fx-select" id="voiceLang" style="margin-top:8px;width:100%">
-          <option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>
-          <option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>
-          <option value="en|zh-CN">🇬🇧 英语 → 中文</option>
-          <option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>
-          <option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>
-          <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
-        </select>
-        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎙️ 点击开始说话</button>
-        <textarea class="voice-text" id="voiceText" placeholder="识别到的文字会显示在这里" readonly></textarea>
-        <div class="voice-result" id="voiceResult"></div>
+        <h4 style="cursor:pointer" onclick="toggleTipBody('voiceBody',this)"><span class="tip-icon">${t.icon}</span>${t.title} <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
+        <div id="voiceBody" style="display:none">
+          <select class="fx-select" id="voiceLang" style="margin-top:8px;width:100%">
+            <option value="es|zh-CN">🇪🇸 西班牙语 → 中文</option>
+            <option value="pt|zh-CN">🇧🇷 葡萄牙语 → 中文</option>
+            <option value="en|zh-CN">🇬🇧 英语 → 中文</option>
+            <option value="zh-CN|es">🇨🇳 中文 → 西班牙语</option>
+            <option value="zh-CN|pt">🇨🇳 中文 → 葡萄牙语</option>
+            <option value="zh-CN|en">🇨🇳 中文 → 英语</option>
+          </select>
+          <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎙️ 点击开始说话</button>
+          <textarea class="voice-text" id="voiceText" placeholder="识别到的文字会显示在这里" readonly></textarea>
+          <div class="voice-result" id="voiceResult"></div>
+        </div>
       </div>`;
     }
     return `<div class="tip-card">
@@ -1705,6 +1711,14 @@ function toggleNotices() {
   const body = document.getElementById('noticesTipBody');
   const isHidden = body.style.display === 'none';
   body.style.display = isHidden ? 'block' : 'none';
+}
+
+function toggleTipBody(id, h4) {
+  const body = document.getElementById(id);
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+  const arrow = h4.querySelector('span[style*="float"]');
+  if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : '';
 }
 
 function loadCustomShops() {
