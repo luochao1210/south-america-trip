@@ -470,7 +470,11 @@ body{
   background:var(--bg2);border:1px solid var(--brd);
   border-radius:var(--rs);padding:14px;
 }
-.tip-card h4{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.tip-card h4{
+  font-size:15px;font-weight:800;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+  color:var(--tx1);letter-spacing:.5px;
+}
 .tip-card p{font-size:12px;color:var(--tx2);line-height:1.5}
 .tip-card a{color:var(--pri);text-decoration:none}
 
@@ -1149,7 +1153,7 @@ const tips = [
   { icon:'💰', title:'汇率换算', body:'converter' },
   { icon:'📷', title:'拍照翻译', body:'camera' },
   { icon:'🎤', title:'语音翻译', body:'voice' },
-  { icon:'🍽️', title:'饮食', body:'food' },
+  { icon:'🍽️', title:'饮食推荐', body:'food' },
   { icon:'📌', title:'提示事项', body:'notices' },
 ];
 
@@ -1599,14 +1603,14 @@ function renderTips() {
       </div>`;
     }
     return `<div class="tip-card">
-      <h4>${t.icon} ${t.title}</h4>
+      <h4><span class="tip-icon">${t.icon}</span>${t.title}</h4>
       <p>${t.body}</p>
     </div>`;
   }).join('');
 
   // Shopping list tip card
   html += `<div class="tip-card full" id="shopTipCard">
-    <h4 style="cursor:pointer" onclick="toggleShopTip()">🛒 准备清单 <span style="float:right;font-size:12px;color:var(--tx3)">${shopDone}/${totalShops} ▾</span></h4>
+    <h4 style="cursor:pointer" onclick="toggleShopTip()">🛒 准备清单 <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
     <div id="shopTipBody" style="display:none">
       <div id="shopCards" style="margin-top:8px"></div>
       <div style="display:flex;gap:6px;margin-top:8px">
@@ -1650,7 +1654,7 @@ function renderTips() {
         </div>`;
       }).join('');
       return `<div class="tip-card full" id="foodTipCard">
-        <h4 style="cursor:pointer" onclick="toggleFoodTip()">${t.icon} ${t.title} <span style="float:right;font-size:12px;color:var(--tx3)">${restaurants.length}个城市 ${totalRest}家 ▾</span></h4>
+        <h4 style="cursor:pointer" onclick="toggleFoodTip()">🍽️ 饮食推荐 <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
         <div id="foodTipBody" style="display:none">
           <div class="food-city-list">${cityCards}</div>
         </div>
@@ -1670,14 +1674,14 @@ function renderTips() {
         </div>`
       ).join('');
       return `<div class="tip-card full">
-        <h4 style="cursor:pointer" onclick="toggleNotices()">${t.icon} ${t.title} <span style="float:right;font-size:12px;color:var(--tx3)">${noticeItems.length}项 ▾</span></h4>
+        <h4 style="cursor:pointer" onclick="toggleNotices()">📌 提示事项 <span style="float:right;font-size:16px;color:var(--tx3)">▾</span></h4>
         <div id="noticesTipBody" style="display:none">
           <div class="food-city-list">${noticeCards}</div>
         </div>
       </div>`;
     }
     return `<div class="tip-card">
-      <h4>${t.icon} ${t.title}</h4>
+      <h4><span class="tip-icon">${t.icon}</span>${t.title}</h4>
       <p>${t.body}</p>
     </div>`;
   }).join('');
