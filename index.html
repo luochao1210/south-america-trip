@@ -1090,8 +1090,8 @@ const flights = [
   { no:'LA844', from:'IPC', to:'SCL', dy:2026,dm:9,dd:28,dh:17,dmi:30, ay:2026,am:9,ad:29,ah:0,ami:5, air:'南美航空', ok:true, note:'经济舱 Basic · 到达即09.29凌晨' },
   { no:'LA2367', from:'SCL', to:'CUZ', dy:2026,dm:9,dd:29,dh:7,dmi:10, ay:2026,am:9,ad:29,ah:8,ami:40, air:'南美航空', ok:true, note:'无免费托运' },
   { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:28,dh:15,dmi:0, ay:2026,am:9,ad:29,ah:5,ami:0, air:'中国国航', ok:true, note:'小何 小季 · T3→T3', grp2:true },
-  { no:'LA8098', from:'GRU', to:'LIM', dy:2026,dm:9,dd:29,dh:0,dmi:0, ay:2026,am:9,ad:29,ah:0,ami:0, air:'南美航空', ok:true, note:'小何 小季 · 经利马中转', grp2:true },
-  { no:'LA2028', from:'LIM', to:'CUZ', dy:2026,dm:9,dd:29,dh:0,dmi:0, ay:2026,am:9,ad:29,ah:0,ami:0, air:'南美航空', ok:true, note:'小何 小季 · 经利马中转', grp2:true },
+  { no:'LA8098', from:'GRU', to:'LIM', dy:2026,dm:9,dd:29,dh:7,dmi:30, ay:2026,am:9,ad:29,ah:10,ami:50, air:'南美航空', ok:true, note:'小何 小季 · 经利马中转 · ~5h20m', grp2:true },
+  { no:'LA2028', from:'LIM', to:'CUZ', dy:2026,dm:9,dd:29,dh:13,dmi:25, ay:2026,am:9,ad:29,ah:14,ami:45, air:'南美航空', ok:true, note:'小何 小季 · 经利马中转 · ~1h20m', grp2:true },
   { no:'待定', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:20,dmi:0, ay:2026,am:10,ad:1,ah:22,ami:30, air:'待定', ok:false, note:'飞行约1.5h' },
   { no:'H25571', from:'LIM', to:'AEP', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:8,ami:30, air:'Sky Airline', ok:true, note:'空客320 · 无餐食 · 无免费托运 · ¥2264' },
   { no:'AR1876', from:'AEP', to:'USH', dy:2026,dm:10,dd:2,dh:17,dmi:55, ay:2026,am:10,ad:2,ah:21,ami:35, air:'阿根廷航空', ok:true, note:'737-800 · 无免费托运' },
@@ -1293,7 +1293,7 @@ const days = [
     ev: [
       { t:'07:10', c:'SCL', txt:'圣地亚哥 SCL T2 出发', sub:'LA2367 · 无免费托运', type:'dep' },
       { t:'08:40', c:'CUZ', txt:'到达库斯科（海拔 3400m）', sub:'LA2367 · 注意高原反应', type:'arr' },
-      { t:'09:29', c:'CUZ', txt:'小何、小季 经利马到达库斯科', sub:'LA8098 GRU→LIM + LA2028 LIM→CUZ', type:'arr', badge:'汇合' },
+      { t:'14:45', c:'CUZ', txt:'小何、小季 经利马到达库斯科', sub:'LA8098 GRU 07:30→LIM 10:50 + LA2028 LIM 13:25→CUZ 14:45', type:'arr', badge:'汇合' },
       { t:'下午', c:'CUZ', txt:'适应海拔，库斯科城区漫步', sub:'武器广场、太阳神殿', type:'act' },
       { t:'晚', c:'CUZ', txt:'住库斯科', sub:'', type:'hotel' },
     ]
