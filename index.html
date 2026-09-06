@@ -1100,8 +1100,8 @@ const flights = [
   { no:'CA898', from:'GRU', to:'PEK', dy:2026,dm:10,dd:6,dh:9,dmi:25, ay:2026,am:10,ad:7,ah:19,ami:30, air:'中国国航', ok:true, note:'T3 → T3' },
 ];
 const trains = [
-  { date:'09.30', route:'库斯科 → 热水镇', company:'PeruRail / Inca Rail', ok:false },
-  { date:'10.01', route:'热水镇 → 库斯科', company:'PeruRail / Inca Rail', ok:false },
+  { date:'09.30', route:'库斯科 → 热水镇（马丘比丘）', company:'IncaRail The Voyager Bimodal · 13:00-18:09', ok:true },
+  { date:'10.01', route:'热水镇（马丘比丘）→ 库斯科', company:'IncaRail The Voyager Bimodal · 14:30-18:20', ok:true },
 ];
 const hotels = [
   { date:'09.25', city:'圣地亚哥', name:null },
@@ -1300,16 +1300,17 @@ const days = [
   { n:7, date:'9月30日 周二', title:'库斯科 → 热水镇', loc:'库斯科 → 热水镇',
     ev: [
       { t:'上午', c:'CUZ', txt:'库斯科城区游览', sub:'', type:'act' },
-      { t:'下午', c:'CUZ', txt:'火车前往热水镇', sub:'PeruRail / Inca Rail · 待购票', type:'act', badge:'订票', bookUrl:'https://www.perurail.com/' },
-      { t:'傍晚', c:'CUZ', txt:'到达热水镇（马丘比丘脚下）', sub:'', type:'arr' },
+      { t:'13:00', c:'CUZ', txt:'火车出发前往热水镇', sub:'IncaRail The Voyager Bimodal', type:'dep' },
+      { t:'18:09', c:'CUZ', txt:'到达马丘比丘站（热水镇）', sub:'车程约 5h09m', type:'arr' },
       { t:'晚', c:'CUZ', txt:'住热水镇', sub:'早睡！明天早起', type:'hotel' },
     ]
   },
   { n:8, date:'10月1日 周三', title:'马丘比丘 → 利马', loc:'马丘比丘 → 库斯科 → 利马',
     ev: [
       { t:'08:00', c:'CUZ', txt:'马丘比丘入场', sub:'Circuito 1 · Ruta 1-B 上层平台', type:'act', badge:'门票' },
-      { t:'中午', c:'CUZ', txt:'下山，火车回 Ollantaytambo', sub:'待购票', type:'act', badge:'订票', bookUrl:'https://www.perurail.com/' },
-      { t:'下午', c:'CUZ', txt:'坐车回库斯科，前往机场', sub:'车程约 1.5h', type:'act' },
+      { t:'14:30', c:'CUZ', txt:'火车返回库斯科', sub:'IncaRail The Voyager Bimodal', type:'dep' },
+      { t:'18:20', c:'CUZ', txt:'到达库斯科', sub:'车程约 3h50m', type:'arr' },
+      { t:'晚上', c:'CUZ', txt:'前往机场', sub:'车程约 1.5h', type:'act' },
       { t:'20:00', c:'CUZ', txt:'库斯科出发飞利马', sub:'航班号待定 · 飞行约 1.5h', type:'dep' },
       { t:'22:30', c:'LIM', txt:'到达利马', sub:'', type:'arr' },
       { t:'~00:00', c:'LIM', txt:'利马机场等候（转机约3.5h）', sub:'下一班 02:00 起飞', type:'info' },
@@ -1437,7 +1438,6 @@ function renderItinerary() {
 const todos = [
   { txt:'预订小何、小季 09.29 圣保罗→库斯科中转航班', urg:'urgent' },
   { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
-  { txt:'预订库斯科↔热水镇火车票（PeruRail / Inca Rail）', urg:'normal' },
   { txt:'预订全部酒店（12 晚）', urg:'normal' },
   { txt:'购买复活节岛国家公园门票', urg:'normal' },
   { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
