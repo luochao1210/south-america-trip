@@ -1092,7 +1092,7 @@ const flights = [
   { no:'CA897', from:'PEK', to:'GRU', dy:2026,dm:9,dd:28,dh:15,dmi:0, ay:2026,am:9,ad:29,ah:5,ami:0, air:'中国国航', ok:true, note:'小何 小季 · T3→T3', grp2:true },
   { no:'LA8098', from:'GRU', to:'LIM', dy:2026,dm:9,dd:29,dh:7,dmi:30, ay:2026,am:9,ad:29,ah:10,ami:50, air:'南美航空', ok:true, note:'小何 小季 · 经利马中转 · ~5h20m', grp2:true },
   { no:'LA2028', from:'LIM', to:'CUZ', dy:2026,dm:9,dd:29,dh:13,dmi:25, ay:2026,am:9,ad:29,ah:14,ami:45, air:'南美航空', ok:true, note:'小何 小季 · 经利马中转 · ~1h20m', grp2:true },
-  { no:'待定', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:20,dmi:0, ay:2026,am:10,ad:1,ah:22,ami:30, air:'待定', ok:false, note:'飞行约1.5h' },
+  { no:'LA2224', from:'CUZ', to:'LIM', dy:2026,dm:10,dd:1,dh:21,dmi:20, ay:2026,am:10,ad:1,ah:22,ami:55, air:'南美航空', ok:true, note:'4人 · ~1h35m' },
   { no:'H25571', from:'LIM', to:'AEP', dy:2026,dm:10,dd:2,dh:2,dmi:0, ay:2026,am:10,ad:2,ah:8,ami:30, air:'Sky Airline', ok:true, note:'空客320 · 无餐食 · 无免费托运 · ¥2264' },
   { no:'AR1876', from:'AEP', to:'USH', dy:2026,dm:10,dd:2,dh:17,dmi:55, ay:2026,am:10,ad:2,ah:21,ami:35, air:'阿根廷航空', ok:true, note:'737-800 · 无免费托运' },
   { no:'AR1885', from:'USH', to:'AEP', dy:2026,dm:10,dd:3,dh:20,dmi:40, ay:2026,am:10,ad:4,ah:0,ami:10, air:'阿根廷航空', ok:true, note:'737-800 · 无免费托运 · 到达即10.04凌晨' },
@@ -1312,9 +1312,9 @@ const days = [
       { t:'14:30', c:'CUZ', txt:'火车返回库斯科', sub:'IncaRail The Voyager Bimodal', type:'dep' },
       { t:'18:20', c:'CUZ', txt:'到达库斯科', sub:'车程约 3h50m', type:'arr' },
       { t:'晚上', c:'CUZ', txt:'前往机场', sub:'车程约 1.5h', type:'act' },
-      { t:'20:00', c:'CUZ', txt:'库斯科出发飞利马', sub:'航班号待定 · 飞行约 1.5h', type:'dep' },
-      { t:'22:30', c:'LIM', txt:'到达利马', sub:'', type:'arr' },
-      { t:'~00:00', c:'LIM', txt:'利马机场等候（转机约3.5h）', sub:'下一班 02:00 起飞', type:'info' },
+      { t:'21:20', c:'CUZ', txt:'库斯科出发飞利马', sub:'LA2224 南美航空 · ~1h35m', type:'dep' },
+      { t:'22:55', c:'LIM', txt:'到达利马', sub:'', type:'arr' },
+      { t:'~00:00', c:'LIM', txt:'利马机场等候（转机约1h）', sub:'下一班 02:00 起飞', type:'info' },
     ]
   },
   { n:9, date:'10月2日 周四', title:'利马 → 布宜诺斯 → 乌斯怀亚', loc:'利马 → 布宜诺斯 → 乌斯怀亚',
@@ -1338,9 +1338,11 @@ const days = [
   },
   { n:11, date:'10月4日 周六', title:'布宜诺斯 ⇄ 科洛尼亚', loc:'布宜诺斯 → 科洛尼亚 → 布宜诺斯',
     ev: [
-      { t:'上午', c:'AEP', txt:'坐船前往科洛尼亚（约 1h）', sub:'渡轮 · 往返共 $60', type:'act' },
+      { t:'08:30', c:'AEP', txt:'坐船前往科洛尼亚', sub:'渡轮 · ~1h15m', type:'dep' },
+      { t:'09:45', c:'MVD', txt:'到达科洛尼亚', sub:'世遗小镇漫步', type:'arr' },
       { t:'白天', c:'MVD', txt:'科洛尼亚世遗小镇漫步', sub:'世界文化遗产', type:'act' },
-      { t:'傍晚', c:'MVD', txt:'坐船返回布宜诺斯', sub:'', type:'act' },
+      { t:'17:01', c:'MVD', txt:'坐船返回布宜诺斯', sub:'渡轮 · ~1h15m', type:'dep' },
+      { t:'18:16', c:'AEP', txt:'到达布宜诺斯', sub:'', type:'arr' },
       { t:'晚', c:'AEP', txt:'住布宜诺斯艾利斯', sub:'', type:'hotel' },
     ]
   },
@@ -1437,11 +1439,9 @@ function renderItinerary() {
    TODOS
    ============================ */
 const todos = [
-  { txt:'预订 10.01 库斯科→利马航班', urg:'normal' },
   { txt:'预订全部酒店（12 晚）', urg:'normal' },
   { txt:'购买复活节岛国家公园门票', urg:'normal' },
   { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
-  { txt:'确认 10.04 布宜诺斯⇄科洛尼亚渡轮时刻（Buquebus / Colonia Express）', urg:'low' },
 ];
 
 const TODO_KEY = 'sa_trip_todo_2026';
@@ -1863,9 +1863,9 @@ const routeGroups = [
   { days:'3-5', dates:'9.26-28', color:'#F2CC8F',
     text:'圣地亚哥 → 复活节岛（LA843 ~5h35m），游览石像群 → 返程（LA844 ~4h35m）' },
   { days:'6-9', dates:'9.29-10.1', color:'#81B29A',
-    text:'圣地亚哥 → 库斯科（LA2367 ~3h30m），四人汇合 → 火车去热水镇 → 马丘比丘 → 飞利马' },
+    text:'圣地亚哥 → 库斯科（LA2367 ~3h30m），四人汇合 → 火车去热水镇 → 马丘比丘 → 飞利马（LA2224 ~1h35m）' },
   { days:'10-11', dates:'10.2-4', color:'#3D8B8B',
-    text:'利马 → 布宜诺斯（H25571 ~4h30m）→ 乌斯怀亚（AR1876 ~3h40m），世界尽头+火地岛 → 返布宜诺斯（AR1885 ~3h30m）→ 科洛尼亚渡轮' },
+    text:'利马 → 布宜诺斯（H25571 ~4h30m）→ 乌斯怀亚（AR1876 ~3h40m），世界尽头+火地岛 → 返布宜诺斯（AR1885 ~3h30m）→ 科洛尼亚渡轮（08:30-09:45 / 17:01-18:16）' },
   { days:'12-14', dates:'10.5-7', color:'#8B5CF6',
     text:'布宜诺斯 → 里约（AR1308 ~2h55m）基督山 → 圣保罗（G31379 ~1h15m）→ 北京（CA898 ~23h），10.7 到家' },
 ];
