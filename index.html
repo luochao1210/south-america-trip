@@ -1729,6 +1729,7 @@ function renderTips() {
           `<div class="tip-rest-card">
             <div class="tip-rest-name">${r.name}${r.tag ? '<span class="tip-rest-tag">'+r.tag+'</span>' : ''}</div>
             <div class="tip-rest-meta">${r.type} · ${r.note}</div>
+            ${r.addr ? '<div class="tip-rest-meta"><a href="'+r.map+'" target="_blank" rel="noopener" style="color:var(--pri);text-decoration:none">📍 '+r.addr+'</a></div>' : ''}
           </div>`
         ).join('');
         return `<div class="food-city-card">
@@ -1919,34 +1920,34 @@ const noticeItems = [
 
 const restaurants = [
   { city:'圣地亚哥 (9.25)', items:[
-    { name:'Boragó', type:'新派智利菜', note:'拉丁美洲Top50餐厅，需提前预订', tag:'必吃' },
-    { name:'Bocanáriz', type:'智利菜', note:'海鲜炖锅 Paila Marina 是招牌', tag:'' },
-    { name:'Mercado Central', type:'海鲜市场', note:'现选海鲜现做，午餐好去处', tag:'' },
+    { name:'Boragó', type:'新派智利菜', note:'拉丁美洲Top50餐厅，需提前预订', tag:'必吃', addr:'Av. Vitacura 2685, Santiago', map:'https://www.google.com/maps/search/?api=1&query=Boragó+Santiago+Chile' },
+    { name:'Bocanáriz', type:'智利菜', note:'海鲜炖锅 Paila Marina 是招牌', tag:'', addr:'José Victorino Lastarria 281, Santiago', map:'https://www.google.com/maps/search/?api=1&query=Bocanáriz+Santiago+Chile' },
+    { name:'Mercado Central', type:'海鲜市场', note:'现选海鲜现做，午餐好去处', tag:'', addr:'San Pablo 967, Santiago', map:'https://www.google.com/maps/search/?api=1&query=Mercado+Central+Santiago+Chile' },
   ]},
   { city:'复活节岛 (9.26-27)', items:[
-    { name:"Te Ra'ai", type:'波利尼西亚菜', note:'当地传统窑烤大餐 Umu Rapa Nui', tag:'特色' },
-    { name:'La Kaña', type:'海鲜', note:'酸橘汁腌鱼 Ceviche 性价比极高', tag:'' },
-    { name:'Mikafé', type:'咖啡简餐', note:'早餐推荐，波利尼西亚融合风', tag:'' },
+    { name:"Te Ra'ai", type:'波利尼西亚菜', note:'当地传统窑烤大餐 Umu Rapa Nui', tag:'特色', addr:'Hanga Roa, Easter Island', map:'https://www.google.com/maps/search/?api=1&query=Te+Raai+Easter+Island' },
+    { name:'La Kaña', type:'海鲜', note:'酸橘汁腌鱼 Ceviche 性价比极高', tag:'', addr:'Av. Atamu Tekena, Hanga Roa', map:'https://www.google.com/maps/search/?api=1&query=La+Kaña+Easter+Island' },
+    { name:'Mikafé', type:'咖啡简餐', note:'早餐推荐，波利尼西亚融合风', tag:'', addr:'Hanga Roa, Easter Island', map:'https://www.google.com/maps/search/?api=1&query=Mikafe+Easter+Island' },
   ]},
   { city:'库斯科 (9.29-10.1)', items:[
-    { name:'Chicha por Gastón Acurio', type:'秘鲁菜', note:'秘鲁名厨旗下，武器广场旁', tag:'必吃' },
-    { name:'Pachapapa', type:'传统安第斯', note:'烤天竺鼠 Cuy 和窑烤体验', tag:'特色' },
-    { name:'Mercado San Pedro', type:'本地市场', note:'鲜榨果汁+本地小吃，便宜地道', tag:'' },
-    { name:'Cicciolina', type:'地中海融合', note:'Tapas 风格，适合晚餐小酌', tag:'' },
+    { name:'Chicha por Gastón Acurio', type:'秘鲁菜', note:'秘鲁名厨旗下，武器广场旁', tag:'必吃', addr:'Plaza Regocijo 261, Cusco', map:'https://www.google.com/maps/search/?api=1&query=Chicha+Gaston+Acurio+Cusco' },
+    { name:'Pachapapa', type:'传统安第斯', note:'烤天竺鼠 Cuy 和窑烤体验', tag:'特色', addr:'Carmen Bajo 120, Cusco', map:'https://www.google.com/maps/search/?api=1&query=Pachapapa+Cusco' },
+    { name:'Mercado San Pedro', type:'本地市场', note:'鲜榨果汁+本地小吃，便宜地道', tag:'', addr:'Santa Clara 454, Cusco', map:'https://www.google.com/maps/search/?api=1&query=Mercado+San+Pedro+Cusco' },
+    { name:'Cicciolina', type:'地中海融合', note:'Tapas 风格，适合晚餐小酌', tag:'', addr:'Calle Triunfo 393, Cusco', map:'https://www.google.com/maps/search/?api=1&query=Cicciolina+Cusco' },
   ]},
   { city:'布宜诺斯 (10.2-10.4)', items:[
-    { name:'Don Julio', type:'阿根廷牛排', note:'全球Top50餐厅，至少提前2周订', tag:'必吃' },
-    { name:'La Cabrera', type:'阿根廷烤肉', note:'Palermo 区，烤肉配小菜拼盘', tag:'' },
-    { name:'Café Tortoni', type:'百年咖啡馆', note:'1858年开业，体验 Porteño 文化', tag:'打卡' },
-    { name:'El Ateneo Grand Splendid', type:'书店咖啡', note:'最美书店里喝咖啡', tag:'打卡' },
+    { name:'Don Julio', type:'阿根廷牛排', note:'全球Top50餐厅，至少提前2周订', tag:'必吃', addr:'Guatemala 4699, Palermo, Buenos Aires', map:'https://www.google.com/maps/search/?api=1&query=Don+Julio+Palermo+Buenos+Aires' },
+    { name:'La Cabrera', type:'阿根廷烤肉', note:'Palermo 区，烤肉配小菜拼盘', tag:'', addr:'José A. Cabrera 5127, Palermo, Buenos Aires', map:'https://www.google.com/maps/search/?api=1&query=La+Cabrera+Palermo+Buenos+Aires' },
+    { name:'Café Tortoni', type:'百年咖啡馆', note:'1858年开业，体验 Porteño 文化', tag:'打卡', addr:'Av. de Mayo 825, Buenos Aires', map:'https://www.google.com/maps/search/?api=1&query=Cafe+Tortoni+Buenos+Aires' },
+    { name:'El Ateneo Grand Splendid', type:'书店咖啡', note:'最美书店里喝咖啡', tag:'打卡', addr:'Av. Santa Fe 1860, Buenos Aires', map:'https://www.google.com/maps/search/?api=1&query=El+Ateneo+Grand+Splendid+Buenos+Aires' },
   ]},
   { city:'乌斯怀亚 (10.2-10.3)', items:[
-    { name:'El Viejo Marino', type:'海鲜', note:'帝王蟹 Centolla 必点', tag:'必吃' },
-    { name:'Tía Elvira', type:'阿根廷菜', note:'烤羊肉 Cordero Patagónico 出色', tag:'' },
+    { name:'El Viejo Marino', type:'海鲜', note:'帝王蟹 Centolla 必点', tag:'必吃', addr:'Av. Maipú 349, Ushuaia', map:'https://www.google.com/maps/search/?api=1&query=El+Viejo+Marino+Ushuaia' },
+    { name:'Tía Elvira', type:'阿根廷菜', note:'烤羊肉 Cordero Patagónico 出色', tag:'', addr:'Maipú 349, Ushuaia', map:'https://www.google.com/maps/search/?api=1&query=Tia+Elvira+Ushuaia' },
   ]},
   { city:'里约 (10.5)', items:[
-    { name:'Confeitaria Colombo', type:'百年甜品', note:'1894年开业，巴西蛋 Pastel de Nata', tag:'打卡' },
-    { name:'Cervantes', type:'巴西小吃', note:'本地人最爱的 Bolinho de Bacalhau 鳕鱼球', tag:'' },
+    { name:'Confeitaria Colombo', type:'百年甜品', note:'1894年开业，巴西蛋 Pastel de Nata', tag:'打卡', addr:'Rua Gonçalves Dias 32, Rio de Janeiro', map:'https://www.google.com/maps/search/?api=1&query=Confeitaria+Colombo+Rio+de+Janeiro' },
+    { name:'Cervantes', type:'巴西小吃', note:'本地人最爱的 Bolinho de Bacalhau 鳕鱼球', tag:'', addr:'Rua do Ouvidor 42, Rio de Janeiro', map:'https://www.google.com/maps/search/?api=1&query=Bar+Cervantes+Rio+de+Janeiro' },
   ]},
 ];
 
