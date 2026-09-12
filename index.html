@@ -1107,14 +1107,12 @@ const trains = [
   { date:'10.04', route:'科洛尼亚 → 布宜诺斯（渡轮）', company:'Buquebus · 17:01-18:16', ok:true },
 ];
 const hotels = [
-  { date:'09.25', city:'圣地亚哥', name:null },
-  { date:'09.26-27', city:'复活节岛', name:null },
-  { date:'09.28', city:'圣地亚哥', name:null },
-  { date:'09.29', city:'库斯科', name:null },
-  { date:'09.30', city:'热水镇', name:null },
-  { date:'10.02', city:'乌斯怀亚', name:null },
-  { date:'10.03-04', city:'布宜诺斯艾利斯', name:null },
-  { date:'10.05', city:'圣保罗', name:null },
+  { date:'09.25', city:'圣地亚哥', name:'Almacruz Hotel y Centro', ok:true },
+  { date:'09.26-27', city:'复活节岛', name:'Kahina Lodge', ok:true },
+  { date:'09.29', city:'库斯科', name:'Hotel Las Quenas', ok:true },
+  { date:'09.30', city:'热水镇（马丘比丘）', name:'LUZ Garden Hotel', ok:true },
+  { date:'10.02', city:'乌斯怀亚', name:'Mysten Kepen B&B', ok:true },
+  { date:'10.03-04', city:'布宜诺斯艾利斯', name:'Up Retiro', ok:true },
 ];
 const tickets = [
   { name:'马丘比丘', date:'10.01', time:'08:00 AM', detail:'Circuito 1 · Ruta 1-B 上层平台', ok:true },
@@ -1441,7 +1439,6 @@ function renderItinerary() {
    TODOS
    ============================ */
 const todos = [
-  { txt:'预订全部酒店（12 晚）', urg:'normal' },
   { txt:'购买复活节岛国家公园门票', urg:'normal' },
   { txt:'购买世界尽头小火车 + 火地岛公园门票', urg:'low' },
 ];
