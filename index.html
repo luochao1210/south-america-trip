@@ -1443,14 +1443,20 @@ function renderItinerary() {
     const uniqueNav = [...new Set(navPoints)];
     const navBtns = uniqueNav.map(n=>'<a class="nav-btn" href="' + gmapURI(n) + '" target="_blank" rel="noopener">📍 ' + UT.label[n] + '</a>').join('');
 
-    // Build day route map URL (satellite view with all locations)
-    const routeLocations = day.ev
-      .filter(e => e.txt && e.type !== 'info')
-      .map(e => e.txt.replace(/（.*?）/g, '').replace(/\s+/g, ' ').trim())
+    // Build day route map URL using GEO coordinates
+    const routeCodes = day.ev
+      .filter(e => e.c && GEO[e.c])
+      .map(e => e.c)
       .filter((v, i, a) => a.indexOf(v) === i);
-    const routeMapUrl = routeLocations.length >= 2
-      ? 'https://www.google.com/maps/dir/' + routeLocations.map(l => encodeURIComponent(l)).join('/') + '/@' + routeLocations[0] + ',3z,/data=!3m1!1e1'
-      : '';
+    let routeMapUrl = '';
+    if (routeCodes.length >= 2) {
+      const waypoints = routeCodes.map(c => GEO[c].lat + ',' + GEO[c].lng);
+      const centerLat = routeCodes.reduce((s, c) => s + GEO[c].lat, 0) / routeCodes.length;
+      const centerLng = routeCodes.reduce((s, c) => s + GEO[c].lng, 0) / routeCodes.length;
+      routeMapUrl = 'https://www.google.com/maps/dir/' + waypoints.join('/') + '/@' + centerLat.toFixed(2) + ',' + centerLng.toFixed(2) + ',5z,/data=!3m1!1e1';
+    } else if (routeCodes.length === 1) {
+      routeMapUrl = 'https://www.google.com/maps/search/?api=1&query=' + GEO[routeCodes[0]].lat + ',' + GEO[routeCodes[0]].lng;
+    }
 
     return '<div class="day-card">' +
       '<div class="day-head">' +
