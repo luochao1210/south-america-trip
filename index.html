@@ -330,13 +330,13 @@ body{
 
 /* ===== Itinerary ===== */
 .itinerary-h-carousel{
-  display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  display:flex;overflow-x:auto;scroll-snap-type:x proximity;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
   padding:0 16px;gap:12px;
 }
 .itinerary-h-carousel::-webkit-scrollbar{display:none}
 .itinerary-h-carousel .day-card{
-  flex:0 0 100%;scroll-snap-align:start;margin:0;
+  flex:0 0 85%;min-width:280px;scroll-snap-align:center;margin:0;
 }
 .day-card{
   background:var(--bg2);border-radius:var(--r);
@@ -355,7 +355,7 @@ body{
 .day-date{font-weight:700;font-size:15px;flex:1}
 .day-arrow{display:none}
 .day-body{
-  overflow-y:auto;max-height:none;
+  overflow-y:visible;max-height:none;
 }
 .day-summary{
   font-size:13px;color:var(--tx2);padding:0 16px 12px;
