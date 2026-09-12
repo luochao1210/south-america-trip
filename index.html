@@ -329,14 +329,13 @@ body{
 }
 
 /* ===== Itinerary ===== */
-.itinerary-h-carousel{
-  overflow-y:auto;scroll-snap-type:y proximity;
+.itinerary-v-carousel{
+  overflow-y:auto;scroll-snap-type:y mandatory;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  padding:0 16px;
 }
-.itinerary-h-carousel::-webkit-scrollbar{display:none}
-.itinerary-h-carousel .day-card{
-  scroll-snap-align:start;margin:0 0 12px;
+.itinerary-v-carousel::-webkit-scrollbar{display:none}
+.itinerary-v-carousel .day-card{
+  scroll-snap-align:start;margin:0 16px 12px;
 }
 .day-card{
   background:var(--bg2);border-radius:var(--r);
@@ -1468,7 +1467,7 @@ function renderItinerary() {
       '</div>' +
       '</div></div></div>';
   }).join('');
-  el.innerHTML = '<div class="itinerary-h-carousel">' + el.innerHTML + '</div>';
+  el.innerHTML = '<div class="itinerary-v-carousel">' + el.innerHTML + '</div>';
 }
 
 /* ============================
