@@ -222,23 +222,14 @@ body{
 .card:active{transform:scale(.98)}
 
 /* Flight card */
-.flight-carousel{
-  display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;padding:4px 16px 12px;
-  scrollbar-width:none;
+.flight-v-carousel{
+  height:calc(3 * 180px);overflow-y:auto;scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
 }
-.flight-carousel::-webkit-scrollbar{display:none}
-.flight-carousel .flight{
-  flex:0 0 calc(33.333% - 8px);min-width:240px;scroll-snap-align:start;
+.flight-v-carousel::-webkit-scrollbar{display:none}
+.flight-v-carousel .flight{
+  scroll-snap-align:start;height:168px;margin:0 16px 12px;overflow:hidden;
 }
-.flight-dots{
-  display:flex;justify-content:center;gap:6px;padding:8px 0;
-}
-.flight-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--brd);
-  cursor:pointer;transition:all .2s;
-}
-.flight-dot.active{background:var(--pri);width:20px;border-radius:4px}
 .flight{padding:16px}
 .flight-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .flight-no{font-weight:700;font-size:15px}
@@ -1255,14 +1246,9 @@ function renderBooking() {
   var panelHtml = '';
 
   if (cat.key === 'flights' && allItems.length > 0) {
-    // Carousel for flights
+    // Vertical scroll-snap carousel for flights
     var cards = allItems.map(function(item){return cat.renderItem(item, item.ok)}).join('');
-    var totalPages = Math.ceil(allItems.length / 3);
-    var dots = Array.from({length: totalPages}, function(_, i) {
-      return '<div class="flight-dot' + (i===0?' active':'') + '" data-page="' + i + '"></div>';
-    }).join('');
-    panelHtml = '<div class="flight-carousel" id="flightCarousel">' + cards + '</div>' +
-      (totalPages > 1 ? '<div class="flight-dots" id="flightDots">' + dots + '</div>' : '');
+    panelHtml = '<div class="flight-v-carousel">' + cards + '</div>';
   } else {
     // Normal list for other categories
     if (cat.confirmed.length > 0) panelHtml += cat.confirmed.map(function(item){return cat.renderItem(item, true)}).join('');
@@ -1271,25 +1257,6 @@ function renderBooking() {
   }
   panelsEl.innerHTML = panelHtml;
 
-  // Flight carousel scroll + dots interaction
-  if (cat.key === 'flights' && allItems.length > 3) {
-    var carousel = document.getElementById('flightCarousel');
-    var dotsEl = document.getElementById('flightDots');
-    if (carousel && dotsEl) {
-      carousel.addEventListener('scroll', function() {
-        var page = Math.round(carousel.scrollLeft / (carousel.scrollWidth / Math.ceil(allItems.length / 3)));
-        dotsEl.querySelectorAll('.flight-dot').forEach(function(d, i) {
-          d.classList.toggle('active', i === page);
-        });
-      });
-      dotsEl.querySelectorAll('.flight-dot').forEach(function(dot) {
-        dot.addEventListener('click', function() {
-          var page = parseInt(dot.dataset.page);
-          carousel.scrollTo({ left: page * (carousel.scrollWidth / Math.ceil(allItems.length / 3)), behavior: 'smooth' });
-        });
-      });
-    }
-  }
   tabsEl.querySelectorAll('.tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       currentBookingCat = tab.dataset.cat;
