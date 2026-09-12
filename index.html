@@ -1665,7 +1665,10 @@ function renderTips() {
             <button class="cam-btn" onclick="copyCamText()">📋 复制</button>
             <button class="cam-btn" onclick="clearCam()">清空</button>
           </div>
-          <div class="cam-result" id="camResult"></div>
+          <div style="position:relative">
+            <div class="cam-result" id="camResult"></div>
+            <button id="camResultCopy" onclick="copyCamResult()" style="display:none;position:absolute;top:8px;right:8px;padding:4px 10px;border:1px solid var(--brd);border-radius:6px;background:var(--bg2);color:var(--tx1);font-size:12px;cursor:pointer">📋 复制</button>
+          </div>
         </div>
       </div>`;
     }
@@ -1948,6 +1951,27 @@ const restaurants = [
 function clearCam() {
   document.getElementById('camText').value = '';
   document.getElementById('camResult').style.display = 'none';
+  document.getElementById('camResultCopy').style.display = 'none';
+}
+
+function copyCamResult() {
+  const text = document.getElementById('camResult').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('camResultCopy');
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => { btn.textContent = '📋 复制'; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('camResultCopy');
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => { btn.textContent = '📋 复制'; }, 2000);
+  });
 }
 
 function openLens() {
@@ -2017,13 +2041,16 @@ function doCamTranslate() {
     .then(data => {
       if (data.responseData && data.responseData.translatedText && data.responseStatus === 200) {
         result.innerHTML = data.responseData.translatedText;
+        document.getElementById('camResultCopy').style.display = 'block';
       } else {
+        document.getElementById('camResultCopy').style.display = 'none';
         const fUrl = getTranslateURL(text, srcLang, tgtLang);
         const isChina = (new Date().getTimezoneOffset() / -60) === 8;
         result.innerHTML = 'API 额度已用完，<a href="' + fUrl + '" target="_blank" style="color:var(--pri);font-weight:700">点击用' + (isChina ? '有道翻译' : 'Google 翻译') + ' →</a>';
       }
     })
     .catch(() => {
+      document.getElementById('camResultCopy').style.display = 'none';
       const fUrl = getTranslateURL(text, srcLang, tgtLang);
       const isChina = (new Date().getTimezoneOffset() / -60) === 8;
       result.innerHTML = '网络错误，<a href="' + fUrl + '" target="_blank" style="color:var(--pri);font-weight:700">点击用' + (isChina ? '有道翻译' : 'Google 翻译') + ' →</a>';
