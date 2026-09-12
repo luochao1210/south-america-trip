@@ -329,6 +329,15 @@ body{
 }
 
 /* ===== Itinerary ===== */
+.itinerary-h-carousel{
+  display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding:0 16px;gap:12px;
+}
+.itinerary-h-carousel::-webkit-scrollbar{display:none}
+.itinerary-h-carousel .day-card{
+  flex:0 0 100%;scroll-snap-align:start;margin:0;
+}
 .day-card{
   background:var(--bg2);border-radius:var(--r);
   border:1px solid var(--brd);margin:0 16px 12px;
@@ -336,7 +345,7 @@ body{
 }
 .day-head{
   display:flex;align-items:center;padding:14px 16px;
-  cursor:pointer;user-select:none;gap:10px;
+  user-select:none;gap:10px;
 }
 .day-num{
   font-size:12px;font-weight:700;color:#fff;
@@ -344,14 +353,10 @@ body{
   padding:2px 8px;flex-shrink:0;
 }
 .day-date{font-weight:700;font-size:15px;flex:1}
-.day-arrow{
-  font-size:12px;color:var(--tx3);transition:transform .25s;flex-shrink:0;
-}
-.day-card.open .day-arrow{transform:rotate(180deg)}
+.day-arrow{display:none}
 .day-body{
-  max-height:0;overflow:hidden;transition:max-height .35s ease;
+  overflow-y:auto;max-height:none;
 }
-.day-card.open .day-body{max-height:2000px}
 .day-summary{
   font-size:13px;color:var(--tx2);padding:0 16px 12px;
   line-height:1.5;
@@ -1115,12 +1120,12 @@ const trains = [
   { date:'10.04', route:'科洛尼亚 → 布宜诺斯（渡轮）', company:'Buquebus · 17:01-18:16', ok:true },
 ];
 const hotels = [
-  { date:'09.25', city:'圣地亚哥', name:'Almacruz Hotel y Centro', ok:true },
-  { date:'09.26-27', city:'复活节岛', name:'Kahina Lodge', ok:true },
-  { date:'09.29', city:'库斯科', name:'Hotel Las Quenas', ok:true },
-  { date:'09.30', city:'热水镇（马丘比丘）', name:'LUZ Garden Hotel', ok:true },
-  { date:'10.02', city:'乌斯怀亚', name:'Mysten Kepen B&B', ok:true },
-  { date:'10.03-04', city:'布宜诺斯艾利斯', name:'Up Retiro', ok:true },
+  { date:'09.25', city:'圣地亚哥', name:'Almacruz Hotel y Centro', ok:true, addr:'San Antonio 65, Santiago', map:'https://www.google.com/maps/search/?api=1&query=Almacruz+Hotel+Santiago+Chile' },
+  { date:'09.26-27', city:'复活节岛', name:'Kahina Lodge', ok:true, addr:'Atamu Tekena, Hanga Roa', map:'https://www.google.com/maps/search/?api=1&query=Kahina+Lodge+Easter+Island' },
+  { date:'09.29', city:'库斯科', name:'Hotel Las Quenas', ok:true, addr:'Calle Los Angeles 1265, Cusco', map:'https://www.google.com/maps/search/?api=1&query=Hotel+Las+Quenas+Cusco' },
+  { date:'09.30', city:'热水镇（马丘比丘）', name:'LUZ Garden Hotel', ok:true, addr:'109 Aymuraypa Tikan, Machu Picchu', map:'https://www.google.com/maps/search/?api=1&query=LUZ+Garden+Hotel+Machu+Picchu' },
+  { date:'10.02', city:'乌斯怀亚', name:'Mysten Kepen B&B', ok:true, addr:'Pres. Bernardino Rivadavia 826, Ushuaia', map:'https://www.google.com/maps/search/?api=1&query=Mysten+Kepen+Ushuaia' },
+  { date:'10.03-04', city:'布宜诺斯艾利斯', name:'Up Retiro', ok:true, addr:'Marcelo T. de Alvear 444, Buenos Aires', map:'https://www.google.com/maps/search/?api=1&query=Up+Retiro+Buenos+Aires' },
   { date:'10.05', city:'圣保罗', name:null, ok:false },
 ];
 const tickets = [
@@ -1224,7 +1229,7 @@ function renderBooking() {
       confirmed: hotels.filter(function(h){return h.name !== null}),
       unbooked: hotels.filter(function(h){return h.name === null}),
       renderItem: function(h, ok) {
-        return '<div class="card info-card" ><div class="ic-title">' + h.city + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">' + h.date + '</span> ' + statusBadge(ok) + '</div><div class="ic-empty">' + (h.name || '待预订') + '</div></div>';
+        return '<div class="card info-card" ><div class="ic-title">' + h.city + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">' + h.date + '</span> ' + statusBadge(ok) + '</div><div class="ic-empty">' + (h.name || '待预订') + '</div>' + (h.addr ? '<div style="margin-top:4px"><a href="' + h.map + '" target="_blank" rel="noopener" style="font-size:11px;color:var(--pri);text-decoration:none">📍 ' + h.addr + '</a></div>' : '') + '</div>';
       } },
     { key:'tickets', icon:'🎫', label:'门票',
       confirmed: tickets.filter(function(t){return t.ok}),
@@ -1448,11 +1453,10 @@ function renderItinerary() {
       ? 'https://www.google.com/maps/dir/' + routeLocations.map(l => encodeURIComponent(l)).join('/') + '/@' + routeLocations[0] + ',3z,/data=!3m1!1e1'
       : '';
 
-    return '<div class="day-card' + (idx===0?' open':'') + '">' +
-      '<div class="day-head" onclick="this.parentElement.classList.toggle(\'open\')">' +
+    return '<div class="day-card">' +
+      '<div class="day-head">' +
       '<span class="day-num">D' + day.n + '</span>' +
       '<span class="day-date">' + day.date + '</span>' +
-      '<span class="day-arrow">▾</span>' +
       '</div>' +
       (summaryText ? '<div class="day-summary"><div class="day-summary-text">' + summaryText + '</div></div>' : '') +
       '<div class="day-body"><div class="day-inner">' +
@@ -1464,6 +1468,7 @@ function renderItinerary() {
       '</div>' +
       '</div></div></div>';
   }).join('');
+  el.innerHTML = '<div class="itinerary-h-carousel">' + el.innerHTML + '</div>';
 }
 
 /* ============================
