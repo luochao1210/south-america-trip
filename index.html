@@ -1421,6 +1421,15 @@ function renderItinerary() {
     const uniqueNav = [...new Set(navPoints)];
     const navBtns = uniqueNav.map(n=>'<a class="nav-btn" href="' + gmapURI(n) + '" target="_blank" rel="noopener">📍 ' + UT.label[n] + '</a>').join('');
 
+    // Build day route map URL (satellite view with all locations)
+    const routeLocations = day.ev
+      .filter(e => e.txt && e.type !== 'info')
+      .map(e => e.txt.replace(/（.*?）/g, '').replace(/\s+/g, ' ').trim())
+      .filter((v, i, a) => a.indexOf(v) === i);
+    const routeMapUrl = routeLocations.length >= 2
+      ? 'https://www.google.com/maps/dir/' + routeLocations.map(l => encodeURIComponent(l)).join('/') + '/@' + routeLocations[0] + ',3z,/data=!3m1!1e1'
+      : '';
+
     return '<div class="day-card' + (idx===0?' open':'') + '">' +
       '<div class="day-head" onclick="this.parentElement.classList.toggle(\'open\')">' +
       '<span class="day-num">D' + day.n + '</span>' +
@@ -1431,7 +1440,10 @@ function renderItinerary() {
       '<div class="day-body"><div class="day-inner">' +
       '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--tx2)">' + day.title + ' <span style="font-weight:400;font-size:12px;color:var(--tx3)">· ' + day.loc + '</span></div>' +
       '<div class="tl">' + timeline + '</div>' +
-      (navBtns?'<div class="day-nav">' + navBtns + '</div>':'') +
+      '<div class="day-nav">' +
+        (routeMapUrl ? '<a class="nav-btn" href="' + routeMapUrl + '" target="_blank" rel="noopener" style="background:var(--pri);color:#fff;border-color:var(--pri);margin-bottom:6px">🗺️ 展开地图</a>' : '') +
+        navBtns +
+      '</div>' +
       '</div></div></div>';
   }).join('');
 }
